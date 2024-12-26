@@ -1,4 +1,4 @@
-package com.example.ratify
+package com.example.ratify.database
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -1,4 +1,4 @@
-package com.example.ratify
+package com.example.ratify.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,6 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ratify.domain.CountEvent
+import com.example.ratify.domain.CountState
+import com.example.ratify.database.Count
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +39,7 @@ fun CountScreen(
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
                 title = {
                     Text("Count Manager")
@@ -96,13 +99,11 @@ fun CountItem(
         ) {
             Button(
                 onClick = onIncrement,
-//                modifier = Modifier.weight(1f)
             ) {
                 Text(text = "Increment")
             }
             Button(
                 onClick = onDecrement,
-//                modifier = Modifier.weight(1f)
             ) {
                 Text(text = "Decrement")
             }

@@ -1,4 +1,4 @@
-package com.example.ratify
+package com.example.ratify.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

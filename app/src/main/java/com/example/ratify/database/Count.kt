@@ -1,4 +1,4 @@
-package com.example.ratify
+package com.example.ratify.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

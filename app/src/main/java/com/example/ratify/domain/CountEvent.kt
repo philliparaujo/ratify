@@ -1,4 +1,6 @@
-package com.example.ratify
+package com.example.ratify.domain
+
+import com.example.ratify.database.Count
 
 sealed interface CountEvent {
     data class IncrementCount(val count: Count): CountEvent
