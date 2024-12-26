@@ -1,4 +1,4 @@
-package com.example.ratify.ui
+package com.example.ratify.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -20,20 +20,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.domain.CountEvent
-import com.example.ratify.domain.CountState
 import com.example.ratify.database.Count
+import com.example.ratify.domain.CountEvent
+import com.example.ratify.ui.CountViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountScreen(
-    state: CountState,
-    onEvent: (CountEvent) -> Unit
+    viewModel: CountViewModel
 ) {
+    val state by viewModel.state.collectAsState()
+    val onEvent = viewModel::onEvent
+
     Scaffold(
         topBar = {
             TopAppBar(
