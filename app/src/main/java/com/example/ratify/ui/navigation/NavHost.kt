@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.ratify.ui.CountViewModelProvider
+import com.example.ratify.domain.CountViewModelProvider
 import com.example.ratify.ui.screens.CountScreen
 import com.example.ratify.ui.screens.HomeScreen
 import com.example.ratify.ui.screens.ProfileScreen

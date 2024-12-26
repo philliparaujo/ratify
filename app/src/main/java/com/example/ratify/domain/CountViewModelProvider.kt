@@ -1,4 +1,4 @@
-package com.example.ratify.ui
+package com.example.ratify.domain
 
 import android.content.Context
 import com.example.ratify.database.DatabaseProvider

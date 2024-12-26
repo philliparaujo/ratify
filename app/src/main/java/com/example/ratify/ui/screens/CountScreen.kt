@@ -28,14 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.database.Count
 import com.example.ratify.domain.CountEvent
-import com.example.ratify.ui.CountViewModel
+import com.example.ratify.domain.CountViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CountScreen(
     viewModel: CountViewModel
 ) {
-    val state by viewModel.state.collectAsState()
+    val counts by viewModel.counts.collectAsState(initial = emptyList())
     val onEvent = viewModel::onEvent
 
     Scaffold(
@@ -65,7 +65,7 @@ fun CountScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(state.counts) { count ->
+            items(counts) { count ->
                 CountItem(
                     count = count,
                     onIncrement = { onEvent(CountEvent.IncrementCount(count)) },
