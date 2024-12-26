@@ -6,34 +6,38 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf(Screen.Home, Screen.Profile, Screen.Settings, Screen.CountManager)
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+fun BottomNavigationBar(navController: NavHostController, startDestination: Destination) {
+    val items = listOf(HomeTarget, ProfileTarget, SettingsTarget, CountManagerTarget)
+    var currentTarget by remember { mutableStateOf(startDestination) }
 
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
     ) {
-        items.forEach { screen ->
+        items.forEach { target ->
             NavigationBarItem(
                 icon = {
-                    Icon(screen.icon, contentDescription = screen.title)
+                    Icon(target.icon, contentDescription = target.title)
                 },
-                label = { Text(screen.title) },
-                selected = currentRoute == screen.route,
+                label = { Text(target.title) },
+                selected = currentTarget == target,
                 onClick = {
-                    if (currentRoute != screen.route) {
-                        navController.navigate(screen.route) {
+                    if (currentTarget != target) {
+                        navController.navigate(target) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
                             restoreState = true
                             launchSingleTop = true
                         }
+                        currentTarget = target
                     }
                 }
             )

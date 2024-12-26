@@ -14,18 +14,18 @@ import com.example.ratify.ui.screens.ProfileScreen
 import com.example.ratify.ui.screens.SettingsScreen
 
 @Composable
-fun NavigationHost(navController: NavHostController, startDestination: Screen, modifier: Modifier = Modifier) {
+fun NavigationHost(navController: NavHostController, startDestination: Destination, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val countViewModel = remember { CountViewModelProvider.provideCountViewModel(context) }
 
     NavHost(
         navController = navController,
-        startDestination = startDestination.route,
+        startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(Screen.Home.route) { HomeScreen() }
-        composable(Screen.Profile.route) { ProfileScreen() }
-        composable(Screen.Settings.route) { SettingsScreen() }
-        composable(Screen.CountManager.route) { CountScreen(viewModel = countViewModel) }
+        composable<HomeTarget> { HomeScreen() }
+        composable<ProfileTarget> { ProfileScreen() }
+        composable<SettingsTarget> { SettingsScreen() }
+        composable<CountManagerTarget> { CountScreen(viewModel = countViewModel) }
     }
 }

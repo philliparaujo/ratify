@@ -9,15 +9,19 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val startDestination = CountManagerTarget
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(
+                navController,
+                startDestination
+            )
         }
     ) { innerPadding ->
         NavigationHost(
-            navController = navController,
-            startDestination = Screen.CountManager,
+            navController,
+            startDestination,
             modifier = Modifier.padding(innerPadding)
         )
     }
