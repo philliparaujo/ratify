@@ -18,6 +18,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["redirectHostName"] = "https://com.example.ratify/callback"
+        manifestPlaceholders["redirectSchemeName"] = "ratify"
+
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${project.findProperty("spotifyClientId")}\"")
+        buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"${project.findProperty("spotifyRedirectUri")}\"")
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -67,4 +74,12 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Spotify
+    implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+    implementation(files("libs/spotify-auth-release-2.1.0.aar"))
+    implementation(libs.gson)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.appcompat)
 }
