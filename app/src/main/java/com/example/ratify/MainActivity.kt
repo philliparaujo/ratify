@@ -7,25 +7,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.ratify.spotify.Scopes
+import androidx.activity.viewModels
+import com.example.ratify.spotify.SpotifyEvent
+import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.navigation.MainScreen
-import com.spotify.android.appremote.api.ConnectionParams
-import com.spotify.android.appremote.api.Connector
-import com.spotify.android.appremote.api.SpotifyAppRemote
-import com.spotify.protocol.types.Track
 import com.spotify.sdk.android.auth.AuthorizationClient
-import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
 class MainActivity : ComponentActivity() {
-    // Keys added in local.properties, accessed in build.gradle
-    private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
-    private val redirectUri: String by lazy { BuildConfig.SPOTIFY_REDIRECT_URI }
-
-    private var spotifyAppRemote: SpotifyAppRemote? = null
-    private val scopes = arrayOf(Scopes.STREAMING, Scopes.APP_REMOTE_CONTROL, Scopes.USER_READ_PLAYBACK_STATE)
-        .map { scope -> scope.value }
-        .toTypedArray()
+    private val spotifyViewModel : SpotifyViewModel by viewModels()
 
     private val authLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -33,7 +23,7 @@ class MainActivity : ComponentActivity() {
             val response = AuthorizationClient.getResponse(result.resultCode, data)
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
-                    connectSpotifyAppRemote()
+                    spotifyViewModel.onEvent(SpotifyEvent.ConnectSpotify)
                 }
                 AuthorizationResponse.Type.ERROR -> {
                     Log.e("MainActivity", "Auth error: ${response.error}")
@@ -47,62 +37,38 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
            MainScreen()
+        }
+
+        // Connect to Spotify on successful authentication request
+        spotifyViewModel.authRequest.observe(this) { request ->
+            val authIntent = AuthorizationClient.createLoginActivityIntent(this, request)
+            authLauncher.launch(authIntent)
+        }
+
+        // Play a playlist on successful connection
+        val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
+        spotifyViewModel.spotifyConnectionState.observe(this) { isConnected ->
+            if (isConnected == true) {
+                Log.d("MainActivity", "Spotify connected successfully!")
+                spotifyViewModel.onEvent(SpotifyEvent.PlayPlaylist(playlistURI))
+            }  else {
+                Log.e("MainActivity", "Failed to connect to Spotify")
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
-
-        val builder = AuthorizationRequest.Builder(
-            clientId,
-            AuthorizationResponse.Type.TOKEN,
-            redirectUri
-        )
-        builder.setScopes(scopes)
-        val request = builder.build()
-        val authIntent = AuthorizationClient.createLoginActivityIntent(this, request)
-        authLauncher.launch(authIntent)
-    }
-
-    private fun connectSpotifyAppRemote() {
-        val connectionParams = ConnectionParams.Builder(clientId)
-            .setRedirectUri(redirectUri)
-            .showAuthView(true)
-            .build()
-        SpotifyAppRemote.connect(this, connectionParams, object : Connector.ConnectionListener {
-            override fun onConnected(appRemote: SpotifyAppRemote) {
-                spotifyAppRemote = appRemote
-                Log.d("MainActivity", "Connected! Yay!")
-                connected()
-            }
-
-            override fun onFailure(throwable: Throwable) {
-                Log.e("MainActivity", throwable.message, throwable)
-            }
-        })
-    }
-
-    private fun connected() {
-        Log.d("MainActivity", "Entered connected")
-        spotifyAppRemote?.let { remote ->
-            // Play a playlist
-            val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
-            remote.playerApi.play(playlistURI)
-            // Subscribe to PlayerState
-            remote.playerApi.subscribeToPlayerState().setEventCallback {
-                val track: Track = it.track
-                Log.d("MainActivity", track.name + " by " + track.artist.name)
-            }
-        }
+        // Check for existing connection before connecting again
+        spotifyViewModel.onEvent(SpotifyEvent.DisconnectSpotify)
+        
+        spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
     }
 
     override fun onStop() {
         super.onStop()
-        spotifyAppRemote?.let {
-            SpotifyAppRemote.disconnect(it)
-        }
+        spotifyViewModel.onEvent(SpotifyEvent.DisconnectSpotify)
     }
 }

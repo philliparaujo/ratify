@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    val startDestination = CountManagerTarget
+    val startDestination = HomeTarget
 
     Scaffold(
         bottomBar = {

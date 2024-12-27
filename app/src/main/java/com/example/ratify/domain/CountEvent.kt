@@ -8,5 +8,4 @@ sealed interface CountEvent {
     data class UpdateValue(val count: Count, val newValue: Int): CountEvent
     object CreateCount: CountEvent
     data class DeleteCount(val count: Count): CountEvent
-
 }
