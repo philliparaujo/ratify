@@ -104,6 +104,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
         spotifyAppRemote?.let {
             SpotifyAppRemote.disconnect(it)
             spotifyAppRemote = null
+            _spotifyConnectionState.value = false
             isSubscribedToPlayerState = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")

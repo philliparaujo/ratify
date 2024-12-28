@@ -21,11 +21,13 @@ class MainActivity : ComponentActivity() {
         Log.d("MainActivity", "onCreate")
 
         // Initialize auth helper, launch authentication
-        spotifyAuthHelper = SpotifyAuthHelper(this, spotifyViewModel)
-        spotifyViewModel.authRequest.observe(this) { request ->
-            Log.d("MainActivity", "prev auth request is " + spotifyViewModel.authRequest.value.toString())
-            Log.d("MainActivity", "auth request is " + request.toString())
-            spotifyAuthHelper.launchAuth(request)
+        if (spotifyViewModel.spotifyConnectionState.value != true) {
+            spotifyAuthHelper = SpotifyAuthHelper(this, spotifyViewModel)
+            spotifyViewModel.authRequest.observe(this) { request ->
+                Log.d("MainActivity", "prev auth request is " + spotifyViewModel.authRequest.value.toString())
+                Log.d("MainActivity", "auth request is " + request.toString())
+                spotifyAuthHelper.launchAuth(request)
+            }
         }
 
         setContent {
@@ -33,10 +35,5 @@ class MainActivity : ComponentActivity() {
                spotifyViewModel = spotifyViewModel
            )
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        spotifyViewModel.onEvent(SpotifyEvent.DisconnectSpotify)
     }
 }
