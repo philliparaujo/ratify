@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -13,6 +14,9 @@ import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SpotifyViewModel(application: Application): AndroidViewModel(application) {
     // Keys added in local.properties, accessed in build.gradle
@@ -35,13 +39,25 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     private val _spotifyConnectionState = MutableLiveData<Boolean>()
     val spotifyConnectionState: LiveData<Boolean> get() = _spotifyConnectionState
 
+    // Provides information on whether the user can play on demand
     private val _userCapabilities = MutableLiveData<Capabilities>()
     val userCapabilities: LiveData<Capabilities> get() = _userCapabilities
+    private var isSubscribedToUserCapabilities = false
+    private fun subscribeToUserCapabilities() {
+        if (spotifyAppRemote != null && !isSubscribedToUserCapabilities) {
+            spotifyAppRemote?.let { remote ->
+                remote.userApi.subscribeToCapabilities().setEventCallback {
+                    Log.d("SpotifyViewModel", "userCapabilities is " + it)
+                    _userCapabilities.value = it
+                }
+            }
+            isSubscribedToUserCapabilities = true
+        }
+    }
 
     // Provides information on current track, playing/paused, playback position, etc.
     private val _playerState = MutableLiveData<PlayerState?>()
     val playerState: LiveData<PlayerState?> get() = _playerState
-
     private var isSubscribedToPlayerState = false
     private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
@@ -50,17 +66,39 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
                     Log.d("SpotifyViewModel", "Now playing: ${state.track.name} by ${state.track.artist.name}")
                 }
                 _playerState.postValue(state)
+
+                // Update playback position on play
+                if (!state.isPaused) {
+                    startUpdatingPlaybackPosition(state.playbackPosition)
+                } else {
+                    stopUpdatingPlaybackPosition()
+                }
             }
             isSubscribedToPlayerState = true
         }
     }
-    private fun subscribeToUserCapabilities() {
-        spotifyAppRemote?.let { remote ->
-            remote.userApi.subscribeToCapabilities().setEventCallback {
-                Log.d("SpotifyViewModel", "userCapabilities is " + it)
-                _userCapabilities.value = it
+
+    private val _currentPlaybackPosition = MutableLiveData<Long>()
+    val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
+    private var playbackJob: Job? = null
+    private fun startUpdatingPlaybackPosition(initialPosition: Long) {
+        // Stop any existing jobs
+        stopUpdatingPlaybackPosition()
+
+        Log.d("SpotifyViewModel", "updating playback position")
+        playbackJob = viewModelScope.launch {
+            var currentPosition = initialPosition
+            while (true) {
+                _currentPlaybackPosition.postValue(currentPosition)
+                delay(1000L)
+                currentPosition += 1000L
             }
         }
+    }
+    private fun stopUpdatingPlaybackPosition() {
+        Log.d("SpotifyViewModel", "not updating playback position")
+        playbackJob?.cancel()
+        playbackJob = null
     }
 
     fun onEvent(event: SpotifyEvent) {
@@ -115,6 +153,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
             spotifyAppRemote = null
             _spotifyConnectionState.value = false
             isSubscribedToPlayerState = false
+            isSubscribedToUserCapabilities = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")
     }

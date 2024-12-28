@@ -23,6 +23,7 @@ fun HomeScreen(
     val spotifyConnectionState by spotifyViewModel.spotifyConnectionState.observeAsState()
     val userCapabilities by spotifyViewModel.userCapabilities.observeAsState()
     val playerState by spotifyViewModel.playerState.observeAsState()
+    val currentPlaybackPosition by spotifyViewModel.currentPlaybackPosition.observeAsState()
 
     val connected = spotifyConnectionState == true
     val canPlayOnDemand = userCapabilities != null && userCapabilities!!.canPlayOnDemand
@@ -39,7 +40,7 @@ fun HomeScreen(
         playerState?.let { state ->
             Text("Now playing: ${state.track.name} by ${state.track.artist.name}")
             Text("Playback state: ${if (state.isPaused) "paused" else "playing"}")
-            Text("Playback position: ${state.playbackPosition} / ${state.track.duration}")
+            Text("Playback position: ${if (state.isPaused) state.playbackPosition else currentPlaybackPosition} / ${state.track.duration}")
         }
 
         Button(
