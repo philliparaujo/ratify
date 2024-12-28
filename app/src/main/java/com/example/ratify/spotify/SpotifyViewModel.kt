@@ -43,6 +43,16 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     private val _playerState = MutableLiveData<PlayerState?>()
     val playerState: LiveData<PlayerState?> get() = _playerState
 
+    private var isSubscribedToPlayerState = false
+    fun subscribeToPlayerState() {
+        if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
+            spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { playerState ->
+                _playerState.postValue(playerState)
+            }
+            isSubscribedToPlayerState = true
+        }
+    }
+
     fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
@@ -58,6 +68,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     }
 
     private fun generateAuthorizationRequest() {
+        Log.d("MainActivity", "super duper previous auth request" + authRequest.value.toString())
         val request = AuthorizationRequest.Builder(
             clientId,
             AuthorizationResponse.Type.TOKEN,
@@ -79,6 +90,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
                 spotifyAppRemote = appRemote
                 Log.d("SpotifyViewModel", "Connected! Yay!")
                 _spotifyConnectionState.value = true
+                subscribeToPlayerState()
             }
 
             override fun onFailure(throwable: Throwable) {
@@ -92,6 +104,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
         spotifyAppRemote?.let {
             SpotifyAppRemote.disconnect(it)
             spotifyAppRemote = null
+            isSubscribedToPlayerState = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")
     }

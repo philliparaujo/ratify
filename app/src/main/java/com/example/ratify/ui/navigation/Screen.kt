@@ -1,8 +1,8 @@
 package com.example.ratify.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,5 +34,5 @@ object SettingsTarget : Destination {
 @Serializable
 object CountManagerTarget : Destination {
     override val title = "Count Manager"
-    override val icon = Icons.Default.KeyboardArrowUp
+    override val icon = Icons.Default.DateRange
 }

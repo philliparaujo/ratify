@@ -18,6 +18,7 @@ class SpotifyAuthHelper(
             val response = AuthorizationClient.getResponse(result.resultCode, data)
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
+                    Log.d("MainActivity", "super previous auth request " + spotifyViewModel.authRequest.value.toString())
                     spotifyViewModel.onEvent(SpotifyEvent.ConnectSpotify)
                 }
                 AuthorizationResponse.Type.ERROR -> {
