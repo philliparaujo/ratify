@@ -6,9 +6,6 @@ sealed interface SpotifyEvent {
     data object ConnectSpotify: SpotifyEvent
     data object DisconnectSpotify: SpotifyEvent
 
-    // User information
-    data object GetUserCapabilities: SpotifyEvent
-
     // Player
     data class PlayPlaylist(val playlistUri: String): SpotifyEvent
     data object Pause: SpotifyEvent

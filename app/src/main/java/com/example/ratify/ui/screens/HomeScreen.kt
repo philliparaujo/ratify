@@ -25,6 +25,8 @@ fun HomeScreen(
     val playerState by spotifyViewModel.playerState.observeAsState()
 
     val connected = spotifyConnectionState == true
+    val canPlayOnDemand = userCapabilities != null && userCapabilities!!.canPlayOnDemand
+    val playerEnabled = connected && canPlayOnDemand
 
     Column(
         modifier = Modifier
@@ -49,15 +51,7 @@ fun HomeScreen(
             Text("Connect to Spotify")
         }
         Button(
-            enabled = connected,
-            onClick = {
-                spotifyViewModel.onEvent(SpotifyEvent.GetUserCapabilities)
-            }
-        ) {
-            Text("Print user status")
-        }
-        Button(
-            enabled = connected,
+            enabled = playerEnabled,
             onClick = {
                 // Play a playlist on successful connection
                 val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
@@ -73,7 +67,7 @@ fun HomeScreen(
         }
         Row {
             Button(
-                enabled = connected,
+                enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.Pause)
                 }
@@ -81,7 +75,7 @@ fun HomeScreen(
                 Text("Pause")
             }
             Button(
-                enabled = connected,
+                enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.Resume)
                 }
@@ -89,7 +83,7 @@ fun HomeScreen(
                 Text("Resume")
             }
             Button(
-                enabled = connected,
+                enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
                 }
@@ -97,7 +91,7 @@ fun HomeScreen(
                 Text("Next Song")
             }
             Button(
-                enabled = connected,
+                enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipPrevious)
                 }

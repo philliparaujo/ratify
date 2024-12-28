@@ -11,7 +11,6 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
-import com.spotify.protocol.types.Track
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
@@ -44,12 +43,23 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     val playerState: LiveData<PlayerState?> get() = _playerState
 
     private var isSubscribedToPlayerState = false
-    fun subscribeToPlayerState() {
+    private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
-            spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { playerState ->
-                _playerState.postValue(playerState)
+            spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { state ->
+                if (playerState.value?.track?.uri != state.track.uri) {
+                    Log.d("SpotifyViewModel", "Now playing: ${state.track.name} by ${state.track.artist.name}")
+                }
+                _playerState.postValue(state)
             }
             isSubscribedToPlayerState = true
+        }
+    }
+    private fun subscribeToUserCapabilities() {
+        spotifyAppRemote?.let { remote ->
+            remote.userApi.subscribeToCapabilities().setEventCallback {
+                Log.d("SpotifyViewModel", "userCapabilities is " + it)
+                _userCapabilities.value = it
+            }
         }
     }
 
@@ -59,7 +69,6 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
             is SpotifyEvent.ConnectSpotify -> connectSpotifyAppRemote()
             is SpotifyEvent.DisconnectSpotify -> disconnectSpotifyAppRemote()
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
-            is SpotifyEvent.GetUserCapabilities -> printUserStatus()
             is SpotifyEvent.Pause -> pause()
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
@@ -68,7 +77,6 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     }
 
     private fun generateAuthorizationRequest() {
-        Log.d("MainActivity", "super duper previous auth request" + authRequest.value.toString())
         val request = AuthorizationRequest.Builder(
             clientId,
             AuthorizationResponse.Type.TOKEN,
@@ -91,6 +99,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
                 Log.d("SpotifyViewModel", "Connected! Yay!")
                 _spotifyConnectionState.value = true
                 subscribeToPlayerState()
+                subscribeToUserCapabilities()
             }
 
             override fun onFailure(throwable: Throwable) {
@@ -111,25 +120,7 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
     }
 
     private fun playPlaylist(playlistURI: String) {
-        spotifyAppRemote?.let { remote ->
-            // Play a playlist
-            remote.playerApi.play(playlistURI)
-            // Subscribe to PlayerState
-            remote.playerApi.subscribeToPlayerState().setEventCallback {
-                _playerState.value = it
-                val track: Track = it.track
-                Log.d("SpotifyViewModel", track.name + " by " + track.artist.name)
-            }
-        }
-    }
-
-    private fun printUserStatus() {
-        spotifyAppRemote?.let { remote ->
-            remote.userApi.subscribeToCapabilities().setEventCallback {
-                Log.d("SpotifyViewModel", "userCapabilities is " + it)
-                _userCapabilities.value = it
-            }
-        }
+        spotifyAppRemote?.playerApi?.play(playlistURI)
     }
 
     private fun pause() {

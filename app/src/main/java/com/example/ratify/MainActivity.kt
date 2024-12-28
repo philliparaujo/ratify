@@ -1,7 +1,6 @@
 package com.example.ratify
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,14 +17,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        Log.d("MainActivity", "onCreate")
-
-        // Initialize auth helper, launch authentication
+        // Initialize auth helper, launch authentication if not already connected
         if (spotifyViewModel.spotifyConnectionState.value != true) {
             spotifyAuthHelper = SpotifyAuthHelper(this, spotifyViewModel)
             spotifyViewModel.authRequest.observe(this) { request ->
-                Log.d("MainActivity", "prev auth request is " + spotifyViewModel.authRequest.value.toString())
-                Log.d("MainActivity", "auth request is " + request.toString())
                 spotifyAuthHelper.launchAuth(request)
             }
         }
