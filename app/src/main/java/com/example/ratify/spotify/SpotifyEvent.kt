@@ -3,6 +3,7 @@ package com.example.ratify.spotify
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SortType
+import com.spotify.protocol.types.Track
 
 sealed interface SpotifyEvent {
     // Authentication and connection
@@ -19,7 +20,7 @@ sealed interface SpotifyEvent {
 //    data class QueueTrack(val trackUri: String): SpotifyEvent
 
     // Database updates
-    data class UpsertSong(val song: Song): SpotifyEvent
+    data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?): SpotifyEvent
     data class DeleteSong(val song: Song): SpotifyEvent
     data class UpdateLastPlayedTs(val uri: String, val lastPlayedTs: Long?): SpotifyEvent
     data class UpdateRating(val uri: String, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent

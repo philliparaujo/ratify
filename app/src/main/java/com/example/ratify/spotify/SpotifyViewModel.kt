@@ -76,10 +76,27 @@ class SpotifyViewModel(
     private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
             spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { state ->
+                val previousSong = playerState.value?.track
+                val currentSong = state.track
+
                 // If song changes
-                if (playerState.value?.track?.uri != state.track.uri) {
-                    Log.d("SpotifyViewModel", "Now playing: ${state.track.name} by ${state.track.artist.name}")
-                    _rating.value = null
+                if (previousSong?.uri != currentSong.uri) {
+                    Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
+                    // Update database with most recent rating
+                    if (previousSong != null) {
+                        val currentTime = System.currentTimeMillis()
+                        onEvent(SpotifyEvent.UpsertSong(
+                            track = previousSong,
+                            rating = _rating.value,
+                            lastPlayedTs = currentTime,
+                            lastRatedTs = if (_rating.value != null) currentTime else null
+                        ))
+                    }
+                    // Load new rating based on database entry
+                    viewModelScope.launch {
+                        val existingSong = dao.getSongByUri(currentSong.uri) // Query database
+                        _rating.value = existingSong?.rating // Update rating if entry exists
+                    }
                 }
                 _playerState.postValue(state)
 
@@ -164,7 +181,20 @@ class SpotifyViewModel(
                 updateRating(event.uri, event.rating, event.lastRatedTs)
             }
             is SpotifyEvent.UpsertSong -> {
-                upsertSong(event.song)
+                upsertSong(
+                    Song(
+                        album = event.track.album,
+                        artist = event.track.artist,
+                        artists = event.track.artists,
+                        duration = event.track.duration,
+                        imageUri = event.track.imageUri,
+                        name = event.track.name,
+                        uri = event.track.uri,
+                        lastPlayedTs = event.lastPlayedTs,
+                        lastRatedTs = event.lastRatedTs,
+                        rating = event.rating
+                    )
+                )
             }
             is SpotifyEvent.UpdateCurrentRating -> {
                 _rating.value = event.rating
