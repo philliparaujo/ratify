@@ -76,8 +76,10 @@ class SpotifyViewModel(
     private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
             spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { state ->
+                // If song changes
                 if (playerState.value?.track?.uri != state.track.uri) {
                     Log.d("SpotifyViewModel", "Now playing: ${state.track.name} by ${state.track.artist.name}")
+                    _rating.value = null
                 }
                 _playerState.postValue(state)
 
@@ -117,6 +119,7 @@ class SpotifyViewModel(
 
     // Database variables
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
+    private val _rating = MutableStateFlow<Rating?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _songs = _sortType
         .flatMapLatest { sortType ->
@@ -128,10 +131,11 @@ class SpotifyViewModel(
         }
 
     private val _state = MutableStateFlow(SongState())
-    val state = combine(_state, _sortType, _songs) { state, sortType, songs ->
+    val state = combine(_state, _sortType, _rating, _songs) { state, sortType, rating, songs ->
         state.copy(
             songs = songs,
-            sortType = sortType
+            sortType = sortType,
+            currentRating = rating
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
 
@@ -161,6 +165,9 @@ class SpotifyViewModel(
             }
             is SpotifyEvent.UpsertSong -> {
                 upsertSong(event.song)
+            }
+            is SpotifyEvent.UpdateCurrentRating -> {
+                _rating.value = event.rating
             }
         }
     }

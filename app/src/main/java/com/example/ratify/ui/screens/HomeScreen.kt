@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.spotifydatabase.SongState
 
 @Composable
 fun HomeScreen(
@@ -29,6 +32,8 @@ fun HomeScreen(
     val connected = spotifyConnectionState == true
     val canPlayOnDemand = userCapabilities != null && userCapabilities!!.canPlayOnDemand
     val playerEnabled = connected && canPlayOnDemand
+
+    val songState by spotifyViewModel.state.collectAsState(initial = SongState())
 
     Column(
         modifier = Modifier
@@ -106,6 +111,7 @@ fun HomeScreen(
             onClick = {
                 val currentState = playerState
                 if (currentState != null) {
+                    val currentTime = System.currentTimeMillis()
                     val currentSong = Song(
                         album = currentState.track.album,
                         artist = currentState.track.artist,
@@ -114,9 +120,9 @@ fun HomeScreen(
                         imageUri = currentState.track.imageUri,
                         name = currentState.track.name,
                         uri = currentState.track.uri,
-                        lastPlayedTs = System.currentTimeMillis(), // Capture the current time
-                        lastRatedTs = null, // Not rated yet
-                        rating = null // No rating yet
+                        lastPlayedTs = currentTime,
+                        lastRatedTs = if (songState.currentRating != null) currentTime else null,
+                        rating = songState.currentRating
                     )
                     spotifyViewModel.onEvent(SpotifyEvent.UpsertSong(currentSong))
                 } else {
@@ -124,5 +130,15 @@ fun HomeScreen(
                 }
             }
         ) { Text("Add song to list") }
+        Text("${songState.currentRating}")
+        Row {
+            for (i in 1..10) {
+                Button(onClick = {
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(Rating.from(i)))
+                }) {
+                    Text("$i")
+                }
+            }
+        }
     }
 }

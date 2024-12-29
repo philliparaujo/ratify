@@ -1,9 +1,11 @@
 package com.example.ratify.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -16,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
@@ -27,7 +30,7 @@ import com.example.ratify.spotifydatabase.SongState
 fun ProfileScreen(
     spotifyViewModel: SpotifyViewModel
 ) {
-    val songs by spotifyViewModel.state.collectAsState(initial = SongState())
+    val songState by spotifyViewModel.state.collectAsState(initial = SongState())
 
     LazyColumn(
         modifier = Modifier
@@ -35,7 +38,7 @@ fun ProfileScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(songs.songs) { song ->
+        items(songState.songs) { song ->
             SongItem(
                 song = song,
                 onDelete = { spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(song)) }
@@ -56,13 +59,32 @@ fun SongItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Fixed-width container for the rating text
+        Box(
+            modifier = Modifier
+                .width(20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = if (song.rating != null) "(" + song.rating.value.toString() + ")" else "-",
+                fontSize = 12.sp
+            )
+        }
+
+        // Song name and artist
         Text(
-            text = song.name.toString() + " - " + song.artist.name.toString(),
+            text = song.name + " - " + song.artist.name.toString(),
             fontSize = 16.sp,
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
+
+        // Delete button
         IconButton(
-            onClick = onDelete,
-            modifier = Modifier.padding(start = 16.dp)
+            onClick = onDelete
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,

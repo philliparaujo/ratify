@@ -24,4 +24,5 @@ sealed interface SpotifyEvent {
     data class UpdateLastPlayedTs(val uri: String, val lastPlayedTs: Long?): SpotifyEvent
     data class UpdateRating(val uri: String, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent
     data class SortSongs(val sortType: SortType): SpotifyEvent
+    data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
 }
