@@ -30,7 +30,7 @@ fun NavigationHost(
         modifier = modifier
     ) {
         composable<HomeTarget> { HomeScreen(spotifyViewModel = spotifyViewModel) }
-        composable<ProfileTarget> { ProfileScreen() }
+        composable<ProfileTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
         composable<SettingsTarget> { SettingsScreen() }
         composable<CountManagerTarget> { CountScreen(viewModel = countViewModel) }
     }

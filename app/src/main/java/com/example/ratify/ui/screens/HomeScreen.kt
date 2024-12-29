@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.Song
 
 @Composable
 fun HomeScreen(
@@ -100,5 +101,28 @@ fun HomeScreen(
                 Text("Previous Song")
             }
         }
+        Button(
+            enabled = playerEnabled && playerState?.track != null,
+            onClick = {
+                val currentState = playerState
+                if (currentState != null) {
+                    val currentSong = Song(
+                        album = currentState.track.album,
+                        artist = currentState.track.artist,
+                        artists = currentState.track.artists,
+                        duration = currentState.track.duration,
+                        imageUri = currentState.track.imageUri,
+                        name = currentState.track.name,
+                        uri = currentState.track.uri,
+                        lastPlayedTs = System.currentTimeMillis(), // Capture the current time
+                        lastRatedTs = null, // Not rated yet
+                        rating = null // No rating yet
+                    )
+                    spotifyViewModel.onEvent(SpotifyEvent.UpsertSong(currentSong))
+                } else {
+                    Log.e("HomeScreen", "No song is currently playing.")
+                }
+            }
+        ) { Text("Add song to list") }
     }
 }
