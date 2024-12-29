@@ -1,8 +1,8 @@
 package com.example.ratify.spotifydatabase
 
-enum class SortType(val displayName: String) {
-    LAST_PLAYED_TS("Last played"),
-    LAST_RATED_TS("Last rated"),
+enum class SearchType(val displayName: String) {
+    NAME("Name"),
+    ARTISTS("Artists"),
     RATING("Rating");
 
     override fun toString(): String {

@@ -1,6 +1,7 @@
 package com.example.ratify.spotify
 
 import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SortType
 import com.spotify.protocol.types.Track
@@ -19,11 +20,15 @@ sealed interface SpotifyEvent {
     data object SkipPrevious: SpotifyEvent
 //    data class QueueTrack(val trackUri: String): SpotifyEvent
 
+    // State updates
+    data class UpdateSortType(val sortType: SortType): SpotifyEvent
+    data class UpdateSearchType(val searchType: SearchType): SpotifyEvent
+    data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
+
     // Database updates
     data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?): SpotifyEvent
     data class DeleteSong(val song: Song): SpotifyEvent
+    data object DeleteSongsWithNullRating: SpotifyEvent
     data class UpdateLastPlayedTs(val uri: String, val lastPlayedTs: Long?): SpotifyEvent
     data class UpdateRating(val uri: String, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent
-    data class SortSongs(val sortType: SortType): SpotifyEvent
-    data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
 }

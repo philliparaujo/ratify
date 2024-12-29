@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
 import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongDao
 import com.example.ratify.spotifydatabase.SongState
@@ -79,25 +80,35 @@ class SpotifyViewModel(
                 val previousSong = playerState.value?.track
                 val currentSong = state.track
 
-                // If song changes
+                // Handle song change
                 if (previousSong?.uri != currentSong.uri) {
                     Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
-                    // Update database with most recent rating
-                    if (previousSong != null) {
-                        val currentTime = System.currentTimeMillis()
-                        onEvent(SpotifyEvent.UpsertSong(
-                            track = previousSong,
-                            rating = _rating.value,
-                            lastPlayedTs = currentTime,
-                            lastRatedTs = if (_rating.value != null) currentTime else null
-                        ))
-                    }
-                    // Load new rating based on database entry
+
                     viewModelScope.launch {
                         val existingSong = dao.getSongByUri(currentSong.uri) // Query database
-                        _rating.value = existingSong?.rating // Update rating if entry exists
+                        val currentTime = System.currentTimeMillis()
+
+                        // Insert current song for first time or simply update its lastPlayedTs
+                        if (existingSong == null) {
+                            onEvent(SpotifyEvent.UpsertSong(
+                                track = currentSong,
+                                lastPlayedTs = currentTime,
+                                rating = null,
+                                lastRatedTs = null,
+                            ))
+                        } else {
+                            onEvent(SpotifyEvent.UpdateLastPlayedTs(
+                                uri = currentSong.uri,
+                                lastPlayedTs = currentTime
+                            ))
+                        }
+
+                        // Load current rating based on database entry
+                        _rating.value = existingSong?.rating
                     }
                 }
+
+                // Update playerState on state change
                 _playerState.postValue(state)
 
                 // Update playback position on play
@@ -135,6 +146,7 @@ class SpotifyViewModel(
     }
 
     // Database variables
+    private val _searchType = MutableStateFlow(SearchType.NAME)
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -148,9 +160,10 @@ class SpotifyViewModel(
         }
 
     private val _state = MutableStateFlow(SongState())
-    val state = combine(_state, _sortType, _rating, _songs) { state, sortType, rating, songs ->
+    val state = combine(_state, _searchType, _sortType, _rating, _songs) { state, searchType, sortType, rating, songs ->
         state.copy(
             songs = songs,
+            searchType = searchType,
             sortType = sortType,
             currentRating = rating
         )
@@ -171,8 +184,17 @@ class SpotifyViewModel(
             is SpotifyEvent.DeleteSong -> {
                 deleteSong(event.song)
             }
-            is SpotifyEvent.SortSongs -> {
+            is SpotifyEvent.DeleteSongsWithNullRating -> {
+                deleteSongWithNullRating()
+            }
+            is SpotifyEvent.UpdateSearchType -> {
+                _searchType.value = event.searchType
+            }
+            is SpotifyEvent.UpdateSortType -> {
                 _sortType.value = event.sortType
+            }
+            is SpotifyEvent.UpdateCurrentRating -> {
+                _rating.value = event.rating
             }
             is SpotifyEvent.UpdateLastPlayedTs -> {
                 updateLastPlayedTs(event.uri, event.lastPlayedTs)
@@ -195,9 +217,6 @@ class SpotifyViewModel(
                         rating = event.rating
                     )
                 )
-            }
-            is SpotifyEvent.UpdateCurrentRating -> {
-                _rating.value = event.rating
             }
         }
     }
@@ -276,6 +295,12 @@ class SpotifyViewModel(
     private fun deleteSong(song: Song) {
         viewModelScope.launch {
             dao.deleteSong(song)
+        }
+    }
+
+    private fun deleteSongWithNullRating() {
+        viewModelScope.launch {
+            dao.deleteSongsWithNullRating()
         }
     }
 

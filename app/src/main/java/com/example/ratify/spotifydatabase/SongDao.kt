@@ -14,11 +14,8 @@ interface SongDao {
     @Delete
     suspend fun deleteSong(song: Song)
 
-//    @Query("UPDATE songs SET lastPlayedTs = :lastPlayedTs WHERE uri = :uri")
-//    suspend fun updateLastPlayedTs(uri: String, lastPlayedTs: Long?)
-//
-//    @Query("UPDATE songs SET lastRatedTs = :lastRatedTs, rating = :rating WHERE uri = :uri")
-//    suspend fun updateRating(uri: String, lastRatedTs: Long?, rating: Rating?)
+    @Query("DELETE FROM songs WHERE rating IS NULL")
+    suspend fun deleteSongsWithNullRating()
 
     @Query("SELECT * FROM songs WHERE uri = :uri LIMIT 1")
     suspend fun getSongByUri(uri: String): Song?

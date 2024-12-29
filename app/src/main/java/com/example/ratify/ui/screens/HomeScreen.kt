@@ -15,14 +15,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
-import com.spotify.protocol.types.PlayerState
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -110,16 +106,6 @@ fun HomeScreen(
                 Text("Previous Song")
             }
         }
-        Button(
-            enabled = playerEnabled && playerState?.track != null,
-            onClick = {
-                upsertSong(
-                    playerState = playerState,
-                    songState = songState,
-                    spotifyViewModel = spotifyViewModel
-                )
-            }
-        ) { Text("Add song to list") }
         Text("${songState.currentRating?.value}")
         Row(
             modifier = Modifier
@@ -129,48 +115,21 @@ fun HomeScreen(
                 Button(
                     enabled = songState.currentRating?.value != i,
                     onClick = {
-                        // Update rating first
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(Rating.from(i)))
+                        // Update current rating (UI indicator)
+                        val newRating = Rating.from(i)
+                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(newRating))
 
-                        // Use a coroutine to delay the upsert until the rating is updated
-                        spotifyViewModel.viewModelScope.launch {
-                            // Upsert once current rating is updated
-                            spotifyViewModel.state.collect { updatedState ->
-                                if (updatedState.currentRating?.value == i) {
-                                    upsertSong(
-                                        playerState = playerState,
-                                        songState = updatedState,
-                                        spotifyViewModel = spotifyViewModel
-                                    )
-                                    cancel() // Stop collecting once the update is complete
-                                }
-                            }
-                        }
+                        // Update rating in database
+                        spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+                            uri = playerState!!.track.uri,
+                            rating = newRating,
+                            lastRatedTs = System.currentTimeMillis()
+                        ))
                     },
                     modifier = Modifier
                         .weight(1f)
                 ) {}
             }
         }
-    }
-}
-
-fun upsertSong(
-    playerState: PlayerState?,
-    songState: SongState,
-    spotifyViewModel: SpotifyViewModel
-) {
-    if (playerState != null) {
-        val currentTime = System.currentTimeMillis()
-        spotifyViewModel.onEvent(
-            SpotifyEvent.UpsertSong(
-                track = playerState.track,
-                rating = songState.currentRating,
-                lastRatedTs = if (songState.currentRating != null) currentTime else null,
-                lastPlayedTs = currentTime
-            )
-        )
-    } else {
-        Log.e("HomeScreen", "No song is currently playing.")
     }
 }
