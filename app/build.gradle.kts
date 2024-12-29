@@ -71,6 +71,7 @@ dependencies {
     // Room
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.11.0")
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

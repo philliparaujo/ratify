@@ -7,6 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
+import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.spotifydatabase.SongDao
+import com.example.ratify.spotifydatabase.SongState
+import com.example.ratify.spotifydatabase.SortType
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
@@ -14,11 +19,20 @@ import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SpotifyViewModel(application: Application): AndroidViewModel(application) {
+class SpotifyViewModel(
+    application: Application,
+    private val dao: SongDao
+): AndroidViewModel(application) {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
     private val redirectUri: String by lazy { BuildConfig.SPOTIFY_REDIRECT_URI }
@@ -101,6 +115,27 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
         playbackJob = null
     }
 
+    // Database variables
+    private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _songs = _sortType
+        .flatMapLatest { sortType ->
+            when (sortType) {
+                SortType.LAST_PLAYED_TS -> dao.getSongsOrderedByLastPlayedTs()
+                SortType.LAST_RATED_TS -> dao.getSongsOrderedByLastRatedTs()
+                SortType.RATING -> dao.getSongsOrderedByRating()
+            }
+        }
+
+    private val _state = MutableStateFlow(SongState())
+    val state = combine(_state, _sortType, _songs) { state, sortType, songs ->
+        state.copy(
+            songs = songs,
+            sortType = sortType
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
+
+
     fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
@@ -111,6 +146,22 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
+
+            is SpotifyEvent.DeleteSong -> {
+                deleteSong(event.song)
+            }
+            is SpotifyEvent.SortSongs -> {
+                _sortType.value = event.sortType
+            }
+            is SpotifyEvent.UpdateLastPlayedTs -> {
+                updateLastPlayedTs(event.uri, event.lastPlayedTs)
+            }
+            is SpotifyEvent.UpdateRating -> {
+                updateRating(event.uri, event.rating, event.lastRatedTs)
+            }
+            is SpotifyEvent.UpsertSong -> {
+                upsertSong(event.song)
+            }
         }
     }
 
@@ -176,5 +227,36 @@ class SpotifyViewModel(application: Application): AndroidViewModel(application) 
 
     private fun skipPrevious() {
         spotifyAppRemote?.playerApi?.skipPrevious()
+    }
+
+    // Database functions
+    private fun upsertSong(song: Song) {
+        viewModelScope.launch {
+            dao.upsertSong(song)
+        }
+    }
+
+    private fun deleteSong(song: Song) {
+        viewModelScope.launch {
+            dao.deleteSong(song)
+        }
+    }
+
+    private fun updateLastPlayedTs(uri: String, lastPlayedTs: Long?) {
+        viewModelScope.launch {
+            val song = dao.getSongByUri(uri)
+            if (song != null) {
+                dao.upsertSong(song.copy(lastPlayedTs = lastPlayedTs))
+            }
+        }
+    }
+
+    private fun updateRating(uri: String, rating: Rating?, lastRatedTs: Long?) {
+        viewModelScope.launch {
+            val song = dao.getSongByUri(uri)
+            if (song != null) {
+                dao.upsertSong(song.copy(lastRatedTs = lastRatedTs, rating = rating))
+            }
+        }
     }
 }
