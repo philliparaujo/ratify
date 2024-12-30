@@ -28,4 +28,13 @@ interface SongDao {
 
     @Query("SELECT * FROM songs ORDER BY rating DESC")
     fun getSongsOrderedByRating(): Flow<List<Song>>
+
+    @Query("SELECT * FROM songs WHERE name LIKE '%' || :name || '%'")
+    fun searchByName(name: String): Flow<List<Song>>
+
+    @Query("SELECT * FROM songs WHERE rating = :rating")
+    fun searchByRating(rating: Int): Flow<List<Song>>
+
+    @Query("SELECT * FROM songs WHERE artists LIKE '%' || :artistName || '%'")
+    fun searchByArtistName(artistName: String): Flow<List<Song>>
 }

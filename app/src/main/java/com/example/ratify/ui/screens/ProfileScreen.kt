@@ -17,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,19 +55,15 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Box(
+            TextField(
+                value = songState.searchQuery,
+                onValueChange = spotifyViewModel::onSearchTextChange,
+                placeholder = { Text(text = "Search")},
+                maxLines = 1,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Search...",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+            )
 
             IconButton(
                 onClick = {

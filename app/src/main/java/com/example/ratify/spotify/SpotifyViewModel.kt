@@ -147,27 +147,51 @@ class SpotifyViewModel(
 
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)
+    private val _searchQuery = MutableStateFlow("")
+    private val _isSearching = MutableStateFlow(false)
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _songs = _sortType
-        .flatMapLatest { sortType ->
-            when (sortType) {
+    private val _songs = combine(_sortType, _searchType, _searchQuery) { sortType, searchType, query ->
+        when {
+            query.isNotEmpty() -> when (searchType) {
+                SearchType.NAME -> dao.searchByName(query)
+                SearchType.ARTISTS -> dao.searchByArtistName(query)
+                SearchType.RATING -> dao.searchByRating(query.toIntOrNull() ?: -1)
+            }
+            else -> when (sortType) {
                 SortType.LAST_PLAYED_TS -> dao.getSongsOrderedByLastPlayedTs()
                 SortType.LAST_RATED_TS -> dao.getSongsOrderedByLastRatedTs()
                 SortType.RATING -> dao.getSongsOrderedByRating()
             }
         }
+    }.flatMapLatest { it }
 
     private val _state = MutableStateFlow(SongState())
-    val state = combine(_state, _searchType, _sortType, _rating, _songs) { state, searchType, sortType, rating, songs ->
+    val state = combine(
+        listOf(_state, _searchType, _sortType, _rating, _songs, _searchQuery, _isSearching)
+    ) { flows: Array<Any?> ->
+        val state = flows[0] as SongState
+        val searchType = flows[1] as SearchType
+        val sortType = flows[2] as SortType
+        val rating = flows[3] as Rating?
+        val songs = flows[4] as List<Song>
+        val searchQuery = flows[5] as String
+        val isSearching = flows[6] as Boolean
+
         state.copy(
             songs = songs,
             searchType = searchType,
             sortType = sortType,
-            currentRating = rating
+            currentRating = rating,
+            searchQuery = searchQuery,
+            isSearching = isSearching
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
+
+    fun onSearchTextChange(text: String) {
+        _searchQuery.value = text
+    }
 
 
     fun onEvent(event: SpotifyEvent) {
