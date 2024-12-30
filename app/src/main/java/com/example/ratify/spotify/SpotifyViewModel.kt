@@ -193,7 +193,6 @@ class SpotifyViewModel(
         _searchQuery.value = text
     }
 
-
     fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
@@ -209,7 +208,7 @@ class SpotifyViewModel(
                 deleteSong(event.song)
             }
             is SpotifyEvent.DeleteSongsWithNullRating -> {
-                deleteSongWithNullRating()
+                deleteSongWithNullRating(event.exceptUri)
             }
             is SpotifyEvent.UpdateSearchType -> {
                 _searchType.value = event.searchType
@@ -322,9 +321,9 @@ class SpotifyViewModel(
         }
     }
 
-    private fun deleteSongWithNullRating() {
+    private fun deleteSongWithNullRating(exceptUri: String) {
         viewModelScope.launch {
-            dao.deleteSongsWithNullRating()
+            dao.deleteSongsWithNullRating(exceptUri)
         }
     }
 

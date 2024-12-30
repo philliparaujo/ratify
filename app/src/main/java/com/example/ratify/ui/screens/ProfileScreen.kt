@@ -21,6 +21,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +40,7 @@ fun ProfileScreen(
     spotifyViewModel: SpotifyViewModel
 ) {
     val songState by spotifyViewModel.state.collectAsState(initial = SongState())
+    val playerState by spotifyViewModel.playerState.observeAsState()
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.RATING)
     val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS)
 
@@ -67,7 +69,8 @@ fun ProfileScreen(
 
             IconButton(
                 onClick = {
-                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating)
+                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
+                        playerState?.track?.uri ?: ""))
                 }
             ) {
                 Icon(
