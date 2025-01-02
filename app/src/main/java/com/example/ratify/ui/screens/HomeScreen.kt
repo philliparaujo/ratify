@@ -1,6 +1,5 @@
 package com.example.ratify.ui.screens
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,8 +23,8 @@ import com.example.ratify.spotifydatabase.SongState
 @Composable
 fun HomeScreen(
     spotifyViewModel: SpotifyViewModel,
-    onExportClick: (Uri) -> Unit,
-    onImportClick: (Uri) -> Unit
+    onExportClick: () -> Unit,
+    onImportClick: () -> Unit
 ) {
     val spotifyConnectionState by spotifyViewModel.spotifyConnectionState.observeAsState()
     val userCapabilities by spotifyViewModel.userCapabilities.observeAsState()
@@ -138,8 +137,7 @@ fun HomeScreen(
         Row {
             Button(
                 onClick = {
-                    // Trigger file export via intent
-                    onExportClick.invoke(Uri.EMPTY)
+                    onExportClick.invoke()
                 }
             ) {
                 Text("Export Database")
@@ -147,8 +145,7 @@ fun HomeScreen(
 
             Button(
                 onClick = {
-                    // Trigger file import via intent
-                    onImportClick.invoke(Uri.EMPTY)
+                    onImportClick.invoke()
                 }
             ) {
                 Text("Import Database")

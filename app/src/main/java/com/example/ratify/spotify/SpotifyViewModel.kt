@@ -124,6 +124,7 @@ class SpotifyViewModel(
         }
     }
 
+    // Provides information on live playback position by incrementing a timer on song being played
     private val _currentPlaybackPosition = MutableLiveData<Long>()
     val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
     private var playbackJob: Job? = null

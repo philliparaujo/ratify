@@ -15,7 +15,7 @@ import java.io.FileOutputStream
 object SongDatabaseProvider {
     @Volatile
     private var instance: SongDatabase? = null
-    private val databaseName = "songs.db"
+    val databaseName = "songs.db"
 
     fun getDatabase(context: Context): SongDatabase {
         return instance ?: synchronized(this) {

@@ -1,6 +1,5 @@
 package com.example.ratify.ui.navigation
 
-import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -11,8 +10,8 @@ import com.example.ratify.spotify.SpotifyViewModel
 @Composable
 fun MainScreen(
     spotifyViewModel: SpotifyViewModel,
-    onExportClick: (Uri) -> Unit,
-    onImportClick: (Uri) -> Unit
+    onExportClick: () -> Unit,
+    onImportClick: () -> Unit
 ) {
     val navController = rememberNavController()
     val startDestination = HomeTarget

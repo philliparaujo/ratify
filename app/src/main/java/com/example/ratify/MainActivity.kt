@@ -6,12 +6,12 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModelFactory
+import com.example.ratify.spotifydatabase.DatabaseIOHelper
 import com.example.ratify.ui.navigation.MainScreen
 
 class MainActivity : ComponentActivity() {
@@ -22,23 +22,7 @@ class MainActivity : ComponentActivity() {
         )
     }
     private lateinit var spotifyAuthHelper: SpotifyAuthHelper
-
-    private val exportLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
-        if (uri != null) {
-            val success = SongDatabaseProvider.exportDatabase(this, uri, contentResolver)
-            showToast(if (success) "Database exported successfully!" else "Failed to export database")
-        }
-    }
-    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) {
-            val success = SongDatabaseProvider.importDatabase(this, uri)
-            showToast(if (success) "Database imported successfully!" else "Failed to import database")
-        }
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
+    private lateinit var databaseIOHelper: DatabaseIOHelper
 
     fun restartApp() {
         val intent = Intent(this, MainActivity::class.java)
@@ -51,6 +35,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Initialize database IO helper
+        databaseIOHelper = DatabaseIOHelper(
+            this,
+            onExportComplete = { success ->
+                showToast(if (success) "Database exported successfully!" else "Failed to export database")
+            },
+            onImportComplete = { success ->
+                showToast(if (success) "Database imported successfully!" else "Failed to import database")
+            }
+        )
+
         // Initialize auth helper, launch authentication if not already connected
         if (spotifyViewModel.spotifyConnectionState.value != true) {
             spotifyAuthHelper = SpotifyAuthHelper(this, spotifyViewModel)
@@ -62,9 +57,13 @@ class MainActivity : ComponentActivity() {
         setContent {
            MainScreen(
                spotifyViewModel = spotifyViewModel,
-               onExportClick = { exportLauncher.launch("songs.db") },
-               onImportClick = { importLauncher.launch(arrayOf("*/*"))}
+               onExportClick = { databaseIOHelper.exportDatabase() },
+               onImportClick = { databaseIOHelper.importDatabase() }
            )
         }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
