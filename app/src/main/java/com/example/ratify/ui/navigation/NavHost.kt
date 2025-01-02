@@ -1,5 +1,6 @@
 package com.example.ratify.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -19,7 +20,9 @@ fun NavigationHost(
     navController: NavHostController,
     startDestination: Destination,
     modifier: Modifier = Modifier,
-    spotifyViewModel: SpotifyViewModel
+    spotifyViewModel: SpotifyViewModel,
+    onExportClick: (Uri) -> Unit,
+    onImportClick: (Uri) -> Unit
 ) {
     val context = LocalContext.current
     val countViewModel = remember { CountViewModelProvider.provideCountViewModel(context) }
@@ -29,7 +32,7 @@ fun NavigationHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable<HomeTarget> { HomeScreen(spotifyViewModel = spotifyViewModel) }
+        composable<HomeTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
         composable<ProfileTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
         composable<SettingsTarget> { SettingsScreen() }
         composable<CountManagerTarget> { CountScreen(viewModel = countViewModel) }
