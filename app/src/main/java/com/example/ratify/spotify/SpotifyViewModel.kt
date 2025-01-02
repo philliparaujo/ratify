@@ -93,13 +93,15 @@ class SpotifyViewModel(
                             onEvent(SpotifyEvent.UpsertSong(
                                 track = currentSong,
                                 lastPlayedTs = currentTime,
+                                timesPlayed = 1,
                                 rating = null,
-                                lastRatedTs = null,
+                                lastRatedTs = null
                             ))
                         } else {
                             onEvent(SpotifyEvent.UpdateLastPlayedTs(
                                 uri = currentSong.uri,
-                                lastPlayedTs = currentTime
+                                lastPlayedTs = currentTime,
+                                timesPlayed = existingSong.timesPlayed + 1
                             ))
                         }
 
@@ -236,8 +238,9 @@ class SpotifyViewModel(
                         name = event.track.name,
                         uri = event.track.uri,
                         lastPlayedTs = event.lastPlayedTs,
+                        timesPlayed = event.timesPlayed,
                         lastRatedTs = event.lastRatedTs,
-                        rating = event.rating
+                        rating = event.rating,
                     )
                 )
             }

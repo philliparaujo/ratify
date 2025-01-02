@@ -23,6 +23,7 @@ data class Song(
 
     // App info (may change)
     val lastPlayedTs: Long?,
+    val timesPlayed: Int,
     val lastRatedTs: Long?,
     val rating: Rating?
 )

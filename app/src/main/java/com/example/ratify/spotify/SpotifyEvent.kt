@@ -26,9 +26,9 @@ sealed interface SpotifyEvent {
     data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
 
     // Database updates
-    data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?): SpotifyEvent
+    data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?, val timesPlayed: Int): SpotifyEvent
     data class DeleteSong(val song: Song): SpotifyEvent
     data class DeleteSongsWithNullRating(val exceptUri: String): SpotifyEvent
-    data class UpdateLastPlayedTs(val uri: String, val lastPlayedTs: Long?): SpotifyEvent
+    data class UpdateLastPlayedTs(val uri: String, val timesPlayed: Int, val lastPlayedTs: Long?): SpotifyEvent
     data class UpdateRating(val uri: String, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent
 }

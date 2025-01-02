@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.room.Room
 import com.example.ratify.MainActivity
+import com.example.ratify.spotifydatabase.DatabaseVersionManager
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -22,7 +23,9 @@ object SongDatabaseProvider {
                 context.applicationContext,
                 SongDatabase::class.java,
                 databaseName
-            ).build()
+            )
+                .addMigrations(*DatabaseVersionManager.getAllMigrations())
+                .build()
             instance = newInstance
             newInstance
         }
@@ -33,7 +36,7 @@ object SongDatabaseProvider {
         instance = null
     }
 
-    fun forceDatabaseSync(database: SongDatabase) {
+    private fun forceDatabaseSync(database: SongDatabase) {
         database.openHelper.writableDatabase.close()
     }
 
