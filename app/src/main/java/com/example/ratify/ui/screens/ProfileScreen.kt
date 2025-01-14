@@ -41,7 +41,7 @@ fun ProfileScreen(
 ) {
     val songState by spotifyViewModel.state.collectAsState(initial = SongState())
     val playerState by spotifyViewModel.playerState.observeAsState()
-    val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.RATING)
+    val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
     val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS)
 
     Column(
@@ -81,7 +81,7 @@ fun ProfileScreen(
             }
         }
 
-        // Searching buttons buttons
+        // Searching buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()

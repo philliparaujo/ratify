@@ -155,19 +155,22 @@ class SpotifyViewModel(
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _songs = combine(_sortType, _searchType, _searchQuery) { sortType, searchType, query ->
-        when {
-            query.isNotEmpty() -> when (searchType) {
-                SearchType.NAME -> dao.searchByName(query)
-                SearchType.ARTISTS -> dao.searchByArtistName(query)
-                SearchType.RATING -> dao.searchByRating(query.toIntOrNull() ?: -1)
-            }
-            else -> when (sortType) {
-                SortType.LAST_PLAYED_TS -> dao.getSongsOrderedByLastPlayedTs()
-                SortType.LAST_RATED_TS -> dao.getSongsOrderedByLastRatedTs()
-                SortType.RATING -> dao.getSongsOrderedByRating()
-            }
-        }
+//    private val _songs = combine(_sortType, _searchType, _searchQuery) { sortType, searchType, query ->
+//        when {
+//            query.isNotEmpty() -> when (searchType) {
+//                SearchType.NAME -> dao.searchByName(query)
+//                SearchType.ARTISTS -> dao.searchByArtistName(query)
+//                SearchType.RATING -> dao.searchByRating(query.toIntOrNull() ?: -1)
+//            }
+//            else -> when (sortType) {
+//                SortType.LAST_PLAYED_TS -> dao.getSongsOrderedByLastPlayedTs()
+//                SortType.LAST_RATED_TS -> dao.getSongsOrderedByLastRatedTs()
+//                SortType.RATING -> dao.getSongsOrderedByRating()
+//            }
+//        }
+//    }.flatMapLatest { it }
+    private val _songs = combine(_searchType, _searchQuery, _sortType) { searchType, searchQuery, sortType ->
+        dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType))
     }.flatMapLatest { it }
 
     private val _state = MutableStateFlow(SongState())
