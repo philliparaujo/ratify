@@ -21,9 +21,10 @@ sealed interface SpotifyEvent {
 //    data class QueueTrack(val trackUri: String): SpotifyEvent
 
     // State updates
-    data class UpdateSortType(val sortType: SortType): SpotifyEvent
     data class UpdateSearchType(val searchType: SearchType): SpotifyEvent
+    data class UpdateSortType(val sortType: SortType): SpotifyEvent
     data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
+    data class UpdateShowSongDialog(val showSongDialog: Song?): SpotifyEvent
 
     // Database updates
     data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?, val timesPlayed: Int): SpotifyEvent

@@ -1,5 +1,6 @@
 package com.example.ratify.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.ui.components.TestDialog
 
 @Composable
 fun ProfileScreen(
@@ -166,9 +168,20 @@ fun ProfileScreen(
             items(songState.songs) { song ->
                 SongItem(
                     song = song,
+                    onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
                     onDelete = { spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(song)) }
                 )
             }
+        }
+
+        // Song dialog
+        if (songState.currentSongDialog != null) {
+            TestDialog(
+                onDismissRequest = {
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
+                },
+                name = songState.currentSongDialog!!.name
+            )
         }
     }
 }
@@ -176,11 +189,13 @@ fun ProfileScreen(
 @Composable
 fun SongItem(
     song: Song,
+    onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxSize()
+            .clickable(onClick = onClick)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween

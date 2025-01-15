@@ -151,47 +151,33 @@ class SpotifyViewModel(
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)
     private val _searchQuery = MutableStateFlow("")
-    private val _isSearching = MutableStateFlow(false)
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
+    private val _showSongDialog = MutableStateFlow<Song?>(null)
     @OptIn(ExperimentalCoroutinesApi::class)
-//    private val _songs = combine(_sortType, _searchType, _searchQuery) { sortType, searchType, query ->
-//        when {
-//            query.isNotEmpty() -> when (searchType) {
-//                SearchType.NAME -> dao.searchByName(query)
-//                SearchType.ARTISTS -> dao.searchByArtistName(query)
-//                SearchType.RATING -> dao.searchByRating(query.toIntOrNull() ?: -1)
-//            }
-//            else -> when (sortType) {
-//                SortType.LAST_PLAYED_TS -> dao.getSongsOrderedByLastPlayedTs()
-//                SortType.LAST_RATED_TS -> dao.getSongsOrderedByLastRatedTs()
-//                SortType.RATING -> dao.getSongsOrderedByRating()
-//            }
-//        }
-//    }.flatMapLatest { it }
     private val _songs = combine(_searchType, _searchQuery, _sortType) { searchType, searchQuery, sortType ->
         dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType))
     }.flatMapLatest { it }
 
     private val _state = MutableStateFlow(SongState())
     val state = combine(
-        listOf(_state, _searchType, _sortType, _rating, _songs, _searchQuery, _isSearching)
+        listOf(_state, _searchType, _sortType, _rating, _showSongDialog, _songs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as SongState
         val searchType = flows[1] as SearchType
         val sortType = flows[2] as SortType
         val rating = flows[3] as Rating?
-        val songs = flows[4] as List<Song>
-        val searchQuery = flows[5] as String
-        val isSearching = flows[6] as Boolean
+        val showSongDialog = flows[4] as Song?
+        val songs = flows[5] as List<Song>
+        val searchQuery = flows[6] as String
 
         state.copy(
             songs = songs,
             searchType = searchType,
             sortType = sortType,
             currentRating = rating,
-            searchQuery = searchQuery,
-            isSearching = isSearching
+            currentSongDialog = showSongDialog,
+            searchQuery = searchQuery
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
 
@@ -204,18 +190,13 @@ class SpotifyViewModel(
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
             is SpotifyEvent.ConnectSpotify -> connectSpotifyAppRemote()
             is SpotifyEvent.DisconnectSpotify -> disconnectSpotifyAppRemote()
+
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
             is SpotifyEvent.Pause -> pause()
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
 
-            is SpotifyEvent.DeleteSong -> {
-                deleteSong(event.song)
-            }
-            is SpotifyEvent.DeleteSongsWithNullRating -> {
-                deleteSongWithNullRating(event.exceptUri)
-            }
             is SpotifyEvent.UpdateSearchType -> {
                 _searchType.value = event.searchType
             }
@@ -225,12 +206,10 @@ class SpotifyViewModel(
             is SpotifyEvent.UpdateCurrentRating -> {
                 _rating.value = event.rating
             }
-            is SpotifyEvent.UpdateLastPlayedTs -> {
-                updateLastPlayedTs(event.uri, event.lastPlayedTs)
+            is SpotifyEvent.UpdateShowSongDialog -> {
+                _showSongDialog.value = event.showSongDialog
             }
-            is SpotifyEvent.UpdateRating -> {
-                updateRating(event.uri, event.rating, event.lastRatedTs)
-            }
+
             is SpotifyEvent.UpsertSong -> {
                 upsertSong(
                     Song(
@@ -248,9 +227,22 @@ class SpotifyViewModel(
                     )
                 )
             }
+            is SpotifyEvent.DeleteSong -> {
+                deleteSong(event.song)
+            }
+            is SpotifyEvent.DeleteSongsWithNullRating -> {
+                deleteSongWithNullRating(event.exceptUri)
+            }
+            is SpotifyEvent.UpdateLastPlayedTs -> {
+                updateLastPlayedTs(event.uri, event.lastPlayedTs)
+            }
+            is SpotifyEvent.UpdateRating -> {
+                updateRating(event.uri, event.rating, event.lastRatedTs)
+            }
         }
     }
 
+    // Helper functions for specific events
     private fun generateAuthorizationRequest() {
         val request = AuthorizationRequest.Builder(
             clientId,
