@@ -19,6 +19,7 @@ import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
+import com.example.ratify.ui.components.MyButton
 
 @Composable
 fun HomeScreen(
@@ -51,15 +52,14 @@ fun HomeScreen(
             Text("Playback position: ${if (state.isPaused) state.playbackPosition else currentPlaybackPosition} / ${state.track.duration}")
         }
 
-        Button(
+        MyButton(
             enabled = !connected,
             onClick = {
                 spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-            }
-        ) {
-            Text("Connect to Spotify")
-        }
-        Button(
+            },
+            text = "Connect to Spotify"
+        )
+        MyButton(
             enabled = playerEnabled,
             onClick = {
                 // Play a playlist on successful connection
@@ -70,43 +70,38 @@ fun HomeScreen(
                 }  else {
                     Log.e("HomeScreen", "Failed to connect to Spotify")
                 }
-            }
-        ) {
-            Text("Play indie playlist")
-        }
+            },
+            text = "Play indie playlist"
+        )
         Row {
-            Button(
+            MyButton(
                 enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.Pause)
-                }
-            ) {
-                Text("Pause")
-            }
-            Button(
+                },
+                text = "Pause"
+            )
+            MyButton(
                 enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.Resume)
-                }
-            ) {
-                Text("Resume")
-            }
-            Button(
+                },
+                text = "Resume"
+            )
+            MyButton(
                 enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
-                }
-            ) {
-                Text("Next Song")
-            }
-            Button(
+                },
+                text = "Next Song"
+            )
+            MyButton(
                 enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipPrevious)
-                }
-            ) {
-                Text("Previous Song")
-            }
+                },
+                text = "Previous song"
+            )
         }
         Text("${songState.currentRating?.value}")
         Row(
@@ -114,7 +109,7 @@ fun HomeScreen(
                 .fillMaxWidth()
         ) {
             for (i in 1..10) {
-                Button(
+                MyButton(
                     enabled = songState.currentRating?.value != i,
                     onClick = {
                         // Update current rating (UI indicator)
@@ -129,27 +124,25 @@ fun HomeScreen(
                         ))
                     },
                     modifier = Modifier
-                        .weight(1f)
-                ) {}
+                        .weight(1f),
+                    text = ""
+                )
             }
         }
 
         Row {
-            Button(
+            MyButton(
                 onClick = {
                     onExportClick.invoke()
-                }
-            ) {
-                Text("Export Database")
-            }
-
-            Button(
+                },
+                text = "Export Database"
+            )
+            MyButton(
                 onClick = {
                     onImportClick.invoke()
-                }
-            ) {
-                Text("Import Database")
-            }
+                },
+                text = "Import Database"
+            )
         }
     }
 }

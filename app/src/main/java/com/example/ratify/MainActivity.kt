@@ -13,6 +13,7 @@ import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModelFactory
 import com.example.ratify.spotifydatabase.DatabaseIOHelper
 import com.example.ratify.ui.navigation.MainScreen
+import com.example.ratify.ui.theme.RatifyTheme
 
 class MainActivity : ComponentActivity() {
     private val spotifyViewModel: SpotifyViewModel by viewModels {
@@ -55,11 +56,13 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-           MainScreen(
-               spotifyViewModel = spotifyViewModel,
-               onExportClick = { databaseIOHelper.exportDatabase() },
-               onImportClick = { databaseIOHelper.importDatabase() }
-           )
+            RatifyTheme {
+               MainScreen(
+                   spotifyViewModel = spotifyViewModel,
+                   onExportClick = { databaseIOHelper.exportDatabase() },
+                   onImportClick = { databaseIOHelper.importDatabase() }
+               )
+            }
         }
     }
 

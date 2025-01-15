@@ -33,6 +33,30 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val RatifyColorScheme = darkColorScheme(
+    // Primary colors
+    primary = MyCyan,
+    onPrimary = MyBlack,
+
+    // Secondary colors
+    secondary = MyYellow,
+    onSecondary = MyWhite,
+
+    // Background and surface colors
+    background = MyBlack,
+    onBackground = MyWhite,
+
+    surfaceVariant = MyGray,
+    onSurfaceVariant = MyWhite
+//    surface = MyGray,
+//    onSurface = MyWhite,
+//
+//    // Additional essentials
+//    surfaceTint = MyCyan,
+//    tertiary = MyYellow,
+//    onTertiary = MyBlack
+)
+
 @Composable
 fun RatifyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -40,18 +64,18 @@ fun RatifyTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+//    val colorScheme = when {
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
+//
+//        darkTheme -> DarkColorScheme
+//        else -> LightColorScheme
+//    }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = RatifyColorScheme,
         typography = Typography,
         content = content
     )
