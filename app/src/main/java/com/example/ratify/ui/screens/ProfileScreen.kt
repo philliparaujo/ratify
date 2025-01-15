@@ -35,6 +35,7 @@ import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.TestDialog
 
 @Composable
@@ -83,79 +84,21 @@ fun ProfileScreen(
             }
         }
 
-        // Searching buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Search by:",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
+        // Searching dropdown
+        DropdownSelect(
+            options = searchTypes,
+            selectedOption = songState.searchType,
+            onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
+            label = "Search by"
+        )
 
-            searchTypes.forEach { searchType ->
-                Button(
-                    enabled = songState.searchType != searchType,
-                    onClick = {
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType))
-                    }
-                ) {
-                    Text(
-                        text = searchType.displayName,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        }
-
-        // Sorting buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Text(
-                    text = "Sort by:",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-
-            sortTypes.forEach { sortType ->
-                Button(
-                    enabled = songState.sortType != sortType,
-                    onClick = {
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateSortType(sortType))
-                    }
-                ) {
-                    Text(
-                        text = sortType.displayName,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        }
+        // Sorting dropdown
+        DropdownSelect(
+            options = sortTypes,
+            selectedOption = songState.sortType,
+            onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
+            label = "Sort by"
+        )
 
         HorizontalDivider()
 
