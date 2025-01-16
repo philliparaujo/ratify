@@ -13,7 +13,7 @@ import com.example.ratify.ui.screens.SettingsScreen
 @Composable
 fun NavigationHost(
     navController: NavHostController,
-    startTarget: Target,
+    startNavigationTarget: NavigationTarget,
     modifier: Modifier = Modifier,
     spotifyViewModel: SpotifyViewModel,
     onExportClick: () -> Unit,
@@ -21,11 +21,11 @@ fun NavigationHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = startTarget,
+        startDestination = startNavigationTarget,
         modifier = modifier
     ) {
-        composable<MusicTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
-        composable<LibraryTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
-        composable<SettingsTarget> { SettingsScreen() }
+        composable<MusicNavigationTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
+        composable<LibraryNavigationTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
+        composable<SettingsNavigationTarget> { SettingsScreen() }
     }
 }

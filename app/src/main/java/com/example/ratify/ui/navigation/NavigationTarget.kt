@@ -7,25 +7,25 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 
-interface Target {
+interface NavigationTarget {
     val title: String
     val icon: ImageVector
 }
 
 @Serializable
-object MusicTarget : Target {
+object MusicNavigationTarget : NavigationTarget {
     override val title = "Music"
     override val icon = Icons.Default.PlayArrow
 }
 
 @Serializable
-object LibraryTarget : Target {
+object LibraryNavigationTarget : NavigationTarget {
     override val title = "Library"
     override val icon = Icons.Default.Menu
 }
 
 @Serializable
-object SettingsTarget : Target {
+object SettingsNavigationTarget : NavigationTarget {
     override val title = "Settings"
     override val icon = Icons.Default.Settings
 }
