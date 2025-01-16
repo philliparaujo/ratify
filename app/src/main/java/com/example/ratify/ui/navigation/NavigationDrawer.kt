@@ -1,6 +1,5 @@
 package com.example.ratify.ui.navigation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,8 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.PermanentNavigationDrawer
@@ -35,8 +32,8 @@ import com.example.ratify.ui.theme.RatifyTheme
 @Composable
 fun NavigationDrawer(
     navController: NavHostController,
-    startDestination: Destination,
-    items: List<Destination>,
+    startTarget: Target,
+    items: List<Target>,
     disabledClick: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -44,13 +41,13 @@ fun NavigationDrawer(
     val currentRoute = currentBackStackEntry?.destination?.route
     val currentTarget = items.find {
         if (currentRoute != null) it.toString().contains(currentRoute) else false
-    } ?: startDestination
+    } ?: startTarget
 
     PermanentNavigationDrawer (
         drawerContent = {
             DrawerContent(
                 navController,
-                startDestination,
+                startTarget,
                 items,
                 currentTarget,
                 disabledClick
@@ -64,9 +61,9 @@ fun NavigationDrawer(
 @Composable
 fun DrawerContent(
     navController: NavHostController,
-    startDestination: Destination,
-    items: List<Destination>,
-    currentTarget: Destination,
+    startTarget: Target,
+    items: List<Target>,
+    currentTarget: Target,
     disabledClick: Boolean,
 ) {
     val outlineColor = MaterialTheme.colorScheme.secondary
@@ -142,7 +139,7 @@ fun LandscapeNavDrawerPreview() {
         Scaffold () { innerPadding ->
             NavigationDrawer(
                 navController = rememberNavController(),
-                startDestination = MusicTarget,
+                startTarget = MusicTarget,
                 items = listOf(MusicTarget, LibraryTarget, SettingsTarget),
                 disabledClick = true,
             ) {

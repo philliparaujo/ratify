@@ -25,8 +25,8 @@ import com.example.ratify.ui.theme.RatifyTheme
 @Composable
 fun BottomNavigationBar(
     navController: NavHostController,
-    startDestination: Destination,
-    items: List<Destination>,
+    startTarget: Target,
+    items: List<Target>,
     disabledClick: Boolean = false,
 ) {
     // Relies on composable<Target> route being a substring of Target.toString()
@@ -34,7 +34,7 @@ fun BottomNavigationBar(
     val currentRoute = currentBackStackEntry?.destination?.route
     val currentTarget = items.find {
         if (currentRoute != null) it.toString().contains(currentRoute) else false
-    } ?: startDestination
+    } ?: startTarget
 
     val outlineColor = MaterialTheme.colorScheme.secondary
     BottomAppBar(
@@ -95,7 +95,7 @@ fun PortraitBottomNavPreview() {
             bottomBar = {
                 BottomNavigationBar(
                     navController = rememberNavController(),
-                    startDestination = MusicTarget,
+                    startTarget = MusicTarget,
                     items = listOf(MusicTarget, LibraryTarget, SettingsTarget),
                     disabledClick = true,
                 )

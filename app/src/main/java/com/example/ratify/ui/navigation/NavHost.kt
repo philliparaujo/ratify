@@ -1,15 +1,11 @@
 package com.example.ratify.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.ratify.domain.CountViewModelProvider
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.ui.screens.CountScreen
 import com.example.ratify.ui.screens.HomeScreen
 import com.example.ratify.ui.screens.ProfileScreen
 import com.example.ratify.ui.screens.SettingsScreen
@@ -17,7 +13,7 @@ import com.example.ratify.ui.screens.SettingsScreen
 @Composable
 fun NavigationHost(
     navController: NavHostController,
-    startDestination: Destination,
+    startTarget: Target,
     modifier: Modifier = Modifier,
     spotifyViewModel: SpotifyViewModel,
     onExportClick: () -> Unit,
@@ -25,7 +21,7 @@ fun NavigationHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = startTarget,
         modifier = modifier
     ) {
         composable<MusicTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
