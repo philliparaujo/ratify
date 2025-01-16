@@ -23,17 +23,13 @@ fun NavigationHost(
     onExportClick: () -> Unit,
     onImportClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    val countViewModel = remember { CountViewModelProvider.provideCountViewModel(context) }
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable<HomeTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
-        composable<ProfileTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
+        composable<MusicTarget> { HomeScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
+        composable<LibraryTarget> { ProfileScreen(spotifyViewModel = spotifyViewModel) }
         composable<SettingsTarget> { SettingsScreen() }
-        composable<CountManagerTarget> { CountScreen(viewModel = countViewModel) }
     }
 }

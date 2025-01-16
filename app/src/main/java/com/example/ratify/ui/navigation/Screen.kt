@@ -2,8 +2,9 @@ package com.example.ratify.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
@@ -14,25 +15,19 @@ interface Destination {
 }
 
 @Serializable
-object HomeTarget : Destination {
-    override val title = "Home"
-    override val icon = Icons.Default.Home
+object MusicTarget : Destination {
+    override val title = "Music"
+    override val icon = Icons.Default.PlayArrow
 }
 
 @Serializable
-object ProfileTarget : Destination {
-    override val title = "Profile"
-    override val icon = Icons.Default.Person
+object LibraryTarget : Destination {
+    override val title = "Library"
+    override val icon = Icons.Default.Menu
 }
 
 @Serializable
 object SettingsTarget : Destination {
     override val title = "Settings"
     override val icon = Icons.Default.Settings
-}
-
-@Serializable
-object CountManagerTarget : Destination {
-    override val title = "Count Manager"
-    override val icon = Icons.Default.DateRange
 }

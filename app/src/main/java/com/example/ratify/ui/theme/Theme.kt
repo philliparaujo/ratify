@@ -39,8 +39,12 @@ private val RatifyColorScheme = darkColorScheme(
     onPrimary = MyBlack,
 
     // Secondary colors
-    secondary = MyYellow,
+    secondary = MyGray,
     onSecondary = MyWhite,
+
+    // Tertiary colors
+    tertiary = MyYellow,
+    onTertiary = MyBlack,
 
     // Background and surface colors
     background = MyBlack,
@@ -48,13 +52,6 @@ private val RatifyColorScheme = darkColorScheme(
 
     surfaceVariant = MyGray,
     onSurfaceVariant = MyWhite
-//    surface = MyGray,
-//    onSurface = MyWhite,
-//
-//    // Additional essentials
-//    surfaceTint = MyCyan,
-//    tertiary = MyYellow,
-//    onTertiary = MyBlack
 )
 
 @Composable
