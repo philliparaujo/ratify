@@ -107,16 +107,18 @@ fun HomeScreen(
             scale = 1f,
             starCount = 5,
             onRatingSelect = { rating ->
-                // Update current rating (UI indicator)
-                val ratingValue = Rating.from(rating)
-                spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                if (playerEnabled) {
+                    // Update current rating (UI indicator)
+                    val ratingValue = Rating.from(rating)
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
 
-                // Update rating in database
-                spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
-                    uri = playerState!!.track.uri,
-                    rating = ratingValue,
-                    lastRatedTs = System.currentTimeMillis()
-                ))
+                    // Update rating in database
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+                        uri = playerState!!.track.uri,
+                        rating = ratingValue,
+                        lastRatedTs = System.currentTimeMillis()
+                    ))
+                }
             },
             currentRating = songState.currentRating
         )
