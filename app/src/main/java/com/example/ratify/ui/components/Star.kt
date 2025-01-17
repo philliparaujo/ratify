@@ -1,24 +1,26 @@
 package com.example.ratify.ui.components
 
 import android.graphics.PointF
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
@@ -26,32 +28,55 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposePath
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
+import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+private const val BASE_STAR_SIZE = 70f
+
 @Composable
 fun StarHalf(
     scale: Float = 1f,
     flipped: Boolean = false,
-    initialStarColor: Color
+    selectedStarColor: Color,
+    deselectedStarColor: Color,
+    selected: Boolean = false,
+    onClick: () -> Unit,
 ) {
-    var starColor by remember { mutableStateOf(initialStarColor) }
-    val secondaryStarColor = MaterialTheme.colorScheme.secondary
+    // Class that creates a shape object to clip with
+    class StarHalfShape(
+        private val path: Path
+    ) : Shape {
+        private val matrix = Matrix()
 
+        override fun createOutline(
+            size: Size,
+            layoutDirection: LayoutDirection,
+            density: Density
+        ): Outline {
+            matrix.scale(size.width, size.height)
+            matrix.translate(0.5f, 0.5f)
+
+            path.transform(matrix)
+            return Outline.Generic(path)
+        }
+    }
+
+    // Sizing and rotation parameters
     val radius = 0.4f * scale
     val innerRadius = radius / 2
     val rotationOffset = 90f
 
-    // Generate the star
+    // Generate the star path
     val vertices = remember {
         val angles = listOf(0f, 36f, 72f, 108f, 144f, 180f).map { it + rotationOffset }
         angles.flatMapIndexed { index, angle ->
@@ -69,49 +94,123 @@ fun StarHalf(
         MutableInteractionSource()
     }
 
+    val starColor = if (selected) selectedStarColor else deselectedStarColor
     Box(
         modifier = Modifier
-            .size((70*scale).dp)
+            .size((BASE_STAR_SIZE * scale).dp)
             .padding(2.dp)
             .clip(StarHalfShape(roundedPolygonPath))
             .background(starColor)
-            .size((70*scale).dp)
+            .size((BASE_STAR_SIZE * scale).dp)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { starColor = if (starColor == initialStarColor) secondaryStarColor else initialStarColor}
+                onClick = onClick
             )
     )
-}
-
-class StarHalfShape(
-    private val path: Path
-) : Shape {
-    private val matrix = Matrix()
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        matrix.scale(size.width, size.height)
-        matrix.translate(0.5f, 0.5f)
-
-        path.transform(matrix)
-        return Outline.Generic(path)
-    }
 }
 
 @Composable
 fun Star(
     scale: Float = 1f,
-    initialStarColor: Color
+    selectedStarColor: Color,
+    deselectedStarColor: Color,
+    isLeftSelected: Boolean,
+    isRightSelected: Boolean,
+    onLeftClick: () -> Unit,
+    onRightClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .padding(0.dp)
+        modifier = Modifier.padding(0.dp)
     ) {
-        StarHalf(scale = scale, initialStarColor = initialStarColor)
-        StarHalf(scale = scale, flipped = true, initialStarColor = initialStarColor)
+        // Left half
+        StarHalf(
+            scale = scale,
+            flipped = false,
+            selectedStarColor = selectedStarColor,
+            deselectedStarColor = deselectedStarColor,
+            onClick = onLeftClick,
+            selected = isLeftSelected
+        )
+
+        // Right half
+        StarHalf(
+            scale = scale,
+            flipped = true,
+            selectedStarColor = selectedStarColor,
+            deselectedStarColor = deselectedStarColor,
+            onClick = onRightClick,
+            selected = isRightSelected
+        )
+    }
+}
+
+@Composable
+fun StarRow(
+    scale: Float = 1f,
+    selectedStarColor: Color = MaterialTheme.colorScheme.tertiary,
+    deselectedStarColor: Color = MaterialTheme.colorScheme.secondary,
+    starCount: Int = 5,
+    onRatingSelect: (Int) -> Unit,
+    currentRating: Rating? = null,
+) {
+    var ratingValue by remember { mutableIntStateOf(currentRating?.value ?: 0) }
+    val starStates = remember { mutableStateListOf(*Array(starCount * 2) { false }) }
+
+    fun updateStarSelections(selectedIndex: Int) {
+        ratingValue = selectedIndex + 1
+        for (j in starStates.indices) {
+            starStates[j] = j <= selectedIndex
+        }
+    }
+
+    // Synchronize with external `currentRating`
+    LaunchedEffect(currentRating) {
+        val newRatingValue = currentRating?.value ?: 0
+        ratingValue = newRatingValue
+        updateStarSelections(newRatingValue - 1)
+    }
+
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDrag = { change, _ ->
+                        val positionX = change.position.x
+                        val starWidth = BASE_STAR_SIZE.dp.toPx() * scale
+                        val starIndex = (positionX / (starWidth / 2)).toInt()
+
+                        if (starIndex in starStates.indices) {
+                            updateStarSelections(starIndex)
+                        }
+                    },
+                    onDragEnd = {
+                        onRatingSelect(ratingValue)
+                    }
+                )
+            }
+    ) {
+        for (i in 0 until starCount) {
+            val leftStarIndex = i * 2
+            val rightStarIndex = i * 2 + 1
+
+            Star(
+                scale = scale,
+                selectedStarColor = selectedStarColor,
+                deselectedStarColor = deselectedStarColor,
+                isLeftSelected = starStates[leftStarIndex],
+                isRightSelected = starStates[rightStarIndex],
+                onLeftClick = {
+                    updateStarSelections(leftStarIndex)
+                    onRatingSelect(ratingValue)
+                },
+                onRightClick = {
+                    updateStarSelections(rightStarIndex)
+                    onRatingSelect(ratingValue)
+                }
+            )
+        }
     }
 }
 
@@ -128,11 +227,17 @@ fun Float.toRadians() = this * (PI.toFloat() / 180f)
 @Preview(name = "Star Preview")
 @Composable
 fun StarPreview() {
+    var rating by remember { mutableStateOf(0) }
+
     RatifyTheme(darkTheme = true) {
-        Row(modifier = Modifier.padding(horizontal = 8.dp)) {
-            repeat(5) {
-                Star(scale = 1f, initialStarColor = MaterialTheme.colorScheme.tertiary)
-            }
-        }
+       StarRow(
+           scale = 1f,
+           starCount = 5,
+           onRatingSelect = { newRating ->
+               Log.e("StarRow", "Selected value: $newRating")
+               rating = newRating
+           },
+           currentRating = if (rating > 0) Rating.from(rating) else null
+       )
     }
 }

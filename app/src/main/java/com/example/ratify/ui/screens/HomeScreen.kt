@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,6 +18,7 @@ import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.MyButton
+import com.example.ratify.ui.components.StarRow
 
 @Composable
 fun HomeScreen(
@@ -104,31 +103,48 @@ fun HomeScreen(
             )
         }
         Text("${songState.currentRating?.value}")
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            for (i in 1..10) {
-                MyButton(
-                    enabled = songState.currentRating?.value != i,
-                    onClick = {
-                        // Update current rating (UI indicator)
-                        val newRating = Rating.from(i)
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(newRating))
+        StarRow(
+            scale = 1f,
+            starCount = 5,
+            onRatingSelect = { rating ->
+                // Update current rating (UI indicator)
+                val ratingValue = Rating.from(rating)
+                spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
 
-                        // Update rating in database
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
-                            uri = playerState!!.track.uri,
-                            rating = newRating,
-                            lastRatedTs = System.currentTimeMillis()
-                        ))
-                    },
-                    modifier = Modifier
-                        .weight(1f),
-                    text = ""
-                )
-            }
-        }
+                // Update rating in database
+                spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+                    uri = playerState!!.track.uri,
+                    rating = ratingValue,
+                    lastRatedTs = System.currentTimeMillis()
+                ))
+            },
+            currentRating = songState.currentRating
+        )
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//        ) {
+//            for (i in 1..10) {
+//                MyButton(
+//                    enabled = songState.currentRating?.value != i,
+//                    onClick = {
+//                        // Update current rating (UI indicator)
+//                        val newRating = Rating.from(i)
+//                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(newRating))
+//
+//                        // Update rating in database
+//                        spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+//                            uri = playerState!!.track.uri,
+//                            rating = newRating,
+//                            lastRatedTs = System.currentTimeMillis()
+//                        ))
+//                    },
+//                    modifier = Modifier
+//                        .weight(1f),
+//                    text = ""
+//                )
+//            }
+//        }
 
         Row {
             MyButton(
