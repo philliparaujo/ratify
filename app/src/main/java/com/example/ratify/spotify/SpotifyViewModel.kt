@@ -20,6 +20,7 @@ import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -129,19 +130,34 @@ class SpotifyViewModel(
     val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
     private var playbackJob: Job? = null
     private fun startUpdatingPlaybackPosition(initialPosition: Long) {
-        // Stop any existing jobs
-        stopUpdatingPlaybackPosition()
+        stopUpdatingPlaybackPosition() // Stop any existing jobs
 
         Log.d("SpotifyViewModel", "updating playback position")
         playbackJob = viewModelScope.launch {
             var currentPosition = initialPosition
+            val updateIntervalMs = 250L
+            val syncIntervalMs = 10000L
+            var syncCounter = 0
             while (true) {
+                // Frequently update local counter to estimate true playback position
                 _currentPlaybackPosition.postValue(currentPosition)
-                delay(1000L)
-                currentPosition += 1000L
+                delay(updateIntervalMs)
+                currentPosition += updateIntervalMs
+
+                // Occasionally Sync playback position using Spotify API in a separate coroutine
+                syncCounter++
+                if (syncCounter % (syncIntervalMs/updateIntervalMs).toInt() == 0) {
+                    launch(Dispatchers.IO) {
+                        val syncedPosition = spotifyAppRemote?.playerApi?.getPlayerState()?.await()?.data?.playbackPosition
+                        if (syncedPosition != null) {
+                            currentPosition = syncedPosition
+                        }
+                    }
+                }
             }
         }
     }
+
     private fun stopUpdatingPlaybackPosition() {
         Log.d("SpotifyViewModel", "not updating playback position")
         playbackJob?.cancel()

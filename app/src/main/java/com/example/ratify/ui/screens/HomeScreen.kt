@@ -1,18 +1,11 @@
 package com.example.ratify.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,10 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
@@ -33,6 +23,7 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
+import com.example.ratify.ui.components.PlaybackPosition
 import com.example.ratify.ui.components.SongDisplay
 import com.example.ratify.ui.components.StarRow
 import com.example.ratify.ui.components.getArtistsString
@@ -62,11 +53,11 @@ fun HomeScreen(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(if (connected) "Connected" else "Not Connected")
+//        Text(if (connected) "Connected" else "Not Connected")
 
         playerState?.let { state ->
-            Text("Now playing: ${state.track.name} by ${state.track.artist.name}")
-            Text("Playback state: ${if (state.isPaused) "paused" else "playing"}")
+//            Text("Now playing: ${state.track.name} by ${state.track.artist.name}")
+//            Text("Playback state: ${if (state.isPaused) "paused" else "playing"}")
             Text("Playback position: ${if (state.isPaused) state.playbackPosition else currentPlaybackPosition} / ${state.track.duration}")
         }
 
@@ -77,20 +68,20 @@ fun HomeScreen(
             },
             text = "Connect to Spotify"
         )
-        MyButton(
-            enabled = playerEnabled,
-            onClick = {
-                // Play a playlist on successful connection
-                val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
-                if (spotifyConnectionState == true) {
-                    Log.d("HomeScreen", "Spotify connected successfully!")
-                    spotifyViewModel.onEvent(SpotifyEvent.PlayPlaylist(playlistURI))
-                }  else {
-                    Log.e("HomeScreen", "Failed to connect to Spotify")
-                }
-            },
-            text = "Play indie playlist"
-        )
+//        MyButton(
+//            enabled = playerEnabled,
+//            onClick = {
+//                // Play a playlist on successful connection
+//                val playlistURI = "spotify:playlist:37i9dQZF1DX2sUQwD7tbmL"
+//                if (spotifyConnectionState == true) {
+//                    Log.d("HomeScreen", "Spotify connected successfully!")
+//                    spotifyViewModel.onEvent(SpotifyEvent.PlayPlaylist(playlistURI))
+//                }  else {
+//                    Log.e("HomeScreen", "Failed to connect to Spotify")
+//                }
+//            },
+//            text = "Play indie playlist"
+//        )
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -126,7 +117,7 @@ fun HomeScreen(
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_next_24)
             )
         }
-        Text("${songState.currentRating?.value}")
+//        Text("${songState.currentRating?.value}")
         StarRow(
             scale = 1f,
             starCount = 5,
@@ -165,6 +156,10 @@ fun HomeScreen(
                 title = playerState!!.track.name,
                 artists = getArtistsString(playerState!!.track.artists),
                 imageUri = spotifyUriToImageUrl(playerState!!.track.imageUri.raw) ?: "",
+            )
+            PlaybackPosition(
+                currentPositionMs = (if (playerState!!.isPaused) playerState!!.playbackPosition else currentPlaybackPosition) ?: 0,
+                totalDurationMs = playerState!!.track.duration,
             )
         }
     }
