@@ -35,7 +35,7 @@ fun BottomNavBar(
                 end = Offset(size.width, 0f),
                 strokeWidth = 1.dp.toPx()
             )
-        }
+        },
     ) {
         navigationTargets.forEach { target ->
             val isSelected = currentNavigationTarget == target
@@ -49,6 +49,8 @@ fun BottomNavBar(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     indicatorColor = MaterialTheme.colorScheme.background,
+                    unselectedIconColor = MaterialTheme.colorScheme.onBackground,
+                    unselectedTextColor = MaterialTheme.colorScheme.onBackground,
                 )
             )
         }
