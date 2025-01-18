@@ -5,21 +5,36 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.example.ratify.R
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.MyButton
+import com.example.ratify.ui.components.MyIconButton
 import com.example.ratify.ui.components.StarRow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     spotifyViewModel: SpotifyViewModel,
@@ -72,34 +87,39 @@ fun HomeScreen(
             },
             text = "Play indie playlist"
         )
-        Row {
-            MyButton(
-                enabled = playerEnabled,
-                onClick = {
-                    spotifyViewModel.onEvent(SpotifyEvent.Pause)
-                },
-                text = "Pause"
-            )
-            MyButton(
-                enabled = playerEnabled,
-                onClick = {
-                    spotifyViewModel.onEvent(SpotifyEvent.Resume)
-                },
-                text = "Resume"
-            )
-            MyButton(
-                enabled = playerEnabled,
-                onClick = {
-                    spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
-                },
-                text = "Next Song"
-            )
-            MyButton(
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            MyIconButton(
                 enabled = playerEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipPrevious)
                 },
-                text = "Previous song"
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_previous_24)
+            )
+            MyIconButton(
+                enabled = playerEnabled,
+                onClick = {
+                    if (playerState != null) {
+                        if (playerState!!.isPaused) {
+                            spotifyViewModel.onEvent(SpotifyEvent.Resume)
+                        } else {
+                            spotifyViewModel.onEvent(SpotifyEvent.Pause)
+                        }
+                    }
+                },
+                icon = ImageVector.vectorResource(
+                    id = if (playerState?.isPaused != false) R.drawable.baseline_play_arrow_24 else R.drawable.baseline_pause_24
+                ),
+                large = true
+            )
+            MyIconButton(
+                enabled = playerEnabled,
+                onClick = {
+                    spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
+                },
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_next_24)
             )
         }
         Text("${songState.currentRating?.value}")
@@ -122,31 +142,6 @@ fun HomeScreen(
             },
             currentRating = songState.currentRating
         )
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//        ) {
-//            for (i in 1..10) {
-//                MyButton(
-//                    enabled = songState.currentRating?.value != i,
-//                    onClick = {
-//                        // Update current rating (UI indicator)
-//                        val newRating = Rating.from(i)
-//                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(newRating))
-//
-//                        // Update rating in database
-//                        spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
-//                            uri = playerState!!.track.uri,
-//                            rating = newRating,
-//                            lastRatedTs = System.currentTimeMillis()
-//                        ))
-//                    },
-//                    modifier = Modifier
-//                        .weight(1f),
-//                    text = ""
-//                )
-//            }
-//        }
 
         Row {
             MyButton(

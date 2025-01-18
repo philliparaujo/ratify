@@ -51,7 +51,10 @@ private val RatifyColorScheme = darkColorScheme(
     onBackground = MyWhite,
 
     surfaceVariant = MyGray,
-    onSurfaceVariant = MyWhite
+    onSurfaceVariant = MyBlack,
+
+    primaryContainer = MyDarkGray,
+    onPrimaryContainer = MyWhite
 )
 
 @Composable
@@ -61,16 +64,6 @@ fun RatifyTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//
-//        darkTheme -> DarkColorScheme
-//        else -> LightColorScheme
-//    }
-
     MaterialTheme(
         colorScheme = RatifyColorScheme,
         typography = Typography,
