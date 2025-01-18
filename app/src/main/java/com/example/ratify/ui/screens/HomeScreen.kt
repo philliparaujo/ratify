@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,10 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
+import com.example.ratify.ui.components.SongDisplay
 import com.example.ratify.ui.components.StarRow
+import com.example.ratify.ui.components.getArtistsString
+import com.example.ratify.ui.components.spotifyUriToImageUrl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,7 +146,6 @@ fun HomeScreen(
             },
             currentRating = songState.currentRating
         )
-
         Row {
             MyButton(
                 onClick = {
@@ -155,6 +158,13 @@ fun HomeScreen(
                     onImportClick.invoke()
                 },
                 text = "Import Database"
+            )
+        }
+        if (playerState != null) {
+            SongDisplay(
+                title = playerState!!.track.name,
+                artists = getArtistsString(playerState!!.track.artists),
+                imageUri = spotifyUriToImageUrl(playerState!!.track.imageUri.raw) ?: "",
             )
         }
     }

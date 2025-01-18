@@ -86,4 +86,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.appcompat)
+
+    // Fetching and loading network images
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }

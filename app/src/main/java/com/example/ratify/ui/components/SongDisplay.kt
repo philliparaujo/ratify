@@ -1,0 +1,201 @@
+package com.example.ratify.ui.components
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.SubcomposeAsyncImage
+import com.example.ratify.R
+import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.ui.theme.RatifyTheme
+import com.spotify.protocol.types.Album
+import com.spotify.protocol.types.Artist
+import com.spotify.protocol.types.ImageUri
+
+@Composable
+fun SongDisplay(
+    title: String,
+    artists: String,
+    imageUri: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.size(300.dp)
+    ) {
+        SubcomposeAsyncImage(
+            model = imageUri,
+            contentDescription = "Song image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(300.dp),
+            error = {
+                // Checks if in Preview mode
+                if (LocalInspectionMode.current) {
+                    Image(
+                        painter = painterResource(R.drawable.baseline_play_arrow_24),
+                        contentDescription = "foo"
+                    )
+                }
+            }
+        )
+
+        // Translucent overlay
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f))
+        )
+
+        // Bottom text
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp)
+            )
+            Text(
+                text=  artists,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+            )
+        }
+
+    }
+}
+
+// Helper functions
+fun spotifyUriToImageUrl(spotifyUri: String?): String? {
+    val spotifyUriPrefix = "spotify:image:"
+    val standardUriPrefix = "https://i.scdn.co/image/"
+    return spotifyUri?.replace(spotifyUriPrefix, standardUriPrefix)
+}
+
+fun getArtistsString(artists: List<Artist>): String {
+    return artists.joinToString(", ") { it.name }
+}
+
+// Previews
+// Network images don't work with previews
+@Preview(name = "Song Display")
+@Composable
+fun SongDisplayPreview() {
+    val unspecifiedString = "foo"
+    val songName = "Touchdown (feat. Bankrol Hayden)"
+
+    val song = Song(
+        album = Album(
+            songName,
+            unspecifiedString
+        ),
+        artist = Artist(
+            "YSB Tril", unspecifiedString
+        ),
+        artists = listOf(
+            Artist(
+                "YSB Tril", unspecifiedString
+            ),
+            Artist(
+                "Bankrol Hayden", unspecifiedString
+            )
+        ),
+        duration = 141581,
+        imageUri = ImageUri(
+            "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+        ),
+        name = songName,
+        uri = "spotify:track:7xWnMfIVVnI3Y3zPp9Ukvi",
+        lastPlayedTs = 1737132383109,
+        timesPlayed = 1,
+        lastRatedTs = 1737132383109,
+        rating = Rating.from(10)
+    )
+
+    RatifyTheme(darkTheme = true) {
+        SongDisplay(
+            title = song.name,
+            artists = getArtistsString(song.artists),
+            imageUri = song.imageUri.raw ?: ""
+        )
+    }
+}
+
+@Preview(name = "Long Name Song Display")
+@Composable
+fun LongNameSongDisplayPreview() {
+    val unspecifiedString = "foo"
+    val songName = "Symphony No. 40 in G Minor, K. 550: I.Allegro molto"
+
+    val song = Song(
+        album = Album(
+            songName,
+            unspecifiedString
+        ),
+        artist = Artist(
+            "Wolfgang Amadeus Mozart", unspecifiedString
+        ),
+        artists = listOf(
+            Artist(
+                "Wolfgang Amadeus Mozart", unspecifiedString
+            ),
+            Artist(
+                "Capella Instropolitana", unspecifiedString
+            ),
+            Artist(
+                "Barry Wordsworth", unspecifiedString
+            )
+        ),
+        duration = 451333,
+        imageUri = ImageUri(
+            unspecifiedString
+        ),
+        name = songName,
+        uri = unspecifiedString,
+        lastPlayedTs = 1737132383109,
+        timesPlayed = 1,
+        lastRatedTs = 1737132383109,
+        rating = Rating.from(10)
+    )
+
+    RatifyTheme(darkTheme = true) {
+        SongDisplay(
+            title = song.name,
+            artists = getArtistsString(song.artists),
+            imageUri = song.imageUri.raw ?: ""
+        )
+    }
+}

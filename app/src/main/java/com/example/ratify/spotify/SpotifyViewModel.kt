@@ -234,7 +234,7 @@ class SpotifyViewModel(
                 deleteSongWithNullRating(event.exceptUri)
             }
             is SpotifyEvent.UpdateLastPlayedTs -> {
-                updateLastPlayedTs(event.uri, event.lastPlayedTs)
+                updateLastPlayedTs(event.uri, event.lastPlayedTs, event.timesPlayed)
             }
             is SpotifyEvent.UpdateRating -> {
                 updateRating(event.uri, event.rating, event.lastRatedTs)
@@ -326,11 +326,11 @@ class SpotifyViewModel(
         }
     }
 
-    private fun updateLastPlayedTs(uri: String, lastPlayedTs: Long?) {
+    private fun updateLastPlayedTs(uri: String, lastPlayedTs: Long?, timesPlayed: Int) {
         viewModelScope.launch {
             val song = dao.getSongByUri(uri)
             if (song != null) {
-                dao.upsertSong(song.copy(lastPlayedTs = lastPlayedTs))
+                dao.upsertSong(song.copy(lastPlayedTs = lastPlayedTs, timesPlayed = timesPlayed))
             }
         }
     }
