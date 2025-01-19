@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,13 +41,13 @@ fun SongDisplay(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.size(300.dp)
+        modifier = modifier.fillMaxWidth().aspectRatio(1f)
     ) {
         SubcomposeAsyncImage(
             model = imageUri,
             contentDescription = "Song image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(300.dp),
+            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
             error = {
                 // Checks if in Preview mode
                 if (LocalInspectionMode.current) {
@@ -146,11 +147,16 @@ fun SongDisplayPreview() {
     )
 
     RatifyTheme(darkTheme = true) {
-        SongDisplay(
-            title = song.name,
-            artists = getArtistsString(song.artists),
-            imageUri = song.imageUri.raw ?: ""
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            SongDisplay(
+                title = song.name,
+                artists = getArtistsString(song.artists),
+                imageUri = song.imageUri.raw ?: ""
+            )
+        }
     }
 }
 
@@ -192,10 +198,15 @@ fun LongNameSongDisplayPreview() {
     )
 
     RatifyTheme(darkTheme = true) {
-        SongDisplay(
-            title = song.name,
-            artists = getArtistsString(song.artists),
-            imageUri = song.imageUri.raw ?: ""
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            SongDisplay(
+                title = song.name,
+                artists = getArtistsString(song.artists),
+                imageUri = song.imageUri.raw ?: ""
+            )
+        }
     }
 }

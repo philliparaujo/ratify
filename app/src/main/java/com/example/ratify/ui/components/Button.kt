@@ -26,6 +26,7 @@ fun MyButton(
 ) {
     val buttonHeight = if (large) 54.dp else 40.dp
     val minWidth = if (large) 140.dp else 100.dp
+    val typography = if (large) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium
 
     Button(
         onClick = onClick,
@@ -42,7 +43,7 @@ fun MyButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            style = typography,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
