@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,6 +41,7 @@ import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 private const val BASE_STAR_SIZE = 70f
 
@@ -72,7 +74,10 @@ fun StarHalf(
     }
 
     // Sizing and rotation parameters
-    val radius = 0.4f * scale
+    val normalizedScale = scale.coerceAtLeast(0.0f).coerceAtMost(1.0f)
+    val adjustedScale = sqrt(normalizedScale.toDouble()).toFloat()
+
+    val radius = 0.4f * adjustedScale
     val innerRadius = radius / 2
     val rotationOffset = 90f
 
@@ -98,7 +103,6 @@ fun StarHalf(
     Box(
         modifier = Modifier
             .size((BASE_STAR_SIZE * scale).dp)
-            .padding(2.dp)
             .clip(StarHalfShape(roundedPolygonPath))
             .background(starColor)
             .size((BASE_STAR_SIZE * scale).dp)
@@ -173,7 +177,6 @@ fun StarRow(
 
     Row(
         modifier = Modifier
-            .padding(horizontal = 8.dp)
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { change, _ ->
@@ -227,17 +230,73 @@ fun Float.toRadians() = this * (PI.toFloat() / 180f)
 @Preview(name = "Star Preview")
 @Composable
 fun StarPreview() {
+    RatifyTheme {
+        Column {
+            Star(
+                scale = 1f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
+
+            Star(
+                scale = 2f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
+
+
+            Star(
+                scale = 0.5f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
+        }
+    }
+}
+
+@Preview(name = "Star Row Preview")
+@Composable
+fun StarRowPreview() {
     var rating by remember { mutableStateOf(0) }
 
     RatifyTheme(darkTheme = true) {
-       StarRow(
-           scale = 1f,
-           starCount = 5,
-           onRatingSelect = { newRating ->
-               Log.e("StarRow", "Selected value: $newRating")
-               rating = newRating
-           },
-           currentRating = if (rating > 0) Rating.from(rating) else null
-       )
+        Column {
+            StarRow(
+                scale = 1f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+            StarRow(
+                scale = 0.5f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+            StarRow(
+                scale = 2f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+        }
     }
 }

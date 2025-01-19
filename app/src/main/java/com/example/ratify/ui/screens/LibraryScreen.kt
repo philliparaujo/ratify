@@ -30,12 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.components.DropdownSelect
-import com.example.ratify.ui.components.TestDialog
+import com.example.ratify.ui.components.Dialog
 
 @Composable
 fun LibraryScreen(
@@ -118,11 +119,31 @@ fun LibraryScreen(
 
         // Song dialog
         if (songState.currentSongDialog != null) {
-            TestDialog(
+            Dialog(
                 onDismissRequest = {
                     spotifyViewModel.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
                 },
-                name = songState.currentSongDialog!!.name
+                song = songState.currentSongDialog!!,
+                onRatingSelect = { rating ->
+                    // Update current rating (UI indicator)
+                    val ratingValue = Rating.from(rating)
+                    if (playerState?.track?.uri == songState.currentSongDialog!!.uri) {
+                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    }
+
+                    // Update rating in database
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+                        uri = songState.currentSongDialog!!.uri,
+                        rating = ratingValue,
+                        lastRatedTs = System.currentTimeMillis()
+                    ))
+                },
+                onPlay = {
+                    spotifyViewModel.onEvent(SpotifyEvent.PlaySong(songState.currentSongDialog!!.uri))
+                },
+                onDelete = {
+                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(songState.currentSongDialog!!))
+                }
             )
         }
     }

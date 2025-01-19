@@ -208,6 +208,7 @@ class SpotifyViewModel(
             is SpotifyEvent.DisconnectSpotify -> disconnectSpotifyAppRemote()
 
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
+            is SpotifyEvent.PlaySong -> playSong(event.songUri)
             is SpotifyEvent.Pause -> pause()
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
@@ -305,6 +306,10 @@ class SpotifyViewModel(
 
     private fun playPlaylist(playlistURI: String) {
         spotifyAppRemote?.playerApi?.play(playlistURI)
+    }
+
+    private fun playSong(songURI: String) {
+        spotifyAppRemote?.playerApi?.play(songURI)
     }
 
     private fun pause() {

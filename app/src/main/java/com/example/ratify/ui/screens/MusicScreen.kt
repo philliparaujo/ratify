@@ -248,7 +248,7 @@ fun PlayerScreenPreview() {
     }
 }
 
-const val landscapeDevice = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
+public const val landscapeDevice = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
 @Preview(
     name = "Landscape Login Screen",
     device = landscapeDevice  // A hack to force landscape render of previews

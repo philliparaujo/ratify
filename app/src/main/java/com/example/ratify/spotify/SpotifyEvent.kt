@@ -14,6 +14,7 @@ sealed interface SpotifyEvent {
 
     // Player
     data class PlayPlaylist(val playlistUri: String): SpotifyEvent
+    data class PlaySong(val songUri: String): SpotifyEvent
     data object Pause: SpotifyEvent
     data object Resume: SpotifyEvent
     data object SkipNext: SpotifyEvent
