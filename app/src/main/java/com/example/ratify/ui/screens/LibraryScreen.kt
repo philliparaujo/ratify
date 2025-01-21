@@ -7,25 +7,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
@@ -35,20 +36,22 @@ import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
-import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Dialog
+import com.example.ratify.ui.components.DropdownSelect
+import com.example.ratify.ui.components.Search
+import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun LibraryScreen(
-    spotifyViewModel: SpotifyViewModel
+    spotifyViewModel: SpotifyViewModel?
 ) {
-    val songState by spotifyViewModel.state.collectAsState(initial = SongState())
-    val playerState by spotifyViewModel.playerState.observeAsState()
+    val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
+    val playerState = spotifyViewModel?.playerState?.observeAsState()?.value
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
     val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS)
 
-    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()
-    val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
+    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
+    val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
     Column(
         modifier = Modifier
@@ -58,29 +61,28 @@ fun LibraryScreen(
         // Search bar, dropdown select,  *super delete button
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            TextField(
-                value = songState.searchQuery,
-                onValueChange = spotifyViewModel::onSearchTextChange,
-                placeholder = { Text(text = "Search")},
-                maxLines = 1,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 8.dp)
+            Search(
+                query = songState.searchQuery,
+                onQueryChange = { spotifyViewModel?.onSearchTextChange(it) },
+                placeholderText = "Search",
+                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = "More search options") },
+                modifier = Modifier.weight(1f)
             )
 
             // Searching dropdown
             DropdownSelect(
                 options = searchTypes,
                 selectedOption = songState.searchType,
-                onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
-                label = "Search by"
+                onSelect = { searchType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
+                label = "Search by",
+                modifier = Modifier.wrapContentWidth()
             )
 
+// SUPER DELETE BUTTON
 //            IconButton(
 //                onClick = {
 //                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
@@ -99,7 +101,7 @@ fun LibraryScreen(
         DropdownSelect(
             options = sortTypes,
             selectedOption = songState.sortType,
-            onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
+            onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
             label = "Sort by",
             large = true
         )
@@ -115,8 +117,8 @@ fun LibraryScreen(
             items(songState.songs) { song ->
                 SongItem(
                     song = song,
-                    onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
-                    onDelete = { spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(song)) }
+                    onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
+                    onDelete = { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song)) }
                 )
             }
         }
@@ -125,28 +127,28 @@ fun LibraryScreen(
         if (songState.currentSongDialog != null) {
             Dialog(
                 onDismissRequest = {
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
+                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
                 },
-                song = songState.currentSongDialog!!,
+                song = songState.currentSongDialog,
                 onRatingSelect = { rating ->
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
-                    if (playerState?.track?.uri == songState.currentSongDialog!!.uri) {
+                    if (playerState?.track?.uri == songState.currentSongDialog.uri) {
                         spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
                     }
 
                     // Update rating in database
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
-                        uri = songState.currentSongDialog!!.uri,
+                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
+                        uri = songState.currentSongDialog.uri,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))
                 },
                 onPlay = {
-                    spotifyViewModel.onEvent(SpotifyEvent.PlaySong(songState.currentSongDialog!!.uri))
+                    spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(songState.currentSongDialog.uri))
                 },
                 onDelete = {
-                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(songState.currentSongDialog!!))
+                    spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(songState.currentSongDialog))
                 },
                 playEnabled = playerEnabled,
                 deleteEnabled = true
@@ -201,5 +203,29 @@ fun SongItem(
                 contentDescription = "Delete song"
             )
         }
+    }
+}
+
+// Previews
+@Preview(name = "Library Screen")
+@Composable
+fun LibraryScreenPreview() {
+    RatifyTheme {
+        LibraryScreen(
+            spotifyViewModel = null
+        )
+    }
+}
+
+@Preview(
+    name = "Landscape Library Screen",
+    device = landscapeDevice
+)
+@Composable
+fun LandscapeLibraryScreenPreview() {
+    RatifyTheme {
+        LibraryScreen(
+            spotifyViewModel = null
+        )
     }
 }
