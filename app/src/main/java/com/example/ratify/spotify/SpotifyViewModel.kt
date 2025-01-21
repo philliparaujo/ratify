@@ -145,15 +145,15 @@ class SpotifyViewModel(
                 currentPosition += updateIntervalMs
 
                 // Occasionally Sync playback position using Spotify API in a separate coroutine
-                syncCounter++
                 if (syncCounter % (syncIntervalMs/updateIntervalMs).toInt() == 0) {
                     launch(Dispatchers.IO) {
-                        val syncedPosition = spotifyAppRemote?.playerApi?.getPlayerState()?.await()?.data?.playbackPosition
+                        val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
                         if (syncedPosition != null) {
                             currentPosition = syncedPosition
                         }
                     }
                 }
+                syncCounter++
             }
         }
     }
