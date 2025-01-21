@@ -40,7 +40,9 @@ fun Dialog(
     onRatingSelect: (Int) -> Unit,
     onPlay: () -> Unit,
     onDelete: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    playEnabled: Boolean = true,
+    deleteEnabled: Boolean = true,
 ) {
     val textColor = MaterialTheme.colorScheme.onBackground
 
@@ -69,6 +71,7 @@ fun Dialog(
         ) {
             MyButton(
                 text = "Play",
+                enabled = playEnabled,
                 onClick = {
                     onPlay()
                     onDismissRequest()
@@ -76,6 +79,7 @@ fun Dialog(
             )
             MyButton(
                 text = "Delete",
+                enabled = deleteEnabled,
                 onClick = {
                     onDelete()
                     onDismissRequest()
@@ -248,7 +252,7 @@ fun timestampToDate(timestamp: Long?): String? {
     }
 
     val date = Date(timestamp)
-    val formatter = SimpleDateFormat("MM/DD/yyyy", Locale.getDefault())
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(date)
 }
 

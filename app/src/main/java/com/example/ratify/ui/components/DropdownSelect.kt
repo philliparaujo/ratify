@@ -1,14 +1,42 @@
 package com.example.ratify.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import com.example.ratify.ui.theme.RatifyTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -17,35 +45,142 @@ fun <T> DropdownSelect(
     selectedOption: T,
     onSelect: (T) -> Unit,
     label: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startExpanded: Boolean = false,
+    large: Boolean = false,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(startExpanded) }
+
+    val fontSize = 16f
+    val height = if (large) 56.dp else 56.dp
+    val width = if (large) 150.dp else 100.dp
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it }
+        onExpandedChange = { expanded = it },
+        modifier = Modifier
+            .height(height)
+            .width(width)
+            .padding(0.dp)
     ) {
-        TextField(
-            value = selectedOption.toString(),
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-        )
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .height(height)
+                .width(width)
+        ) {
+            TextField(
+                value = selectedOption.toString(),
+                onValueChange = {},
+                readOnly = true,
+                shape = CircleShape,
+                label = { Text(text = label, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontSize = TextUnit(
+                        fontSize,
+                        TextUnitType.Sp
+                    ),
+                    fontWeight = FontWeight.Bold,
+                    baselineShift = BaselineShift(-1f)
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledTextColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.background,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.background,
+                    disabledIndicatorColor = MaterialTheme.colorScheme.background,
+                    focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledLabelColor = MaterialTheme.colorScheme.onSecondary
+                ),
+                modifier = modifier
+                    .padding(0.dp)
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+            )
+        }
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option.toString()) },
+                    text = {
+                        Text(
+                            text = option.toString(),
+                            modifier = Modifier.fillMaxSize(),
+                            textAlign = TextAlign.Center,
+                            fontSize = TextUnit(
+                                fontSize,
+                                TextUnitType.Sp
+                            )
+                        )
+                    },
                     onClick = {
                         onSelect(option)
                         expanded = false
-                    }
+                    },
                 )
             }
+        }
+
+    }
+}
+
+// Previews
+@Preview(name = "Dropdown Select")
+@Composable
+fun DropdownSelectPreview() {
+    RatifyTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            DropdownSelect(
+                options = listOf(
+                    "Name",
+                    "Artists",
+                    "Album",
+                    "Rating"
+                ),
+                selectedOption = "Name",
+                onSelect = {},
+                label = "Search by"
+            )
+
+            DropdownSelect(
+                options = listOf(
+                    "Name",
+                    "Artists",
+                    "Album",
+                    "Rating"
+                ),
+                selectedOption = "Artists",
+                onSelect = {},
+                label = "Search by",
+                startExpanded = true
+            )
+
+
+            DropdownSelect(
+                options = listOf(
+                    "Rating",
+                    "Last played",
+                    "Last rated",
+                    "Times played"
+                ),
+                selectedOption = "Last played",
+                onSelect = {},
+                label = "Sort by",
+                startExpanded = true,
+                large = true
+            )
         }
     }
 }

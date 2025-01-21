@@ -47,12 +47,15 @@ fun LibraryScreen(
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
     val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS)
 
+    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()
+    val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        // Search bar, super delete button
+        // Search bar, dropdown select,  *super delete button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -70,34 +73,35 @@ fun LibraryScreen(
                     .padding(end = 8.dp)
             )
 
-            IconButton(
-                onClick = {
-                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
-                        playerState?.track?.uri ?: ""))
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete all songs with null rating",
-                    tint = Color.LightGray
-                )
-            }
-        }
+            // Searching dropdown
+            DropdownSelect(
+                options = searchTypes,
+                selectedOption = songState.searchType,
+                onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
+                label = "Search by"
+            )
 
-        // Searching dropdown
-        DropdownSelect(
-            options = searchTypes,
-            selectedOption = songState.searchType,
-            onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
-            label = "Search by"
-        )
+//            IconButton(
+//                onClick = {
+//                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
+//                        playerState?.track?.uri ?: ""))
+//                }
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Delete,
+//                    contentDescription = "Delete all songs with null rating",
+//                    tint = Color.LightGray
+//                )
+//            }
+        }
 
         // Sorting dropdown
         DropdownSelect(
             options = sortTypes,
             selectedOption = songState.sortType,
             onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
-            label = "Sort by"
+            label = "Sort by",
+            large = true
         )
 
         HorizontalDivider()
@@ -143,7 +147,9 @@ fun LibraryScreen(
                 },
                 onDelete = {
                     spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(songState.currentSongDialog!!))
-                }
+                },
+                playEnabled = playerEnabled,
+                deleteEnabled = true
             )
         }
     }
