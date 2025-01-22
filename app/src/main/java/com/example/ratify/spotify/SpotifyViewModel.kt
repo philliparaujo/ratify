@@ -170,6 +170,7 @@ class SpotifyViewModel(
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
     private val _showSongDialog = MutableStateFlow<Song?>(null)
+    private val _visualizerShowing = MutableStateFlow<Boolean>(false)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _songs = combine(_searchType, _searchQuery, _sortType) { searchType, searchQuery, sortType ->
         dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType))
@@ -177,22 +178,24 @@ class SpotifyViewModel(
 
     private val _state = MutableStateFlow(SongState())
     val state = combine(
-        listOf(_state, _searchType, _sortType, _rating, _showSongDialog, _songs, _searchQuery)
+        listOf(_state, _searchType, _sortType, _rating, _showSongDialog, _visualizerShowing, _songs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as SongState
         val searchType = flows[1] as SearchType
         val sortType = flows[2] as SortType
         val rating = flows[3] as Rating?
         val showSongDialog = flows[4] as Song?
-        val songs = flows[5] as List<Song>
-        val searchQuery = flows[6] as String
+        val visualizerShowing = flows[5] as Boolean
+        val songs = flows[6] as List<Song>
+        val searchQuery = flows[7] as String
 
         state.copy(
-            songs = songs,
             searchType = searchType,
             sortType = sortType,
             currentRating = rating,
             currentSongDialog = showSongDialog,
+            visualizerShowing = visualizerShowing,
+            songs = songs,
             searchQuery = searchQuery
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
@@ -225,6 +228,9 @@ class SpotifyViewModel(
             }
             is SpotifyEvent.UpdateShowSongDialog -> {
                 _showSongDialog.value = event.showSongDialog
+            }
+            is SpotifyEvent.UpdateVisualizerShowing -> {
+                _visualizerShowing.value = event.visualizerShowing
             }
 
             is SpotifyEvent.UpsertSong -> {

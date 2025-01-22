@@ -8,4 +8,5 @@ data class SongState(
     val searchQuery: String = "",
     val currentRating: Rating? = null,  // Represents song's currently selected rating, shown on UI
     val currentSongDialog: Song? = null,  // Represents currently shown dialog for a song
+    val visualizerShowing: Boolean = false,
 )

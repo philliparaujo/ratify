@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +39,7 @@ import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
+import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
@@ -56,9 +57,10 @@ fun LibraryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Search bar, dropdown select,  *super delete button
+        // Search bar, dropdown select
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -69,7 +71,15 @@ fun LibraryScreen(
                 query = songState.searchQuery,
                 onQueryChange = { spotifyViewModel?.onSearchTextChange(it) },
                 placeholderText = "Search",
-                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = "More search options") },
+                trailingIcon = Icons.Default.MoreVert,
+                dropdownLabels = listOf(
+                    if (songState.visualizerShowing) "Hide visualizer" else "Show visualizer",
+                    "Delete unrated songs"
+                ),
+                dropdownOptionOnClick = listOf(
+                    { spotifyViewModel?.onEvent(SpotifyEvent.UpdateVisualizerShowing(!songState.visualizerShowing)) },
+                    { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSongsWithNullRating(playerState?.track?.uri ?: "")) }
+                ),
                 modifier = Modifier.weight(1f)
             )
 
@@ -81,30 +91,48 @@ fun LibraryScreen(
                 label = "Search by",
                 modifier = Modifier.wrapContentWidth()
             )
+        }
 
-// SUPER DELETE BUTTON
-//            IconButton(
-//                onClick = {
-//                    spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
-//                        playerState?.track?.uri ?: ""))
-//                }
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Delete,
-//                    contentDescription = "Delete all songs with null rating",
-//                    tint = Color.LightGray
-//                )
-//            }
+        if (songState.visualizerShowing) {
+            Visualizer(
+                heights = (1..10).map { rating ->
+                    songState.songs.count { song -> song.rating?.value == rating }.toFloat()
+                }
+            )
         }
 
         // Sorting dropdown
-        DropdownSelect(
-            options = sortTypes,
-            selectedOption = songState.sortType,
-            onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
-            label = "Sort by",
-            large = true
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column {
+                Text(
+                    "${songState.songs.count()} entries",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp
+                )
+                val totalRatings = songState.songs.mapNotNull { song -> song.rating?.value }
+                val averageScore = if (totalRatings.isNotEmpty()) {
+                    totalRatings.sum().toFloat() / totalRatings.size
+                } else {
+                    0f
+                }
+                Text(
+                    "Average score: %.1f".format(averageScore),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp
+                )
+            }
+            DropdownSelect(
+                options = sortTypes,
+                selectedOption = songState.sortType,
+                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
+                label = "Sort by",
+                large = true
+            )
+        }
 
         HorizontalDivider()
 

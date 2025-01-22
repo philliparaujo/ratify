@@ -9,8 +9,11 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -21,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.ui.theme.RatifyTheme
@@ -32,9 +36,12 @@ fun Search(
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholderText: String = "Search",
-    trailingIcon: @Composable (() -> Unit)?
+    trailingIcon: ImageVector?,
+    dropdownLabels: List<String>,
+    dropdownOptionOnClick: List<() -> Unit>
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    var isDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
     SearchBar(
         modifier = modifier.padding(top = 0.dp),
@@ -50,7 +57,29 @@ fun Search(
                     Icons.Default.Search,
                     contentDescription = "Search icon"
                 ) },
-                trailingIcon = trailingIcon,
+                trailingIcon = trailingIcon?.let {
+                    {
+                        Box {
+                            IconButton(onClick = { isDropdownExpanded = true }) {
+                                Icon(imageVector = it, contentDescription = "More search options")
+                            }
+                            DropdownMenu(
+                                expanded = isDropdownExpanded,
+                                onDismissRequest = { isDropdownExpanded = false }
+                            ) {
+                                dropdownLabels.forEachIndexed { index, option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            dropdownOptionOnClick[index]()
+                                            isDropdownExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
                 colors = SearchBarDefaults.inputFieldColors(
                     focusedTextColor = MaterialTheme.colorScheme.onSecondary,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
@@ -94,15 +123,16 @@ fun SearchBarPreview() {
                 Search(
                     query = "Foo",
                     onQueryChange = { _ -> },
-                    trailingIcon = null
+                    trailingIcon = null,
+                    dropdownOptionOnClick = emptyList(),
+                    dropdownLabels = emptyList()
                 )
                 Search(
                     query = "",
                     onQueryChange = { _ ->},
-                    trailingIcon = { Icon(
-                        Icons.Default.MoreVert,
-                        contentDescription = "More search options"
-                    ) }
+                    trailingIcon = Icons.Default.MoreVert,
+                    dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
+                    dropdownOptionOnClick = listOf<() -> Unit>({}, {})
                 )
             }
         }
