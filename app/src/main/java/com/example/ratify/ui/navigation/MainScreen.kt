@@ -8,7 +8,7 @@ import com.example.ratify.spotify.SpotifyViewModel
 fun MainScreen(
     spotifyViewModel: SpotifyViewModel,
     onExportClick: () -> Unit,
-    onImportClick: () -> Unit
+    onImportClick: () -> Unit,
 ) {
     val navController = rememberNavController()
 

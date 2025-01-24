@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.view.WindowCompat
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyViewModel
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
                )
             }
         }
+
+        // Set status bar content (top/bottom) to white to match dark app background
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
     private fun showToast(message: String) {

@@ -1,11 +1,16 @@
 package com.example.ratify.ui.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
@@ -21,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.ui.components.LeftNavDrawer
 import com.example.ratify.ui.components.BottomNavBar
+import com.example.ratify.ui.components.LeftNavDrawer
 
 @Composable
 fun NavigationRenderer(
@@ -62,7 +67,12 @@ fun NavigationRenderer(
 
     // Render content
     if (isLandscape) {
-        Scaffold() { innerPadding ->
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .windowInsetsPadding(WindowInsets.displayCutout)
+        ) { innerPadding ->
             PermanentNavigationDrawer (
                 drawerContent = {
                     LeftNavDrawer(
@@ -83,7 +93,7 @@ fun NavigationRenderer(
                     currentNavigationTarget = currentTarget,
                     onClick = onClick
                 )
-            }
+            },
         ) { innerPadding ->
             navigationHost(innerPadding)
         }
