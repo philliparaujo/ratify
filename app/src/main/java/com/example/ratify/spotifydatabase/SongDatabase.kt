@@ -10,7 +10,8 @@ import com.example.ratify.spotifydatabase.SongDao
 
 @Database(
     entities = [Song::class],
-    version = DatabaseVersionManager.DATABASE_VERSION
+    version = DatabaseVersionManager.DATABASE_VERSION,
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class SongDatabase: RoomDatabase() {

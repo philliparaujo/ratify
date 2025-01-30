@@ -1,12 +1,11 @@
 package com.example.ratify.spotifydatabase
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
 
-@Entity("songs")
+@Entity(tableName = "songs", primaryKeys = ["uri"])
 data class Song(
     // Track info (unchanging)
     val album: Album,
@@ -17,8 +16,6 @@ data class Song(
 //    val isEpisode: Boolean,
 //    val isPodcast: Boolean,
     val name: String,
-
-    @PrimaryKey(autoGenerate = false)
     val uri: String,
 
     // App info (may change)
