@@ -39,6 +39,7 @@ import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
+import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.theme.RatifyTheme
 
@@ -78,7 +79,9 @@ fun LibraryScreen(
                 ),
                 dropdownOptionOnClick = listOf(
                     { spotifyViewModel?.onEvent(SpotifyEvent.UpdateVisualizerShowing(!songState.visualizerShowing)) },
-                    { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSongsWithNullRating(playerState?.track?.uri ?: "")) }
+                    { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
+                        playerState?.track?.name ?: "",
+                        playerState?.track?.artists ?: listOf())) }
                 ),
                 modifier = Modifier.weight(1f)
             )
@@ -167,7 +170,8 @@ fun LibraryScreen(
 
                     // Update rating in database
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
-                        uri = songState.currentSongDialog.uri,
+                        name = songState.currentSongDialog.name,
+                        artists = songState.currentSongDialog.artists,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))
@@ -180,55 +184,6 @@ fun LibraryScreen(
                 },
                 playEnabled = playerEnabled,
                 deleteEnabled = true
-            )
-        }
-    }
-}
-
-@Composable
-fun SongItem(
-    song: Song,
-    onClick: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable(onClick = onClick)
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        // Fixed-width container for the rating text
-        Box(
-            modifier = Modifier
-                .width(25.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = if (song.rating != null) "(" + song.rating.value.toString() + ")" else "-",
-                fontSize = 12.sp
-            )
-        }
-
-        // Song name and artist
-        Text(
-            text = song.name + " - " + song.artist.name.toString(),
-            fontSize = 16.sp,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        // Delete button
-        IconButton(
-            onClick = onDelete
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete song"
             )
         }
     }

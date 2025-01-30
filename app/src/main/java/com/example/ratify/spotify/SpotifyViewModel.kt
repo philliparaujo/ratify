@@ -16,6 +16,7 @@ import com.example.ratify.spotifydatabase.SortType
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
@@ -86,7 +87,7 @@ class SpotifyViewModel(
                     Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
 
                     viewModelScope.launch {
-                        val existingSong = dao.getSongByUri(currentSong.uri) // Query database
+                        val existingSong = dao.getSongByPrimaryKey(currentSong.name, currentSong.artists) // Query database
                         val currentTime = System.currentTimeMillis()
 
                         // Insert current song for first time or simply update its lastPlayedTs
@@ -100,9 +101,10 @@ class SpotifyViewModel(
                             ))
                         } else {
                             onEvent(SpotifyEvent.UpdateLastPlayedTs(
-                                uri = currentSong.uri,
+                                name = existingSong.name,
+                                artists = existingSong.artists,
                                 lastPlayedTs = currentTime,
-                                timesPlayed = existingSong.timesPlayed + 1
+                                timesPlayed = existingSong.timesPlayed + 1,
                             ))
                         }
 
@@ -254,13 +256,13 @@ class SpotifyViewModel(
                 deleteSong(event.song)
             }
             is SpotifyEvent.DeleteSongsWithNullRating -> {
-                deleteSongWithNullRating(event.exceptUri)
+                deleteSongWithNullRating(event.exceptName, event.exceptArtists)
             }
             is SpotifyEvent.UpdateLastPlayedTs -> {
-                updateLastPlayedTs(event.uri, event.lastPlayedTs, event.timesPlayed)
+                updateLastPlayedTs(event.name, event.artists, event.lastPlayedTs, event.timesPlayed)
             }
             is SpotifyEvent.UpdateRating -> {
-                updateRating(event.uri, event.rating, event.lastRatedTs)
+                updateRating(event.name, event.artists, event.rating, event.lastRatedTs)
             }
         }
     }
@@ -347,24 +349,25 @@ class SpotifyViewModel(
         }
     }
 
-    private fun deleteSongWithNullRating(exceptUri: String) {
+    private fun deleteSongWithNullRating(exceptName: String, exceptArtists: List<Artist>) {
         viewModelScope.launch {
-            dao.deleteSongsWithNullRating(exceptUri)
+            dao.deleteSongsWithNullRating(exceptName, exceptArtists)
         }
     }
 
-    private fun updateLastPlayedTs(uri: String, lastPlayedTs: Long?, timesPlayed: Int) {
+    private fun updateLastPlayedTs(name: String, artists: List<Artist>, lastPlayedTs: Long?, timesPlayed: Int) {
         viewModelScope.launch {
-            val song = dao.getSongByUri(uri)
+            val song = dao.getSongByPrimaryKey(name, artists)
             if (song != null) {
                 dao.upsertSong(song.copy(lastPlayedTs = lastPlayedTs, timesPlayed = timesPlayed))
             }
         }
     }
 
-    private fun updateRating(uri: String, rating: Rating?, lastRatedTs: Long?) {
+    private fun updateRating(name: String, artists: List<Artist>, rating: Rating?, lastRatedTs: Long?) {
         viewModelScope.launch {
-            val song = dao.getSongByUri(uri)
+            val song = dao.getSongByPrimaryKey(name, artists)
+            Log.d("SpotifyViewModel", "$song")
             if (song != null) {
                 dao.upsertSong(song.copy(lastRatedTs = lastRatedTs, rating = rating))
             }

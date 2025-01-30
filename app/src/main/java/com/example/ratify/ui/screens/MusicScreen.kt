@@ -166,7 +166,8 @@ fun PlayerScreen(
 
                     // Update rating in database
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
-                        uri = playerState?.value!!.track.uri,
+                        name = playerState?.value!!.track.name,
+                        artists = playerState.value!!.track.artists,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))

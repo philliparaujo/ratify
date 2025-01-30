@@ -4,6 +4,7 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SortType
+import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Track
 
 sealed interface SpotifyEvent {
@@ -31,7 +32,7 @@ sealed interface SpotifyEvent {
     // Database updates
     data class UpsertSong(val track: Track, val rating: Rating?, val lastRatedTs: Long?, val lastPlayedTs: Long?, val timesPlayed: Int): SpotifyEvent
     data class DeleteSong(val song: Song): SpotifyEvent
-    data class DeleteSongsWithNullRating(val exceptUri: String): SpotifyEvent
-    data class UpdateLastPlayedTs(val uri: String, val timesPlayed: Int, val lastPlayedTs: Long?): SpotifyEvent
-    data class UpdateRating(val uri: String, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent
+    data class DeleteSongsWithNullRating(val exceptName: String, val exceptArtists: List<Artist>): SpotifyEvent
+    data class UpdateLastPlayedTs(val name: String, val artists: List<Artist>, val timesPlayed: Int, val lastPlayedTs: Long?): SpotifyEvent
+    data class UpdateRating(val name: String, val artists: List<Artist>, val rating: Rating?, val lastRatedTs: Long?): SpotifyEvent
 }

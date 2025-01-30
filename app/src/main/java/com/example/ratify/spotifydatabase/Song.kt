@@ -5,7 +5,7 @@ import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
 
-@Entity(tableName = "songs", primaryKeys = ["name", "artists", "duration"])
+@Entity(tableName = "songs", primaryKeys = ["name", "artists"])
 data class Song(
     // Track info (unchanging)
     val album: Album,
