@@ -1,23 +1,17 @@
 package com.example.ratify.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,18 +19,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
-import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
-import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
@@ -55,16 +46,41 @@ fun LibraryScreen(
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Search bar, dropdown select
-        Row(
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    @Composable
+    fun RenderSongList() {
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            items(songState.songs) { song ->
+                SongItem(
+                    song = song,
+                    onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
+                    onPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri)) },
+                    playEnabled = playerEnabled
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun RenderVisualizer() {
+        Visualizer(
+            heights = (1..10).map { rating ->
+                songState.songs.count {
+                        song -> song.rating?.value == rating }.toFloat()
+            }
+        )
+    }
+    
+    @Composable
+    fun RenderSearch() {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -95,22 +111,18 @@ fun LibraryScreen(
                 modifier = Modifier.wrapContentWidth()
             )
         }
+    }
 
-        if (songState.visualizerShowing) {
-            Visualizer(
-                heights = (1..10).map { rating ->
-                    songState.songs.count { song -> song.rating?.value == rating }.toFloat()
-                }
-            )
-        }
-
-        // Sorting dropdown
+    @Composable
+    fun RenderListDetails(modifier: Modifier) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
                     "${songState.songs.count()} entries",
                     color = MaterialTheme.colorScheme.onBackground,
@@ -128,6 +140,8 @@ fun LibraryScreen(
                     fontSize = 14.sp
                 )
             }
+
+            // Sorting dropdown
             DropdownSelect(
                 options = sortTypes,
                 selectedOption = songState.sortType,
@@ -136,57 +150,40 @@ fun LibraryScreen(
                 large = true
             )
         }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (isLandscape) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(48.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column(
+                    modifier = Modifier.weight(4f)
+                ) {
+                    RenderSearch()
+                }
+
+                RenderListDetails(modifier = Modifier.weight(3f))
+            }
+        } else {
+            RenderSearch()
+            RenderListDetails(modifier = Modifier.fillMaxWidth())
+        }
+
+        if (songState.visualizerShowing) {
+            RenderVisualizer()
+        }
 
         HorizontalDivider()
 
-        // Song list
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            items(songState.songs) { song ->
-                SongItem(
-                    song = song,
-                    onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
-                    onPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri)) },
-                    playEnabled = playerEnabled
-                )
-            }
-        }
-
-        // Song dialog
-        if (songState.currentSongDialog != null) {
-            Dialog(
-                onDismissRequest = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
-                },
-                song = songState.currentSongDialog,
-                onRatingSelect = { rating ->
-                    // Update current rating (UI indicator)
-                    val ratingValue = Rating.from(rating)
-                    if (playerState?.track?.uri == songState.currentSongDialog.uri) {
-                        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
-                    }
-
-                    // Update rating in database
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
-                        name = songState.currentSongDialog.name,
-                        artists = songState.currentSongDialog.artists,
-                        rating = ratingValue,
-                        lastRatedTs = System.currentTimeMillis()
-                    ))
-                },
-                onPlay = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(songState.currentSongDialog.uri))
-                },
-                onDelete = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(songState.currentSongDialog))
-                },
-                playEnabled = playerEnabled,
-                deleteEnabled = true
-            )
-        }
+        RenderSongList()
     }
 }
 
