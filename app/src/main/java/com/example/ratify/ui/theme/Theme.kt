@@ -37,6 +37,7 @@ private val RatifyColorScheme = darkColorScheme(
     // Primary colors
     primary = MyCyan,
     onPrimary = MyBlack,
+    inversePrimary = MyDarkCyan,
 
     // Secondary colors
     secondary = MyGray,

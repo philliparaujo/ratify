@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
+import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.max
 
@@ -50,13 +51,19 @@ fun Visualizer(
             modifier = Modifier.padding(horizontal = horizontalInnerPadding, vertical = verticalInnerPadding)
         ) {
             heights.forEachIndexed({ i,h ->
+                val ratingValue = i+1
+
                 Column(
                     modifier = Modifier
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(columnSpacing)
                 ) {
-                    Box(modifier = Modifier.height(h/maxHeight * totalHeight).fillMaxWidth().background(MaterialTheme.colorScheme.primary))
-                    Text(text = "${i + 1}", color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Box(modifier = Modifier
+                        .height(h/maxHeight * totalHeight)
+                        .fillMaxWidth()
+                        .background(getRatingColor(Rating.from(ratingValue))
+                    ))
+                    Text(text = "${ratingValue}", color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 }
             })
         }

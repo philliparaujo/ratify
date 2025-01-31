@@ -143,13 +143,14 @@ fun LibraryScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             items(songState.songs) { song ->
                 SongItem(
                     song = song,
                     onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
-                    onDelete = { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song)) }
+                    onPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri)) },
+                    playEnabled = playerEnabled
                 )
             }
         }
