@@ -209,18 +209,20 @@ fun LibraryScreen(
 
                 RenderListDetails(modifier = Modifier.weight(3f))
             }
+            if (songState.visualizerShowing) {
+                RenderVisualizer()
+            }
         } else {
             RenderSearch()
+            if (songState.visualizerShowing) {
+                RenderVisualizer()
+            }
             RenderListDetails(modifier = Modifier.fillMaxWidth())
         }
 
         HorizontalDivider()
 
         RenderSongList()
-
-        if (songState.visualizerShowing) {
-            RenderVisualizer()
-        }
         if (songState.currentSongDialog != null) {
             RenderCurrentSongDialog(songState.currentSongDialog)
         }
