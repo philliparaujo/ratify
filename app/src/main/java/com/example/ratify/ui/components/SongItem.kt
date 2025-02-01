@@ -1,8 +1,10 @@
 package com.example.ratify.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.theme.MyDarkCyan
 import com.example.ratify.ui.theme.RatifyTheme
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SongItem(
     song: Song,
@@ -59,11 +62,14 @@ fun SongItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(itemHeight)
-            .clickable(onClick = onClick)
             .clip(roundedCorner)
             .border(0.5.dp, MaterialTheme.colorScheme.secondary, roundedCorner)
             .background(MaterialTheme.colorScheme.background)
-            .padding(innerContentPadding),
+            .padding(innerContentPadding)
+            .combinedClickable(
+                onClick = onClick, // Ensure the entire row is clickable
+                onLongClick = { /* Optional: Handle long-press if needed */ }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Rating box

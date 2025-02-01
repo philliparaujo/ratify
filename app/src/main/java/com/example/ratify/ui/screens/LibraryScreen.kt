@@ -25,9 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
+import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
@@ -50,6 +53,50 @@ fun LibraryScreen(
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     @Composable
+    fun RenderVisualizer() {
+        Visualizer(
+            heights = (1..10).map { rating ->
+                songState.songs.count {
+                        song -> song.rating?.value == rating }.toFloat()
+            }
+        )
+    }
+
+    @Composable
+    fun RenderCurrentSongDialog(song: Song) {
+        Dialog(
+            onDismissRequest = {
+                spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
+            },
+            song = song,
+            onRatingSelect = { rating ->
+                // Update current rating (UI indicator)
+                val ratingValue = Rating.from(rating)
+                if (playerState?.track?.uri == song.uri) {
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                }
+                // Update rating in database
+                spotifyViewModel?.onEvent(
+                    SpotifyEvent.UpdateRating(
+                        name = song.name,
+                        artists = song.artists,
+                        rating = ratingValue,
+                        lastRatedTs = System.currentTimeMillis()
+                    )
+                )
+            },
+            onPlay = {
+                spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri))
+            },
+            onDelete = {
+                spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song))
+            },
+            playEnabled = playerEnabled,
+            deleteEnabled = true
+        )
+    }
+
+    @Composable
     fun RenderSongList() {
         LazyColumn(
             modifier = Modifier
@@ -67,16 +114,6 @@ fun LibraryScreen(
         }
     }
 
-    @Composable
-    fun RenderVisualizer() {
-        Visualizer(
-            heights = (1..10).map { rating ->
-                songState.songs.count {
-                        song -> song.rating?.value == rating }.toFloat()
-            }
-        )
-    }
-    
     @Composable
     fun RenderSearch() {
         Row(
@@ -177,13 +214,16 @@ fun LibraryScreen(
             RenderListDetails(modifier = Modifier.fillMaxWidth())
         }
 
-        if (songState.visualizerShowing) {
-            RenderVisualizer()
-        }
-
         HorizontalDivider()
 
         RenderSongList()
+
+        if (songState.visualizerShowing) {
+            RenderVisualizer()
+        }
+        if (songState.currentSongDialog != null) {
+            RenderCurrentSongDialog(songState.currentSongDialog)
+        }
     }
 }
 
