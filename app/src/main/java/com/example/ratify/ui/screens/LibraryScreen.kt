@@ -44,7 +44,7 @@ fun LibraryScreen(
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
     val playerState = spotifyViewModel?.playerState?.observeAsState()?.value
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
-    val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS)
+    val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS, SortType.TIMES_PLAYED, SortType.NAME)
 
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false

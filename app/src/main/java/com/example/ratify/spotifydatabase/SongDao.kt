@@ -65,6 +65,8 @@ interface SongDao {
                 SortType.LAST_PLAYED_TS -> baseQuery.append("lastPlayedTs DESC")
                 SortType.LAST_RATED_TS -> baseQuery.append("lastRatedTs DESC")
                 SortType.RATING -> baseQuery.append("rating DESC")
+                SortType.NAME -> baseQuery.append("name COLLATE NOCASE ASC")
+                SortType.TIMES_PLAYED -> baseQuery.append("timesPlayed DESC")
             }
         }
 
