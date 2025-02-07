@@ -70,6 +70,13 @@ class MainActivity : ComponentActivity() {
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        // Sync playback position by asking Spotify, prevents desync when app in background
+        spotifyViewModel.syncPlaybackPositionNow()
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

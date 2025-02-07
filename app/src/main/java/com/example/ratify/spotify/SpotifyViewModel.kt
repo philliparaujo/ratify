@@ -166,6 +166,15 @@ class SpotifyViewModel(
         playbackJob = null
     }
 
+    fun syncPlaybackPositionNow() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
+            syncedPosition?.let {
+                startUpdatingPlaybackPosition(it)
+            }
+        }
+    }
+
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)
     private val _searchQuery = MutableStateFlow("")
