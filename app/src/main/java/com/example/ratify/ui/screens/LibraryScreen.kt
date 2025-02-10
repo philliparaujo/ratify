@@ -1,5 +1,6 @@
 package com.example.ratify.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,9 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
@@ -35,11 +40,14 @@ import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
+import com.example.ratify.ui.navigation.LibraryNavigationTarget
+import com.example.ratify.ui.navigation.isRouteOnTarget
 import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun LibraryScreen(
-    spotifyViewModel: SpotifyViewModel?
+    spotifyViewModel: SpotifyViewModel?,
+    navController: NavController
 ) {
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
     val playerState = spotifyViewModel?.playerState?.observeAsState()?.value
@@ -51,6 +59,15 @@ fun LibraryScreen(
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+//    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+//    val isScreenActive = currentBackStackEntry?.destination?.route == LibraryNavigationTarget
+
+    // Figure out which Target is currently selected
+    // Relies on composable<Target> route being a substring of Target.toString()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+    val isScreenActive = isRouteOnTarget(currentRoute, LibraryNavigationTarget)
 
     @Composable
     fun RenderVisualizer() {
@@ -64,6 +81,10 @@ fun LibraryScreen(
 
     @Composable
     fun RenderCurrentSongDialog(song: Song) {
+        AnimatedVisibility(
+            visible = true,
+
+        ) { }
         Dialog(
             onDismissRequest = {
                 spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
@@ -106,7 +127,7 @@ fun LibraryScreen(
             items(songState.songs) { song ->
                 SongItem(
                     song = song,
-                    onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
+                    onClick = { if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
                     onPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri)) },
                     playEnabled = playerEnabled
                 )
@@ -235,7 +256,8 @@ fun LibraryScreen(
 fun LibraryScreenPreview() {
     RatifyTheme {
         LibraryScreen(
-            spotifyViewModel = null
+            spotifyViewModel = null,
+            navController = rememberNavController()
         )
     }
 }
@@ -248,7 +270,8 @@ fun LibraryScreenPreview() {
 fun LandscapeLibraryScreenPreview() {
     RatifyTheme {
         LibraryScreen(
-            spotifyViewModel = null
+            spotifyViewModel = null,
+            navController = rememberNavController()
         )
     }
 }

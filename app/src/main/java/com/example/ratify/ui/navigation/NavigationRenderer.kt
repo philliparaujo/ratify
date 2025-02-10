@@ -43,7 +43,7 @@ fun NavigationRenderer(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val currentTarget = navigationTargets.find {
-        if (currentRoute != null) it.toString().contains(currentRoute) else false
+        isRouteOnTarget(currentRoute, it)
     } ?: startNavigationTarget
 
     // Figure out current orientation
@@ -140,4 +140,12 @@ fun targetOnClick(
             launchSingleTop = true
         }
     }
+}
+
+fun isRouteOnTarget(route: String?, target: NavigationTarget): Boolean {
+    if (route == null) {
+        return false
+    }
+
+    return target.toString().contains(route)
 }
