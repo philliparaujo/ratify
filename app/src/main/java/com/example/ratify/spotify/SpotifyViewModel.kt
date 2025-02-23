@@ -92,13 +92,15 @@ class SpotifyViewModel(
 
                         // Insert current song for first time or simply update its lastPlayedTs
                         if (existingSong == null) {
-                            onEvent(SpotifyEvent.UpsertSong(
-                                track = currentSong,
-                                lastPlayedTs = currentTime,
-                                timesPlayed = 1,
-                                rating = null,
-                                lastRatedTs = null
-                            ))
+                            if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
+                                onEvent(SpotifyEvent.UpsertSong(
+                                    track = currentSong,
+                                    lastPlayedTs = currentTime,
+                                    timesPlayed = 1,
+                                    rating = null,
+                                    lastRatedTs = null
+                                ))
+                            }
                         } else {
                             onEvent(SpotifyEvent.UpdateLastPlayedTs(
                                 name = existingSong.name,
