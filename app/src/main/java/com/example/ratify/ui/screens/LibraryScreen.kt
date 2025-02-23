@@ -43,6 +43,7 @@ import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.isRouteOnTarget
 import com.example.ratify.ui.theme.RatifyTheme
+import kotlinx.coroutines.awaitAll
 
 @Composable
 fun LibraryScreen(
@@ -59,9 +60,6 @@ fun LibraryScreen(
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
-
-//    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-//    val isScreenActive = currentBackStackEntry?.destination?.route == LibraryNavigationTarget
 
     // Figure out which Target is currently selected
     // Relies on composable<Target> route being a substring of Target.toString()
@@ -128,7 +126,14 @@ fun LibraryScreen(
                 SongItem(
                     song = song,
                     onClick = { if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
-                    onPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri)) },
+                    onLongClick = {
+                        spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
+                    },
+                    onPlay = {
+                        spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
+                        Thread.sleep(1000)
+                        spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
+                    },
                     playEnabled = playerEnabled
                 )
             }

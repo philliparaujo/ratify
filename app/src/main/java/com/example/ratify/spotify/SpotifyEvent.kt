@@ -20,7 +20,7 @@ sealed interface SpotifyEvent {
     data object Resume: SpotifyEvent
     data object SkipNext: SpotifyEvent
     data object SkipPrevious: SpotifyEvent
-//    data class QueueTrack(val trackUri: String): SpotifyEvent
+    data class QueueTrack(val trackUri: String): SpotifyEvent
 
     // State updates
     data class UpdateSearchType(val searchType: SearchType): SpotifyEvent

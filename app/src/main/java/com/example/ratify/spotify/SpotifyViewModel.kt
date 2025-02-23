@@ -226,6 +226,7 @@ class SpotifyViewModel(
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
             is SpotifyEvent.PlaySong -> playSong(event.songUri)
             is SpotifyEvent.Pause -> pause()
+            is SpotifyEvent.QueueTrack -> queueTrack(event.trackUri)
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
@@ -333,6 +334,10 @@ class SpotifyViewModel(
 
     private fun pause() {
         spotifyAppRemote?.playerApi?.pause()
+    }
+
+    private fun queueTrack(trackURI: String) {
+        spotifyAppRemote?.playerApi?.queue(trackURI)
     }
 
     private fun resume() {

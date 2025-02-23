@@ -44,6 +44,7 @@ import com.example.ratify.ui.theme.RatifyTheme
 fun SongItem(
     song: Song,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     onPlay: () -> Unit,
     playEnabled: Boolean = true,
 ) {
@@ -67,7 +68,7 @@ fun SongItem(
             .background(MaterialTheme.colorScheme.background)
             .combinedClickable(
                 onClick = onClick,
-                onLongClick = { /* Optional long-press action */ }
+                onLongClick = onLongClick
             )
     ) {
         // Background Image
@@ -178,6 +179,7 @@ fun SongItemPreview() {
                 SongItem(
                     song = mockSong.copy(rating = Rating.from(ratingValue)),
                     onClick = { },
+                    onLongClick = { },
                     onPlay = { }
                 )
             }
@@ -186,6 +188,7 @@ fun SongItemPreview() {
             SongItem(
                 song = mockSong.copy(rating = null),
                 onClick = { },
+                onLongClick = { },
                 onPlay = { }
             )
         }
