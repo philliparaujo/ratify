@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -41,9 +42,10 @@ import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
+import com.example.ratify.ui.navigation.SnackbarAction
 import com.example.ratify.ui.navigation.isRouteOnTarget
+import com.example.ratify.ui.navigation.showSnackbar
 import com.example.ratify.ui.theme.RatifyTheme
-import kotlinx.coroutines.awaitAll
 
 @Composable
 fun LibraryScreen(
@@ -61,10 +63,14 @@ fun LibraryScreen(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
+    val scope = rememberCoroutineScope()
+
     // Figure out which Target is currently selected
     // Relies on composable<Target> route being a substring of Target.toString()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
+
+    // Prevents song items from being interactable when navigating away from screen
     val isScreenActive = isRouteOnTarget(currentRoute, LibraryNavigationTarget)
 
     @Composable
@@ -81,7 +87,6 @@ fun LibraryScreen(
     fun RenderCurrentSongDialog(song: Song) {
         AnimatedVisibility(
             visible = true,
-
         ) { }
         Dialog(
             onDismissRequest = {
@@ -127,12 +132,31 @@ fun LibraryScreen(
                     song = song,
                     onClick = { if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
                     onLongClick = {
-                        spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
+                        if (isScreenActive) {
+                            if (playerEnabled) {
+                                spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
+                                showSnackbar(scope,"\"${song.name}\" added to queue")
+                            } else {
+                                showSnackbar(
+                                    scope,
+                                    "Not connected to Spotify",
+                                    SnackbarAction(
+                                        name = "Connect",
+                                        action = {
+                                            spotifyViewModel?.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                                        }
+                                    )
+                                )
+                            }
+                        }
                     },
                     onPlay = {
-                        spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
-                        Thread.sleep(1000)
-                        spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
+                        if (isScreenActive) {
+                            spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
+                            showSnackbar(scope, "\"${song.name}\" now playing")
+                            Thread.sleep(1000)
+                            spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
+                        }
                     },
                     playEnabled = playerEnabled
                 )

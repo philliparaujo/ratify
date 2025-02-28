@@ -15,9 +15,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarData
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -28,6 +35,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BottomNavBar
 import com.example.ratify.ui.components.LeftNavDrawer
+import com.example.ratify.ui.components.MySnackBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun NavigationRenderer(
@@ -65,14 +74,54 @@ fun NavigationRenderer(
         )
     }
 
-    // Render content
-    if (isLandscape) {
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .windowInsetsPadding(WindowInsets.displayCutout)
-        ) { innerPadding ->
+    // Snackbar rendering
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
+    val scope = rememberCoroutineScope()
+    ObserveAsEvents(
+        flow = SnackbarController.events,
+        snackbarHostState
+    ) { event ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+
+            val result = snackbarHostState.showSnackbar(
+                message = event.message,
+                actionLabel = event.action?.name,
+                duration = SnackbarDuration.Short
+            )
+
+            if (result == SnackbarResult.ActionPerformed) {
+                event.action?.action?.invoke()
+            }
+        }
+    }
+
+    // Render content: bottomBar in Portrait, leftNavDrawer in Landscape
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            ) { snackbarData: SnackbarData ->
+                MySnackBar(
+                    snackbarData
+                )
+            }
+        },
+        bottomBar = { if (!isLandscape) {
+            BottomNavBar(
+                navigationTargets = navigationTargets,
+                currentNavigationTarget = currentTarget,
+                onClick = onClick
+            )
+        } },
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .windowInsetsPadding(WindowInsets.displayCutout)
+    ) { innerPadding ->
+        if (isLandscape) {
             PermanentNavigationDrawer (
                 drawerContent = {
                     LeftNavDrawer(
@@ -84,17 +133,7 @@ fun NavigationRenderer(
             ) {
                 navigationHost(innerPadding)
             }
-        }
-    } else {
-        Scaffold(
-            bottomBar = {
-                BottomNavBar(
-                    navigationTargets = navigationTargets,
-                    currentNavigationTarget = currentTarget,
-                    onClick = onClick
-                )
-            },
-        ) { innerPadding ->
+        } else {
             navigationHost(innerPadding)
         }
     }
