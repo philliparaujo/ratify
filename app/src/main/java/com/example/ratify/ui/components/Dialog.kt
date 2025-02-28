@@ -39,6 +39,7 @@ fun Dialog(
     song: Song,
     onRatingSelect: (Int) -> Unit,
     onPlay: () -> Unit,
+    onDisabledPlay: () -> Unit = {},
     onDelete: () -> Unit,
     onDismissRequest: () -> Unit,
     playEnabled: Boolean = true,
@@ -75,6 +76,9 @@ fun Dialog(
                 onClick = {
                     onPlay()
                     onDismissRequest()
+                },
+                onDisabledClick = {
+                    onDisabledPlay()
                 }
             )
             MyButton(
@@ -270,6 +274,7 @@ fun TestDialogPreview() {
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },
                 onPlay = {},
+                onDisabledPlay = {},
                 onDelete = {}
             )
         }
@@ -289,6 +294,7 @@ fun LandscapeTestDialogPreview() {
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },
                 onPlay = {},
+                onDisabledPlay = {},
                 onDelete = {}
             )
         }

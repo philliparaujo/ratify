@@ -46,6 +46,7 @@ fun SongItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onPlay: () -> Unit,
+    onDisabledPlay: () -> Unit = {},
     playEnabled: Boolean = true,
 ) {
     val itemHeight = 55.dp
@@ -141,6 +142,7 @@ fun SongItem(
             MyIconButton(
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_play_arrow_24),
                 onClick = onPlay,
+                onDisabledClick = onDisabledPlay,
                 enabled = playEnabled,
             )
         }
@@ -148,7 +150,7 @@ fun SongItem(
 }
 
 @Composable
-public fun getRatingColor(rating: Rating?): Color {
+fun getRatingColor(rating: Rating?): Color {
     val primaryColor = MaterialTheme.colorScheme.primary  // Rating = 10
     val lowRatingColor = MaterialTheme.colorScheme.inversePrimary  // Rating = 1
     val noRatingColor = MaterialTheme.colorScheme.background // No rating
@@ -180,7 +182,8 @@ fun SongItemPreview() {
                     song = mockSong.copy(rating = Rating.from(ratingValue)),
                     onClick = { },
                     onLongClick = { },
-                    onPlay = { }
+                    onPlay = { },
+                    onDisabledPlay = { }
                 )
             }
 
@@ -189,7 +192,8 @@ fun SongItemPreview() {
                 song = mockSong.copy(rating = null),
                 onClick = { },
                 onLongClick = { },
-                onPlay = { }
+                onPlay = { },
+                onDisabledPlay = { }
             )
         }
     }

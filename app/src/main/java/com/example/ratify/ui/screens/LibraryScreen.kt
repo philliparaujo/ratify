@@ -112,6 +112,18 @@ fun LibraryScreen(
             onPlay = {
                 spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri))
             },
+            onDisabledPlay = {
+                showSnackbar(
+                    scope,
+                    "Not connected to Spotify",
+                    SnackbarAction(
+                        name = "Connect",
+                        action = {
+                            spotifyViewModel?.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                        }
+                    )
+                )
+            },
             onDelete = {
                 spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song))
             },
@@ -157,6 +169,18 @@ fun LibraryScreen(
                             Thread.sleep(1000)
                             spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
                         }
+                    },
+                    onDisabledPlay = {
+                        showSnackbar(
+                            scope,
+                            "Not connected to Spotify",
+                            SnackbarAction(
+                                name = "Connect",
+                                action = {
+                                    spotifyViewModel?.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                                }
+                            )
+                        )
                     },
                     playEnabled = playerEnabled
                 )

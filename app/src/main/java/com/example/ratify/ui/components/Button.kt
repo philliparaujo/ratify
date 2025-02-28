@@ -1,16 +1,20 @@
 package com.example.ratify.ui.components
 
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,6 +24,7 @@ import com.example.ratify.ui.theme.RatifyTheme
 fun MyButton(
     text: String,
     onClick: () -> Unit,
+    onDisabledClick: () -> Unit = {},
     enabled: Boolean = true,
     large: Boolean = false,
     modifier: Modifier = Modifier
@@ -28,31 +33,51 @@ fun MyButton(
     val minWidth = if (large) 140.dp else 100.dp
     val typography = if (large) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium
 
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        ),
+    Box(
         modifier = modifier
-            .height(buttonHeight)
-            .defaultMinSize(minWidth)
+            .clip(MaterialTheme.shapes.medium)
     ) {
-        Text(
-            text = text,
-            style = typography,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Button(
+            onClick = onClick,
+            enabled = enabled,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier
+                .height(buttonHeight)
+                .defaultMinSize(minWidth)
+        ) {
+            Text(
+                text = text,
+                style = typography,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        // Overlay to capture clicks when disabled
+        if (!enabled) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable(
+                        enabled = true,
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        onDisabledClick()
+                    }
+            )
+        }
     }
 }
 
 // Previews
-val smallButtonText = "Delete"
-val bigButtonText = "Connect to Spotify"
+const val smallButtonText = "Delete"
+const val bigButtonText = "Connect to Spotify"
 
 @Preview(name = "Enabled Button")
 @Composable
@@ -60,9 +85,9 @@ fun EnabledButtonPreview() {
     RatifyTheme(darkTheme = true) {
         Column {
             MyButton(text = smallButtonText, onClick = {}, enabled = true)
-            MyButton(text = smallButtonText, onClick = {}, enabled = false)
+            MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
             MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
-            MyButton(text = bigButtonText, onClick = {}, enabled = false, large = true)
+            MyButton(text = bigButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false, large = true)
         }
     }
 }
