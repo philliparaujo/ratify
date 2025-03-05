@@ -18,12 +18,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,10 +73,9 @@ fun NavigationRenderer(
     }
 
     // Snackbar rendering
-    val snackbarHostState = remember {
-        SnackbarHostState()
-    }
+    val snackbarHostState = spotifyViewModel.snackbarHostState
     val scope = rememberCoroutineScope()
+
     ObserveAsEvents(
         flow = SnackbarController.events,
         snackbarHostState

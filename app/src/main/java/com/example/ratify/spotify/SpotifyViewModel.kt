@@ -2,6 +2,9 @@ package com.example.ratify.spotify
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +16,7 @@ import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongDao
 import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
@@ -173,6 +177,22 @@ class SpotifyViewModel(
             val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
             syncedPosition?.let {
                 startUpdatingPlaybackPosition(it)
+            }
+        }
+    }
+
+    // Keeps Snackbars active across any UI changes / screen rotations
+    val snackbarHostState = SnackbarHostState()
+    fun showSnackbar(message: String, action: SnackbarAction? = null) {
+        viewModelScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = action?.name,
+                duration = SnackbarDuration.Short
+            ).let { result ->
+                if (result == SnackbarResult.ActionPerformed) {
+                    action?.action?.invoke()
+                }
             }
         }
     }

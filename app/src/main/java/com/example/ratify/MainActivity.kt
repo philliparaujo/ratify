@@ -1,8 +1,8 @@
 package com.example.ratify
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,12 +41,22 @@ class MainActivity : ComponentActivity() {
         databaseIOHelper = DatabaseIOHelper(
             this,
             onExportComplete = { success ->
-                showToast(if (success) "Database exported successfully!" else "Failed to export database")
+                spotifyViewModel.showSnackbar(if (success) "Database exported successfully!" else "Failed to export database")
             },
             onImportComplete = { success ->
-                showToast(if (success) "Database imported successfully!" else "Failed to import database")
+                spotifyViewModel.showSnackbar(if (success) "Database imported successfully!" else "Failed to import database")
             }
         )
+
+        // On successful DatabaseIO import, the app restarts to display the up-to-date database
+        // on the Library page. But the Snackbar we wish to show does not persist on app restarts.
+        // This allows us to save the Snackbar and display it on app restart.
+        val sharedPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val snackbarMessage = sharedPrefs.getString("pendingSnackbar", null)
+        if (snackbarMessage != null) {
+            spotifyViewModel.showSnackbar(snackbarMessage)
+            sharedPrefs.edit().remove("pendingSnackbar").apply()
+        }
 
         // Initialize auth helper, launch authentication if not already connected
         if (spotifyViewModel.spotifyConnectionState.value != true) {
@@ -73,11 +83,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
-        // Sync playback position by asking Spotify, prevents desync when app in background
+        // Sync playback position by asking Spotify, prevents de-sync when app in background
         spotifyViewModel.syncPlaybackPositionNow()
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

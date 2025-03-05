@@ -77,6 +77,10 @@ object SongDatabaseProvider {
             }
             Log.d("SongDatabaseProvider", "Database import completed successfully.")
 
+            // Save Snackbar message to display after app restart
+            val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            sharedPrefs.edit().putString("pendingSnackbar", "Database imported successfully!").apply()
+
             // Restart the app to reflect new database state
             (context as? Activity)?.runOnUiThread {
                 (context as MainActivity).restartApp()
