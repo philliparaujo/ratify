@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
+import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
@@ -38,7 +39,8 @@ import kotlinx.coroutines.launch
 
 class SpotifyViewModel(
     application: Application,
-    private val dao: SongDao
+    private val dao: SongDao,
+    private val settingsManager: SettingsManager
 ): AndroidViewModel(application) {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
@@ -198,6 +200,9 @@ class SpotifyViewModel(
             }
         }
     }
+
+    // Settings
+    val settings = settingsManager
 
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)

@@ -1,5 +1,6 @@
 package com.example.ratify.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,12 +9,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,6 +26,7 @@ import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SongState
+import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
 import com.example.ratify.ui.components.PlaybackPosition
@@ -34,6 +35,7 @@ import com.example.ratify.ui.components.StarRow
 import com.example.ratify.ui.components.getArtistsString
 import com.example.ratify.ui.components.spotifyUriToImageUrl
 import com.example.ratify.ui.theme.RatifyTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun MusicScreen(
@@ -57,6 +59,10 @@ fun MusicScreen(
 fun LoginScreen(
     spotifyViewModel: SpotifyViewModel?
 ) {
+    val settings = spotifyViewModel?.settings
+    val scope = rememberCoroutineScope()
+    val autoSignIn = settings?.autoSignIn?.collectAsState(initial = false)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -75,10 +81,14 @@ fun LoginScreen(
                 text = "Connect to Spotify",
                 large = true,
             )
-            Text(
-                text = "Keep me signed in",
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.bodyMedium
+            BinarySetting(
+                displayText = "Keep me signed in",
+                state = autoSignIn?.value ?: false,
+                toggleState = { newState ->
+                    scope.launch {
+                        settings?.setAutoSignIn(newState)
+                    }
+                }
             )
         }
     }
@@ -95,7 +105,7 @@ fun PlayerScreen(
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
 
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     @Composable
     fun RenderSongDisplay() {

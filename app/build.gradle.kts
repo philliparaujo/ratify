@@ -94,4 +94,7 @@ dependencies {
     // Fetching and loading network images
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    // Settings
+    implementation(libs.androidx.datastore.preferences)
 }

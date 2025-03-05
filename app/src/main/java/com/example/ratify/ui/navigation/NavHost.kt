@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.ui.screens.MusicScreen
 import com.example.ratify.ui.screens.LibraryScreen
+import com.example.ratify.ui.screens.MusicScreen
 import com.example.ratify.ui.screens.SettingsScreen
 
 @Composable
@@ -26,6 +26,6 @@ fun NavigationHost(
     ) {
         composable<MusicNavigationTarget> { MusicScreen(spotifyViewModel = spotifyViewModel) }
         composable<LibraryNavigationTarget> { LibraryScreen(spotifyViewModel = spotifyViewModel, navController = navController) }
-        composable<SettingsNavigationTarget> { SettingsScreen(onExportClick = onExportClick, onImportClick = onImportClick) }
+        composable<SettingsNavigationTarget> { SettingsScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
     }
 }
