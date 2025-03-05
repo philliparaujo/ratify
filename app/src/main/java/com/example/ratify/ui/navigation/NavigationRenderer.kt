@@ -81,8 +81,6 @@ fun NavigationRenderer(
         snackbarHostState
     ) { event ->
         scope.launch {
-            snackbarHostState.currentSnackbarData?.dismiss()
-
             val result = snackbarHostState.showSnackbar(
                 message = event.message,
                 actionLabel = event.action?.name,

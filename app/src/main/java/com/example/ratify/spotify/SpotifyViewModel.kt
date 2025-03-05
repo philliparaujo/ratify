@@ -184,6 +184,8 @@ class SpotifyViewModel(
     // Keeps Snackbars active across any UI changes / screen rotations
     val snackbarHostState = SnackbarHostState()
     fun showSnackbar(message: String, action: SnackbarAction? = null) {
+        snackbarHostState.currentSnackbarData?.dismiss()
+
         viewModelScope.launch {
             snackbarHostState.showSnackbar(
                 message = message,
