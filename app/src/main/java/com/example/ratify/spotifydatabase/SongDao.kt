@@ -19,7 +19,7 @@ interface SongDao {
     suspend fun deleteSong(song: Song)
 
     @Query("DELETE FROM songs WHERE rating IS NULL AND NOT (name = :exceptName AND artists = :exceptArtists)")
-    suspend fun deleteSongsWithNullRating(exceptName: String, exceptArtists: List<Artist>)
+    suspend fun deleteSongsWithNullRating(exceptName: String, exceptArtists: List<Artist>): Int
 
     @Query("SELECT * FROM songs WHERE name = :name AND artists = :artists LIMIT 1")
     suspend fun getSongByPrimaryKey(name: String, artists: List<Artist>): Song?

@@ -68,7 +68,7 @@ class SpotifyViewModel(
         if (spotifyAppRemote != null && !isSubscribedToUserCapabilities) {
             spotifyAppRemote?.let { remote ->
                 remote.userApi.subscribeToCapabilities().setEventCallback {
-                    Log.d("SpotifyViewModel", "userCapabilities is " + it)
+                    Log.d("SpotifyViewModel", "userCapabilities is $it")
                     _userCapabilities.value = it
                 }
             }
@@ -203,7 +203,7 @@ class SpotifyViewModel(
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
     private val _rating = MutableStateFlow<Rating?>(null)
     private val _showSongDialog = MutableStateFlow<Song?>(null)
-    private val _visualizerShowing = MutableStateFlow<Boolean>(false)
+    private val _visualizerShowing = MutableStateFlow(false)
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _songs = combine(_searchType, _searchQuery, _sortType) { searchType, searchQuery, sortType ->
         dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType))
@@ -244,12 +244,13 @@ class SpotifyViewModel(
             is SpotifyEvent.DisconnectSpotify -> disconnectSpotifyAppRemote()
 
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
-            is SpotifyEvent.PlaySong -> playSong(event.songUri)
+            is SpotifyEvent.PlaySong -> playSong(event.songUri, event.songName)
             is SpotifyEvent.Pause -> pause()
-            is SpotifyEvent.QueueTrack -> queueTrack(event.trackUri)
+            is SpotifyEvent.QueueTrack -> queueTrack(event.trackUri, event.trackName)
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
+            is SpotifyEvent.PlayerEventWhenNotConnected -> playerEventWhenNotConnected()
 
             is SpotifyEvent.UpdateSearchType -> {
                 _searchType.value = event.searchType
@@ -321,6 +322,7 @@ class SpotifyViewModel(
             override fun onConnected(appRemote: SpotifyAppRemote) {
                 spotifyAppRemote = appRemote
                 Log.d("SpotifyViewModel", "Connected! Yay!")
+                showSnackbar("Connected to Spotify")
                 _spotifyConnectionState.value = true
                 subscribeToPlayerState()
                 subscribeToUserCapabilities()
@@ -342,22 +344,25 @@ class SpotifyViewModel(
             isSubscribedToUserCapabilities = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")
+        showSnackbar("Disconnected from Spotify")
     }
 
     private fun playPlaylist(playlistURI: String) {
         spotifyAppRemote?.playerApi?.play(playlistURI)
     }
 
-    private fun playSong(songURI: String) {
+    private fun playSong(songURI: String, songName: String) {
         spotifyAppRemote?.playerApi?.play(songURI)
+        showSnackbar("\"${songName}\" now playing")
     }
 
     private fun pause() {
         spotifyAppRemote?.playerApi?.pause()
     }
 
-    private fun queueTrack(trackURI: String) {
+    private fun queueTrack(trackURI: String, trackName: String) {
         spotifyAppRemote?.playerApi?.queue(trackURI)
+        showSnackbar("\"${trackName}\" added to queue")
     }
 
     private fun resume() {
@@ -372,6 +377,18 @@ class SpotifyViewModel(
         spotifyAppRemote?.playerApi?.skipPrevious()
     }
 
+    private fun playerEventWhenNotConnected() {
+        showSnackbar(
+            "Not connected to Spotify",
+            SnackbarAction(
+                name = "Connect",
+                action = {
+                    onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                }
+            )
+        )
+    }
+
     // Database functions
     private fun upsertSong(song: Song) {
         viewModelScope.launch {
@@ -382,12 +399,14 @@ class SpotifyViewModel(
     private fun deleteSong(song: Song) {
         viewModelScope.launch {
             dao.deleteSong(song)
+            showSnackbar("Deleted \"${song.name}\"")
         }
     }
 
     private fun deleteSongWithNullRating(exceptName: String, exceptArtists: List<Artist>) {
         viewModelScope.launch {
-            dao.deleteSongsWithNullRating(exceptName, exceptArtists)
+            val deletedCount = dao.deleteSongsWithNullRating(exceptName, exceptArtists)
+            showSnackbar("Deleted $deletedCount songs")
         }
     }
 

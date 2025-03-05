@@ -41,7 +41,6 @@ import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
-import com.example.ratify.ui.navigation.SnackbarAction
 import com.example.ratify.ui.navigation.isRouteOnTarget
 import com.example.ratify.ui.theme.RatifyTheme
 
@@ -106,19 +105,10 @@ fun LibraryScreen(
                 )
             },
             onPlay = {
-                spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri))
+                spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
             },
             onDisabledPlay = {
-                spotifyViewModel?.showSnackbar(
-                    "Not connected to Spotify",
-                    SnackbarAction(
-                        name = "Connect",
-                        action = {
-                            spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-                            spotifyViewModel.showSnackbar("Connected to Spotify")
-                        }
-                    )
-                )
+                spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
             },
             onDelete = {
                 spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song))
@@ -142,41 +132,19 @@ fun LibraryScreen(
                     onLongClick = {
                         if (isScreenActive) {
                             if (playerEnabled) {
-                                spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
-                                spotifyViewModel?.showSnackbar("\"${song.name}\" added to queue")
+                                spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
                             } else {
-                                spotifyViewModel?.showSnackbar(
-                                    "Not connected to Spotify",
-                                    SnackbarAction(
-                                        name = "Connect",
-                                        action = {
-                                            spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-                                            spotifyViewModel.showSnackbar("Connected to Spotify")
-                                        }
-                                    )
-                                )
+                                spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                             }
                         }
                     },
                     onPlay = {
                         if (isScreenActive) {
-                            spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri))
-                            spotifyViewModel?.showSnackbar("\"${song.name}\" now playing")
-                            Thread.sleep(1000)
-                            spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
+                            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
                         }
                     },
                     onDisabledPlay = {
-                        spotifyViewModel?.showSnackbar(
-                            "Not connected to Spotify",
-                            SnackbarAction(
-                                name = "Connect",
-                                action = {
-                                    spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-                                    spotifyViewModel.showSnackbar("Connected to Spotify")
-                                }
-                            )
-                        )
+                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                     },
                     playEnabled = playerEnabled
                 )

@@ -71,7 +71,6 @@ fun LoginScreen(
                 enabled = true,
                 onClick = {
                     spotifyViewModel?.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-                    spotifyViewModel?.showSnackbar("Connected to Spotify")
                 },
                 text = "Connect to Spotify",
                 large = true,
