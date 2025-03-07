@@ -78,9 +78,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val darkTheme by settingsManager.darkTheme.collectAsState(true)
+            val themeColor by settingsManager.themeColor.collectAsState("Default")
 
             RatifyTheme(
-                darkTheme = darkTheme
+                darkTheme = darkTheme,
+                themeColor = themeColor
             ) {
                MainScreen(
                    spotifyViewModel = spotifyViewModel,

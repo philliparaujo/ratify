@@ -26,7 +26,6 @@ fun BinarySetting(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(8.dp)
     ) {
         Checkbox(
             checked = state,
