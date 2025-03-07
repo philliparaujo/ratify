@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.settings.SettingsManager
@@ -82,9 +81,6 @@ class MainActivity : ComponentActivity() {
                )
             }
         }
-
-        // Set status bar content (top/bottom) to white to match dark app background
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
     }
 
     override fun onResume() {
@@ -98,11 +94,14 @@ class MainActivity : ComponentActivity() {
         super.onStart()
 
         // If the app launch has autoSignIn set to true, automatically connect to Spotify
-        lifecycleScope.launch {
-            // .first() prevents auto sign-in on setting toggle
-            val autoSignIn = settingsManager.autoSignIn.first()
-            if (autoSignIn) {
-                spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+        val connected = spotifyViewModel.spotifyConnectionState.value == true
+        if (!connected) {
+            lifecycleScope.launch {
+                // .first() prevents auto sign-in on setting toggle
+                val autoSignIn = settingsManager.autoSignIn.first()
+                if (autoSignIn) {
+                    spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                }
             }
         }
     }
