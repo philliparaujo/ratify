@@ -75,7 +75,8 @@ fun LibraryScreen(
 
     // Settings variables
     val settings = spotifyViewModel?.settings
-    val queueSkip = settings?.queueSkip?.collectAsState(initial = false)
+    val showImageUri = settings?.libraryImageUri?.collectAsState(true)
+    val queueSkip = settings?.queueSkip?.collectAsState(false)
     fun realPlay(song: Song) {
         if (queueSkip?.value == true) {
             spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
@@ -160,7 +161,8 @@ fun LibraryScreen(
                     onDisabledPlay = {
                         if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                     },
-                    playEnabled = playerEnabled
+                    playEnabled = playerEnabled,
+                    showImageUri = showImageUri?.value ?: true
                 )
             }
         }

@@ -48,6 +48,7 @@ fun SongItem(
     onPlay: () -> Unit,
     onDisabledPlay: () -> Unit = {},
     playEnabled: Boolean = true,
+    showImageUri: Boolean,
 ) {
     val itemHeight = 55.dp
     val innerContentPadding = 3.dp
@@ -72,22 +73,24 @@ fun SongItem(
                 onLongClick = onLongClick
             )
     ) {
-        // Background Image
-        SubcomposeAsyncImage(
-            model = spotifyUriToImageUrl(song.imageUri.raw),
-            contentDescription = "Song Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(roundedCorner)
-        )
+        if (showImageUri) {
+            // Background Image
+            SubcomposeAsyncImage(
+                model = spotifyUriToImageUrl(song.imageUri.raw),
+                contentDescription = "Song Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(roundedCorner)
+            )
 
-        // Translucent overlay
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
-        )
+            // Translucent overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
+            )
+        }
 
         // Foreground Content (Row)
         Row(
@@ -185,7 +188,8 @@ fun DarkSongItemsPreview() {
                     onClick = { },
                     onLongClick = { },
                     onPlay = { },
-                    onDisabledPlay = { }
+                    onDisabledPlay = { },
+                    showImageUri = false
                 )
             }
 
@@ -195,7 +199,8 @@ fun DarkSongItemsPreview() {
                 onClick = { },
                 onLongClick = { },
                 onPlay = { },
-                onDisabledPlay = { }
+                onDisabledPlay = { },
+                showImageUri = false
             )
         }
     }
@@ -219,7 +224,8 @@ fun LightSongItemsPreview() {
                     onClick = { },
                     onLongClick = { },
                     onPlay = { },
-                    onDisabledPlay = { }
+                    onDisabledPlay = { },
+                    showImageUri = false
                 )
             }
 
@@ -229,7 +235,8 @@ fun LightSongItemsPreview() {
                 onClick = { },
                 onLongClick = { },
                 onPlay = { },
-                onDisabledPlay = { }
+                onDisabledPlay = { },
+                showImageUri = false
             )
         }
     }

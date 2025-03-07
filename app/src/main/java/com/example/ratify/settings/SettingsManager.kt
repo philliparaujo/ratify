@@ -15,6 +15,7 @@ class SettingsManager(private val context: Context) {
         val AUTO_SIGN_IN = booleanPreferencesKey("auto_sign_in")
         val SKIP_ON_RATE = booleanPreferencesKey("skip_on_rate")
         val QUEUE_SKIP = booleanPreferencesKey("queue_skip")
+        val LIBRARY_IMAGE_URI = booleanPreferencesKey("library_image_uri")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
     }
 
@@ -24,6 +25,8 @@ class SettingsManager(private val context: Context) {
         .map { it[PreferencesKeys.SKIP_ON_RATE] ?: false}
     val queueSkip: Flow<Boolean> = context.dataStore.data
         .map { it[PreferencesKeys.QUEUE_SKIP] ?: false}
+    val libraryImageUri: Flow<Boolean> = context.dataStore.data
+        .map { it[PreferencesKeys.LIBRARY_IMAGE_URI] ?: true }
     val darkTheme: Flow<Boolean> = context.dataStore.data
         .map { it[PreferencesKeys.DARK_THEME] ?: true }
 
@@ -35,6 +38,9 @@ class SettingsManager(private val context: Context) {
     }
     suspend fun setQueueSkip(queueSkip: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.QUEUE_SKIP] = queueSkip }
+    }
+    suspend fun setLibraryImageUri(libraryImageUri: Boolean) {
+        context.dataStore.edit { it[PreferencesKeys.LIBRARY_IMAGE_URI] = libraryImageUri }
     }
     suspend fun setDarkTheme(darkTheme: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.DARK_THEME] = darkTheme }

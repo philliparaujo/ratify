@@ -36,6 +36,7 @@ fun SettingsScreen(
     val autoSignIn = settings?.autoSignIn?.collectAsState(false)
     val skipOnRate = settings?.skipOnRate?.collectAsState(false)
     val queueSkip = settings?.queueSkip?.collectAsState(false)
+    val libraryImageUri = settings?.libraryImageUri?.collectAsState(true)
     val darkTheme = settings?.darkTheme?.collectAsState(true)
 
     Box(
@@ -88,6 +89,15 @@ fun SettingsScreen(
                         }
                     }
                 )
+                BinarySetting(
+                    displayText = "Show song images in Library",
+                    state = libraryImageUri?.value ?: true,
+                    toggleState = { newState ->
+                        scope.launch {
+                            settings?.setLibraryImageUri(newState)
+                        }
+                    }
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround,
@@ -99,9 +109,9 @@ fun SettingsScreen(
                     )
                     Switch(
                         checked = darkTheme?.value ?: true,
-                        onCheckedChange = { newDarkTheme ->
+                        onCheckedChange = { newState ->
                             scope.launch {
-                                settings?.setDarkTheme(newDarkTheme)
+                                settings?.setDarkTheme(newState)
                             }
                         },
                     )
