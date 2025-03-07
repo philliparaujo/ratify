@@ -15,7 +15,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarColors
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,8 +46,7 @@ fun Search(
     var isDropdownExpanded by rememberSaveable { mutableStateOf(false) }
 
     SearchBar(
-        modifier = modifier.padding(top = 0.dp),
-        inputField = {
+        {
             SearchBarDefaults.InputField(
                 query = query,
                 onQueryChange = onQueryChange,
@@ -65,7 +66,8 @@ fun Search(
                             }
                             DropdownMenu(
                                 expanded = isDropdownExpanded,
-                                onDismissRequest = { isDropdownExpanded = false }
+                                onDismissRequest = { isDropdownExpanded = false },
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
                             ) {
                                 dropdownLabels.forEachIndexed { index, option ->
                                     DropdownMenuItem(
@@ -73,7 +75,15 @@ fun Search(
                                         onClick = {
                                             dropdownOptionOnClick[index]()
                                             isDropdownExpanded = false
-                                        }
+                                        },
+                                        colors = MenuItemColors(
+                                            textColor = MaterialTheme.colorScheme.onBackground,
+                                            leadingIconColor = MaterialTheme.colorScheme.onBackground,
+                                            trailingIconColor = MaterialTheme.colorScheme.onBackground,
+                                            disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                                            disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
+                                            disabledTrailingIconColor = MaterialTheme.colorScheme.onBackground
+                                        )
                                     )
                                 }
                             }
@@ -81,32 +91,34 @@ fun Search(
                     }
                 },
                 colors = SearchBarDefaults.inputFieldColors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledTextColor = MaterialTheme.colorScheme.onPrimary,
-                    cursorColor = MaterialTheme.colorScheme.onSecondary,
+                    cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     selectionColors = TextSelectionColors(
-                        handleColor = MaterialTheme.colorScheme.onSecondary,
+                        handleColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         backgroundColor = MaterialTheme.colorScheme.secondary
                     ),
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedTrailingIconColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledTrailingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSecondary,
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSecondary,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 modifier = Modifier
                     .padding(top = 0.dp)
             )
-        },
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
+        }, expanded, { expanded = it }, modifier.padding(top = 0.dp),
         windowInsets = WindowInsets(
             left = 0, top = 0, right = 0, bottom = 0
+        ),
+        colors = SearchBarColors(
+            MaterialTheme.colorScheme.primaryContainer,
+            MaterialTheme.colorScheme.background
         )
     ) { }
 }

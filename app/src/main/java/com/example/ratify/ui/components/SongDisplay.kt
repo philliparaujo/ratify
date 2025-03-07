@@ -61,7 +61,7 @@ fun SongDisplay(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f))
+                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f))
         )
 
         // Bottom text
@@ -71,7 +71,7 @@ fun SongDisplay(
         ) {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSecondary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -83,7 +83,7 @@ fun SongDisplay(
             )
             Text(
                 text=  artists,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,

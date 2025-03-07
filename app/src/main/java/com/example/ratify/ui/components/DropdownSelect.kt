@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -102,6 +103,7 @@ fun <T> DropdownSelect(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
@@ -120,6 +122,14 @@ fun <T> DropdownSelect(
                         onSelect(option)
                         expanded = false
                     },
+                    colors = MenuItemColors(
+                        textColor = MaterialTheme.colorScheme.onBackground,
+                        leadingIconColor = MaterialTheme.colorScheme.onBackground,
+                        trailingIconColor = MaterialTheme.colorScheme.onBackground,
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.onBackground
+                    )
                 )
             }
         }
