@@ -8,14 +8,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper
+import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModelFactory
 import com.example.ratify.spotifydatabase.DatabaseIOHelper
 import com.example.ratify.ui.navigation.MainScreen
 import com.example.ratify.ui.theme.RatifyTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val settingsManager by lazy { SettingsManager(this) }
@@ -88,5 +92,18 @@ class MainActivity : ComponentActivity() {
 
         // Sync playback position by asking Spotify, prevents de-sync when app in background
         spotifyViewModel.syncPlaybackPositionNow()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // If the app launch has autoSignIn set to true, automatically connect to Spotify
+        lifecycleScope.launch {
+            // .first() prevents auto sign-in on setting toggle
+            val autoSignIn = settingsManager.autoSignIn.first()
+            if (autoSignIn) {
+                spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+            }
+        }
     }
 }

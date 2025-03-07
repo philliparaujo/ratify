@@ -49,14 +49,19 @@ fun LibraryScreen(
     spotifyViewModel: SpotifyViewModel?,
     navController: NavController
 ) {
+    // Current states (UI and Spotify Player)
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
     val playerState = spotifyViewModel?.playerState?.observeAsState()?.value
+
+    // Active search/sort options
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
     val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS, SortType.TIMES_PLAYED, SortType.NAME)
 
+    // Player enabled logic
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
+    // Orientation logic
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
@@ -67,6 +72,19 @@ fun LibraryScreen(
 
     // Prevents song items from being interactable when navigating away from screen
     val isScreenActive = isRouteOnTarget(currentRoute, LibraryNavigationTarget)
+
+    // Settings variables
+    val settings = spotifyViewModel?.settings
+    val queueSkip = settings?.queueSkip?.collectAsState(initial = false)
+    fun realPlay(song: Song) {
+        if (queueSkip?.value == true) {
+            spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+            Thread.sleep(1000)
+            spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
+        } else {
+            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
+        }
+    }
 
     @Composable
     fun RenderVisualizer() {
@@ -104,9 +122,7 @@ fun LibraryScreen(
                     )
                 )
             },
-            onPlay = {
-                spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
-            },
+            onPlay = { realPlay(song) },
             onDisabledPlay = {
                 spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
             },
@@ -128,7 +144,9 @@ fun LibraryScreen(
             items(songState.songs) { song ->
                 SongItem(
                     song = song,
-                    onClick = { if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song)) },
+                    onClick = {
+                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song))
+                    },
                     onLongClick = {
                         if (isScreenActive) {
                             if (playerEnabled) {
@@ -138,11 +156,7 @@ fun LibraryScreen(
                             }
                         }
                     },
-                    onPlay = {
-                        if (isScreenActive) {
-                            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
-                        }
-                    },
+                    onPlay = { if (isScreenActive) realPlay(song) },
                     onDisabledPlay = {
                         if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                     },

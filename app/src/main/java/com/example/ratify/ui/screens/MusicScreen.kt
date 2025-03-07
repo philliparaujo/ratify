@@ -98,14 +98,20 @@ fun LoginScreen(
 fun PlayerScreen(
     spotifyViewModel: SpotifyViewModel?
 ) {
+    // Player state
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()
     val playerState = spotifyViewModel?.playerState?.observeAsState()
     val currentPlaybackPosition = spotifyViewModel?.currentPlaybackPosition?.observeAsState()
     val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
 
+    // Orientation logic
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    // Settings variables
+    val settings = spotifyViewModel?.settings
+    val skipOnRate = settings?.skipOnRate?.collectAsState(initial = false)
 
     @Composable
     fun RenderSongDisplay() {
@@ -181,6 +187,10 @@ fun PlayerScreen(
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))
+
+                    if (skipOnRate?.value == true) {
+                        spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
+                    }
                 }
             },
             currentRating = songState?.value?.currentRating
