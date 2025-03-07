@@ -1,6 +1,5 @@
 package com.example.ratify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
@@ -130,14 +128,69 @@ fun <T> DropdownSelect(
 }
 
 // Previews
-@Preview(name = "Dropdown Select")
+@Preview(name = "Dark Dropdown Select")
 @Composable
-fun DropdownSelectPreview() {
-    RatifyTheme {
+fun DarkDropdownSelectPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White),
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            DropdownSelect(
+                options = listOf(
+                    "Name",
+                    "Artists",
+                    "Album",
+                    "Rating"
+                ),
+                selectedOption = "Name",
+                onSelect = {},
+                label = "Search by"
+            )
+
+            DropdownSelect(
+                options = listOf(
+                    "Name",
+                    "Artists",
+                    "Album",
+                    "Rating"
+                ),
+                selectedOption = "Artists",
+                onSelect = {},
+                label = "Search by",
+                startExpanded = true
+            )
+
+
+            DropdownSelect(
+                options = listOf(
+                    "Rating",
+                    "Last played",
+                    "Last rated",
+                    "Times played"
+                ),
+                selectedOption = "Last played",
+                onSelect = {},
+                label = "Sort by",
+                startExpanded = true,
+                large = true
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Dropdown Select")
+@Composable
+fun LightDropdownSelectPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             DropdownSelect(

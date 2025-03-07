@@ -261,10 +261,12 @@ fun timestampToDate(timestamp: Long?): String? {
 }
 
 // Previews
-@Preview(name = "Test Dialog")
+@Preview(name = "Dark Test Dialog")
 @Composable
-fun TestDialogPreview() {
-    RatifyTheme {
+fun DarkTestDialogPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -281,10 +283,56 @@ fun TestDialogPreview() {
     }
 }
 
-@Preview(name = "Landscape Test Dialog", device = landscapeDevice)
+@Preview(name = "Light Test Dialog")
 @Composable
-fun LandscapeTestDialogPreview() {
-    RatifyTheme {
+fun TestDialogPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Dialog(
+                song = mockSong,
+                onDismissRequest = {},
+                onRatingSelect = { _ -> },
+                onPlay = {},
+                onDisabledPlay = {},
+                onDelete = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Dark Landscape Test Dialog", device = landscapeDevice)
+@Composable
+fun DarkLandscapeTestDialogPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Dialog(
+                song = mockSong,
+                onDismissRequest = {},
+                onRatingSelect = { _ -> },
+                onPlay = {},
+                onDisabledPlay = {},
+                onDelete = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Landscape Test Dialog", device = landscapeDevice)
+@Composable
+fun LightLandscapeTestDialogPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

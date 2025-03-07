@@ -82,10 +82,26 @@ fun SettingsScreen(
     }
 }
 
-@Preview(name = "Settings Screen")
+@Preview(name = "Dark Settings Screen")
 @Composable
-fun SettingsScreenPreview() {
-    RatifyTheme {
+fun DarkSettingsScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        SettingsScreen(
+            spotifyViewModel = null,
+            onExportClick = { },
+            onImportClick = { }
+        )
+    }
+}
+
+@Preview(name = "Light Settings Screen")
+@Composable
+fun LightSettingsScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         SettingsScreen(
             spotifyViewModel = null,
             onExportClick = { },
@@ -95,12 +111,14 @@ fun SettingsScreenPreview() {
 }
 
 @Preview(
-    name = "Landscape Settings Screen",
+    name = "Dark Landscape Settings Screen",
     device = landscapeDevice
 )
 @Composable
-fun LandscapeSettingsScreenPreview() {
-    RatifyTheme {
+fun DarkLandscapeSettingsScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         SettingsScreen(
             spotifyViewModel = null,
             onExportClick = { },
@@ -108,3 +126,21 @@ fun LandscapeSettingsScreenPreview() {
         )
     }
 }
+
+@Preview(
+    name = "Light Landscape Settings Screen",
+    device = landscapeDevice
+)
+@Composable
+fun LightLandscapeSettingsScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        SettingsScreen(
+            spotifyViewModel = null,
+            onExportClick = { },
+            onImportClick = { }
+        )
+    }
+}
+

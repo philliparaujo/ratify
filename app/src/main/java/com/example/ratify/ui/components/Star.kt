@@ -17,7 +17,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -227,10 +226,12 @@ fun radialToCartesian(radius: Float, angleRadians: Float): PointF {
 fun Float.toRadians() = this * (PI.toFloat() / 180f)
 
 // Previews
-@Preview(name = "Star Preview")
+@Preview(name = "Dark Star Preview")
 @Composable
-fun StarPreview() {
-    RatifyTheme {
+fun DarkStarPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Column {
             Star(
                 scale = 1f,
@@ -263,12 +264,92 @@ fun StarPreview() {
     }
 }
 
-@Preview(name = "Star Row Preview")
+@Preview(name = "Light Star Preview")
 @Composable
-fun StarRowPreview() {
-    var rating by remember { mutableStateOf(0) }
+fun LightStarPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column {
+            Star(
+                scale = 1f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
 
-    RatifyTheme(darkTheme = true) {
+            Star(
+                scale = 2f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
+
+
+            Star(
+                scale = 0.5f,
+                selectedStarColor = MaterialTheme.colorScheme.tertiary,
+                deselectedStarColor = MaterialTheme.colorScheme.secondary,
+                isLeftSelected = true,
+                isRightSelected = true,
+                onLeftClick = {},
+            ) {}
+        }
+    }
+}
+
+@Preview(name = "Dark Star Row Preview")
+@Composable
+fun DarkStarRowPreview() {
+    var rating by remember { mutableIntStateOf(0) }
+
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column {
+            StarRow(
+                scale = 1f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+            StarRow(
+                scale = 0.5f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+            StarRow(
+                scale = 2f,
+                starCount = 5,
+                onRatingSelect = { newRating ->
+                    Log.e("StarRow", "Selected value: $newRating")
+                    rating = newRating
+                },
+                currentRating = if (rating > 0) Rating.from(rating) else null
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Star Row Preview")
+@Composable
+fun LightStarRowPreview() {
+    var rating by remember { mutableIntStateOf(0) }
+
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Column {
             StarRow(
                 scale = 1f,

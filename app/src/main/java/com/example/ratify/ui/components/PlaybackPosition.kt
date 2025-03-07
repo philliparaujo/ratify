@@ -114,10 +114,52 @@ fun formatTime(timeMs: Long): String {
 }
 
 // Preview
-@Preview(showBackground = true)
+@Preview(name = "Dark Player Position")
 @Composable
-fun PlayerPositionPreview() {
-    RatifyTheme(darkTheme = true) {
+fun DarkPlayerPositionPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column {
+            Box(
+                Modifier.background(color = MaterialTheme.colorScheme.background)
+            ) {
+                PlaybackPosition(
+                    currentPositionMs = 105000L, // 1:45
+                    totalDurationMs = 300000L,  // 5:00
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Box(
+                Modifier.background(color = MaterialTheme.colorScheme.background)
+            ) {
+                PlaybackPosition(
+                    currentPositionMs = 0L, // 0:00
+                    totalDurationMs = 300000L,  // 5:00
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Box(
+                Modifier.background(color = MaterialTheme.colorScheme.background)
+            ) {
+                PlaybackPosition(
+                    currentPositionMs = 300000L, // 5:00
+                    totalDurationMs = 300000L,  // 5:00
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Light Player Position")
+@Composable
+fun LightPlayerPositionPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Column {
             Box(
                 Modifier.background(color = MaterialTheme.colorScheme.background)

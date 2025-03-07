@@ -1,5 +1,6 @@
 package com.example.ratify.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,12 +58,41 @@ fun BinarySetting(
 }
 
 // Previews
-@Preview(name = "BinarySettings")
+@Preview(name = "Dark BinarySettings")
 @Composable
-fun BinarySettings() {
-    RatifyTheme {
+fun DarkBinarySettingsPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            BinarySetting(
+                displayText = "Default setting",
+                state = true,
+                toggleState = { }
+            )
+            BinarySetting(
+                displayText = "Other Default setting",
+                state = false,
+                toggleState = { }
+            )
+        }
+    }
+}
+
+@Preview(name = "Light BinarySettings")
+@Composable
+fun LightBinarySettingsPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             BinarySetting(
                 displayText = "Default setting",
@@ -79,14 +109,46 @@ fun BinarySettings() {
 }
 
 @Preview(
-    name = "Landscape BinarySettings",
+    name = "Dark Landscape BinarySettings",
     device = landscapeDevice
 )
 @Composable
-fun LandscapeBinarySettings() {
-    RatifyTheme {
+fun DarkLandscapeBinarySettingsPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            BinarySetting(
+                displayText = "Default setting",
+                state = true,
+                toggleState = { }
+            )
+            BinarySetting(
+                displayText = "Other Default setting",
+                state = false,
+                toggleState = { }
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Light Landscape BinarySettings",
+    device = landscapeDevice
+)
+@Composable
+fun LightLandscapeBinarySettings() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             BinarySetting(
                 displayText = "Default setting",

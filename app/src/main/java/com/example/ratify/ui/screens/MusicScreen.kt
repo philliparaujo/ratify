@@ -246,20 +246,48 @@ fun PlayerScreen(
 }
 
 // Previews
-@Preview(name = "Login Screen")
+@Preview(name = "Dark Login Screen")
 @Composable
-fun LoginScreenPreview() {
-    RatifyTheme {
+fun DarkLoginScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         LoginScreen(
             spotifyViewModel = null
         )
     }
 }
 
-@Preview(name = "Player Screen")
+@Preview(name = "Light Login Screen")
 @Composable
-fun PlayerScreenPreview() {
-    RatifyTheme {
+fun LightLoginScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        LoginScreen(
+            spotifyViewModel = null
+        )
+    }
+}
+
+@Preview(name = "Dark Player Screen")
+@Composable
+fun DarkPlayerScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        PlayerScreen(
+            spotifyViewModel = null
+        )
+    }
+}
+
+@Preview(name = "Light Player Screen")
+@Composable
+fun LightPlayerScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         PlayerScreen(
             spotifyViewModel = null
         )
@@ -268,12 +296,14 @@ fun PlayerScreenPreview() {
 
 const val landscapeDevice = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
 @Preview(
-    name = "Landscape Login Screen",
+    name = "Dark Landscape Login Screen",
     device = landscapeDevice  // A hack to force landscape render of previews
 )
 @Composable
-fun LandscapeLoginScreenPreview() {
-    RatifyTheme {
+fun DarkLandscapeLoginScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         LoginScreen(
             spotifyViewModel = null
         )
@@ -281,12 +311,44 @@ fun LandscapeLoginScreenPreview() {
 }
 
 @Preview(
-    name = "Landscape Player Screen",
+    name = "Light Landscape Login Screen",
+    device = landscapeDevice  // A hack to force landscape render of previews
+)
+@Composable
+fun LightLandscapeLoginScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        LoginScreen(
+            spotifyViewModel = null
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Landscape Player Screen",
     device = landscapeDevice
 )
 @Composable
-fun LandscapePlayerScreenPreview() {
-    RatifyTheme {
+fun DarkLandscapePlayerScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        PlayerScreen(
+            spotifyViewModel = null
+        )
+    }
+}
+
+@Preview(
+    name = "Light Landscape Player Screen",
+    device = landscapeDevice
+)
+@Composable
+fun LightLandscapePlayerScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         PlayerScreen(
             spotifyViewModel = null
         )

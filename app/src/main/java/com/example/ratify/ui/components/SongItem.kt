@@ -167,10 +167,46 @@ fun getRatingColor(rating: Rating?): Color {
 
 
 // Previews
-@Preview(name = "Song Item")
+@Preview(name = "Dark Song Items")
 @Composable
-fun SongItemPreview() {
-    RatifyTheme(darkTheme = true) {
+fun DarkSongItemsPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Generate SongItems for ratings 10 to 1
+            (10 downTo 1).forEach { ratingValue ->
+                SongItem(
+                    song = mockSong.copy(rating = Rating.from(ratingValue)),
+                    onClick = { },
+                    onLongClick = { },
+                    onPlay = { },
+                    onDisabledPlay = { }
+                )
+            }
+
+            // Song with no rating
+            SongItem(
+                song = mockSong.copy(rating = null),
+                onClick = { },
+                onLongClick = { },
+                onPlay = { },
+                onDisabledPlay = { }
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Song Items")
+@Composable
+fun LightSongItemsPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

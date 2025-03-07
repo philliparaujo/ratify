@@ -58,12 +58,28 @@ fun BottomNavBar(
 }
 
 // Previews
-@Preview(name = "Portrait Bottom Nav", widthDp = 360, heightDp = 640)
+@Preview(name = "Dark Portrait Bottom Nav", widthDp = 360, heightDp = 640)
 @Composable
-fun PortraitBottomNavPreview() {
-    RatifyTheme {
+fun DarkPortraitBottomNavPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         BottomNavBar(
-            onClick = { target, isSelected -> {}},
+            onClick = { _, _ -> run {} },
+            navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
+            currentNavigationTarget = MusicNavigationTarget,
+        )
+    }
+}
+
+@Preview(name = "Light Portrait Bottom Nav", widthDp = 360, heightDp = 640)
+@Composable
+fun LightPortraitBottomNavPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        BottomNavBar(
+            onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
             currentNavigationTarget = MusicNavigationTarget,
         )

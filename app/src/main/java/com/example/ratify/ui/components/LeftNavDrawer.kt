@@ -69,12 +69,28 @@ fun LeftNavDrawer(
 }
 
 // Previews
-@Preview(name = "Landscape Nav Drawer", widthDp = 640, heightDp = 360)
+@Preview(name = "Dark Landscape Nav Drawer", widthDp = 640, heightDp = 360)
 @Composable
-fun LandscapeNavDrawerPreview() {
-    RatifyTheme {
+fun DarkLandscapeNavDrawerPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         LeftNavDrawer(
-            onClick = { target, isSelected -> {}},
+            onClick = { _, _ -> run {} },
+            navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
+            currentTarget = MusicNavigationTarget
+        )
+    }
+}
+
+@Preview(name = "Light Landscape Nav Drawer", widthDp = 640, heightDp = 360)
+@Composable
+fun LightLandscapeNavDrawerPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        LeftNavDrawer(
+            onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
             currentTarget = MusicNavigationTarget
         )

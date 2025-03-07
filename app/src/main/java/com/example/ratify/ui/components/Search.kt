@@ -112,10 +112,12 @@ fun Search(
 }
 
 // Previews
-@Preview(name = "Search Bar")
+@Preview(name = "Dark Search Bar")
 @Composable
-fun SearchBarPreview() {
-    RatifyTheme {
+fun DarkSearchBarPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -132,7 +134,36 @@ fun SearchBarPreview() {
                     onQueryChange = { _ ->},
                     trailingIcon = Icons.Default.MoreVert,
                     dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
-                    dropdownOptionOnClick = listOf<() -> Unit>({}, {})
+                    dropdownOptionOnClick = listOf({}, {})
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Light Search Bar")
+@Composable
+fun LightSearchBarPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column {
+                Search(
+                    query = "Foo",
+                    onQueryChange = { _ -> },
+                    trailingIcon = null,
+                    dropdownOptionOnClick = emptyList(),
+                    dropdownLabels = emptyList()
+                )
+                Search(
+                    query = "",
+                    onQueryChange = { _ ->},
+                    trailingIcon = Icons.Default.MoreVert,
+                    dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
+                    dropdownOptionOnClick = listOf({}, {})
                 )
             }
         }

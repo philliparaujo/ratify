@@ -282,10 +282,25 @@ fun LibraryScreen(
 }
 
 // Previews
-@Preview(name = "Library Screen")
+@Preview(name = "Dark Library Screen")
 @Composable
-fun LibraryScreenPreview() {
-    RatifyTheme {
+fun DarkLibraryScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        LibraryScreen(
+            spotifyViewModel = null,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview(name = "Light Library Screen")
+@Composable
+fun LightLibraryScreenPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         LibraryScreen(
             spotifyViewModel = null,
             navController = rememberNavController()
@@ -294,12 +309,30 @@ fun LibraryScreenPreview() {
 }
 
 @Preview(
-    name = "Landscape Library Screen",
+    name = "Dark Landscape Library Screen",
     device = landscapeDevice
 )
 @Composable
-fun LandscapeLibraryScreenPreview() {
-    RatifyTheme {
+fun DarkLandscapeLibraryScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        LibraryScreen(
+            spotifyViewModel = null,
+            navController = rememberNavController()
+        )
+    }
+}
+
+@Preview(
+    name = "Light Landscape Library Screen",
+    device = landscapeDevice
+)
+@Composable
+fun LightLandscapeLibraryScreenPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         LibraryScreen(
             spotifyViewModel = null,
             navController = rememberNavController()

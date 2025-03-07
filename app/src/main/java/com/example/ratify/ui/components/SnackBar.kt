@@ -74,11 +74,54 @@ fun MySnackBar(
 
 
 // Previews
-
-@Preview(name = "SnackBar")
+@Preview(name = "Dark SnackBar")
 @Composable
-fun SnackBarPreview() {
-    RatifyTheme(darkTheme = true) {
+fun DarkSnackBarPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            MySnackBar(
+                snackbarData = object : SnackbarData {
+                    override val visuals = object : SnackbarVisuals {
+                        override val message = "Preview"
+                        override val actionLabel = "Dismiss"
+                        override val withDismissAction = true
+                        override val duration = SnackbarDuration.Short
+                    }
+
+                    override fun performAction() {}
+                    override fun dismiss() {}
+                }
+            )
+
+            MySnackBar(
+                snackbarData = object : SnackbarData {
+                    override val visuals = object : SnackbarVisuals {
+                        override val message = "Preview"
+                        override val actionLabel = null
+                        override val withDismissAction = true
+                        override val duration = SnackbarDuration.Short
+                    }
+
+                    override fun performAction() {}
+                    override fun dismiss() {}
+                }
+            )
+        }
+    }
+}
+
+
+@Preview(name = "Light SnackBar")
+@Composable
+fun LightSnackBarPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

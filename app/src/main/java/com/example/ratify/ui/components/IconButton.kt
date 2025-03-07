@@ -1,6 +1,7 @@
 package com.example.ratify.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -70,11 +71,54 @@ fun MyIconButton(
 }
 
 // Previews
-@Preview(name = "Enabled Icon Button")
+@Preview(name = "Dark Enabled Icon Button")
 @Composable
-fun EnabledIconButtonPreview() {
-    RatifyTheme(darkTheme = true) {
-        Column {
+fun DarkEnabledIconButtonPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+            MyIconButton(
+                onClick = {},
+                enabled = true,
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
+                large = false
+            )
+            MyIconButton(
+                onClick = {},
+                onDisabledClick = { Log.d("IconButton", "IconButton is disabled") },
+                enabled = false,
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
+                large = false
+            )
+            MyIconButton(
+                onClick = {},
+                enabled = true,
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
+                large = true
+            )
+            MyIconButton(
+                onClick = {},
+                onDisabledClick = { Log.d("IconButton", "IconButton is disabled") },
+                enabled = false,
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
+                large = true
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Enabled Icon Button")
+@Composable
+fun LightEnabledIconButtonPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
             MyIconButton(
                 onClick = {},
                 enabled = true,

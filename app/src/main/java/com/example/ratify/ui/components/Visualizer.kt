@@ -50,31 +50,57 @@ fun Visualizer(
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier.padding(horizontal = horizontalInnerPadding, vertical = verticalInnerPadding)
         ) {
-            heights.forEachIndexed({ i,h ->
-                val ratingValue = i+1
+            heights.forEachIndexed { i, h ->
+                val ratingValue = i + 1
 
                 Column(
                     modifier = Modifier
                         .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(columnSpacing)
                 ) {
-                    Box(modifier = Modifier
-                        .height(h/maxHeight * totalHeight)
-                        .fillMaxWidth()
-                        .background(getRatingColor(Rating.from(ratingValue))
-                    ))
-                    Text(text = "${ratingValue}", color = MaterialTheme.colorScheme.primary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    Box(
+                        modifier = Modifier
+                            .height(h / maxHeight * totalHeight)
+                            .fillMaxWidth()
+                            .background(
+                                getRatingColor(Rating.from(ratingValue))
+                            )
+                    )
+                    Text(
+                        text = "$ratingValue",
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-            })
+            }
         }
     }
 }
 
 // Previews
-@Preview(name = "Visualizer")
+@Preview(name = "Dark Visualizer")
 @Composable
-fun VisualizerPreview() {
-    RatifyTheme {
+fun DarkVisualizerPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Visualizer(
+                heights = listOf(50f, 150f, 30f, 1f, 50f, 50f, 50f, 50f, 50f, 50f)
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Visualizer")
+@Composable
+fun LightVisualizerPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

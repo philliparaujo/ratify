@@ -110,9 +110,9 @@ fun getArtistsString(artists: List<Artist>): String {
 
 // Previews
 // Network images don't work with previews
-val unspecifiedString = "foo"
-val songName = "Touchdown (feat. Bankrol Hayden)"
-public val mockSong = Song(
+const val unspecifiedString = "foo"
+const val songName = "Touchdown (feat. Bankrol Hayden)"
+val mockSong = Song(
     album = Album(
         songName,
         unspecifiedString
@@ -139,11 +139,44 @@ public val mockSong = Song(
     lastRatedTs = 1737132383109,
     rating = Rating.from(10)
 )
+const val longSongName = "Symphony No. 40 in G Minor, K. 550: I.Allegro molto"
+val longMockSong = Song(
+    album = Album(
+        longSongName,
+        unspecifiedString
+    ),
+    artist = Artist(
+        "Wolfgang Amadeus Mozart", unspecifiedString
+    ),
+    artists = listOf(
+        Artist(
+            "Wolfgang Amadeus Mozart", unspecifiedString
+        ),
+        Artist(
+            "Capella Instropolitana", unspecifiedString
+        ),
+        Artist(
+            "Barry Wordsworth", unspecifiedString
+        )
+    ),
+    duration = 451333,
+    imageUri = ImageUri(
+        unspecifiedString
+    ),
+    name = longSongName,
+    uri = unspecifiedString,
+    lastPlayedTs = 1737132383109,
+    timesPlayed = 1,
+    lastRatedTs = 1737132383109,
+    rating = Rating.from(10)
+)
 
-@Preview(name = "Song Display")
+@Preview(name = "Dark Song Display")
 @Composable
-fun SongDisplayPreview() {
-    RatifyTheme(darkTheme = true) {
+fun DarkSongDisplayPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -157,52 +190,58 @@ fun SongDisplayPreview() {
     }
 }
 
-@Preview(name = "Long Name Song Display")
+@Preview(name = "Light Song Display")
 @Composable
-fun LongNameSongDisplayPreview() {
-    val unspecifiedString = "foo"
-    val songName = "Symphony No. 40 in G Minor, K. 550: I.Allegro molto"
-
-    val song = Song(
-        album = Album(
-            songName,
-            unspecifiedString
-        ),
-        artist = Artist(
-            "Wolfgang Amadeus Mozart", unspecifiedString
-        ),
-        artists = listOf(
-            Artist(
-                "Wolfgang Amadeus Mozart", unspecifiedString
-            ),
-            Artist(
-                "Capella Instropolitana", unspecifiedString
-            ),
-            Artist(
-                "Barry Wordsworth", unspecifiedString
-            )
-        ),
-        duration = 451333,
-        imageUri = ImageUri(
-            unspecifiedString
-        ),
-        name = songName,
-        uri = unspecifiedString,
-        lastPlayedTs = 1737132383109,
-        timesPlayed = 1,
-        lastRatedTs = 1737132383109,
-        rating = Rating.from(10)
-    )
-
-    RatifyTheme(darkTheme = true) {
+fun LightSongDisplayPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             SongDisplay(
-                title = song.name,
-                artists = getArtistsString(song.artists),
-                imageUri = song.imageUri.raw ?: ""
+                title = mockSong.name,
+                artists = getArtistsString(mockSong.artists),
+                imageUri = mockSong.imageUri.raw ?: ""
+            )
+        }
+    }
+}
+
+@Preview(name = "Dark Long Name Song Display")
+@Composable
+fun DarkLongNameSongDisplayPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            SongDisplay(
+                title = longMockSong.name,
+                artists = getArtistsString(longMockSong.artists),
+                imageUri = longMockSong.imageUri.raw ?: ""
+            )
+        }
+    }
+}
+
+@Preview(name = "Light Long Name Song Display")
+@Composable
+fun LightLongNameSongDisplayPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            SongDisplay(
+                title = longMockSong.name,
+                artists = getArtistsString(longMockSong.artists),
+                imageUri = longMockSong.imageUri.raw ?: ""
             )
         }
     }

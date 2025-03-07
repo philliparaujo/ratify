@@ -1,6 +1,7 @@
 package com.example.ratify.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -79,11 +80,32 @@ fun MyButton(
 const val smallButtonText = "Delete"
 const val bigButtonText = "Connect to Spotify"
 
-@Preview(name = "Enabled Button")
+@Preview(name = "Dark Enabled Button")
 @Composable
-fun EnabledButtonPreview() {
-    RatifyTheme(darkTheme = true) {
-        Column {
+fun DarkEnabledButtonPreview() {
+    RatifyTheme(
+        darkTheme = true
+    ) {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+            MyButton(text = smallButtonText, onClick = {}, enabled = true)
+            MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
+            MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
+            MyButton(text = bigButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false, large = true)
+        }
+    }
+}
+
+@Preview(name = "Light Enabled Button")
+@Composable
+fun LightEnabledButtonPreview() {
+    RatifyTheme(
+        darkTheme = false
+    ) {
+        Column(
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
             MyButton(text = smallButtonText, onClick = {}, enabled = true)
             MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
             MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
