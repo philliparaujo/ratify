@@ -1,14 +1,19 @@
 package com.example.ratify.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,15 +33,21 @@ fun SettingsScreen(
     val settings = spotifyViewModel?.settings
     val scope = rememberCoroutineScope()
 
-    val autoSignIn = settings?.autoSignIn?.collectAsState(initial = false)
-    val skipOnRate = settings?.skipOnRate?.collectAsState(initial = false)
-    val queueSkip = settings?.queueSkip?.collectAsState(initial = false)
+    val autoSignIn = settings?.autoSignIn?.collectAsState(false)
+    val skipOnRate = settings?.skipOnRate?.collectAsState(false)
+    val queueSkip = settings?.queueSkip?.collectAsState(false)
+    val darkTheme = settings?.darkTheme?.collectAsState(true)
 
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
         Column {
-            Text(text = "Settings Screen", fontSize = 24.sp, modifier = Modifier.padding(16.dp))
+            Text(
+                text = "Settings Screen",
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(16.dp)
+            )
 
             Row(modifier = Modifier.padding(16.dp)) {
                 MyButton(
@@ -77,6 +88,28 @@ fun SettingsScreen(
                         }
                     }
                 )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
+                ) {
+                    Text(
+                        "Light Theme",
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Switch(
+                        checked = darkTheme?.value ?: true,
+                        onCheckedChange = { newDarkTheme ->
+                            scope.launch {
+                                settings?.setDarkTheme(newDarkTheme)
+                            }
+                        },
+                    )
+                    Text(
+                        "Dark Theme",
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }

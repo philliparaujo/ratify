@@ -7,6 +7,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.settings.SettingsManager
@@ -73,12 +77,21 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            RatifyTheme {
+            val darkTheme by settingsManager.darkTheme.collectAsState(true)
+
+            RatifyTheme(
+                darkTheme = darkTheme
+            ) {
                MainScreen(
                    spotifyViewModel = spotifyViewModel,
                    onExportClick = { databaseIOHelper.exportDatabase() },
                    onImportClick = { databaseIOHelper.importDatabase() }
                )
+            }
+
+            // Dynamically update status bar appearance based on theme
+            LaunchedEffect(darkTheme) {
+                WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !darkTheme
             }
         }
     }

@@ -2,7 +2,6 @@ package com.example.ratify.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -67,7 +66,7 @@ private val LightColorScheme = darkColorScheme(
 
 @Composable
 fun RatifyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,  // Disabling for now
     content: @Composable () -> Unit

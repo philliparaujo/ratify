@@ -15,14 +15,17 @@ class SettingsManager(private val context: Context) {
         val AUTO_SIGN_IN = booleanPreferencesKey("auto_sign_in")
         val SKIP_ON_RATE = booleanPreferencesKey("skip_on_rate")
         val QUEUE_SKIP = booleanPreferencesKey("queue_skip")
+        val DARK_THEME = booleanPreferencesKey("dark_theme")
     }
 
     val autoSignIn: Flow<Boolean> = context.dataStore.data
-        .map { it[PreferencesKeys.AUTO_SIGN_IN] ?: true }
+        .map { it[PreferencesKeys.AUTO_SIGN_IN] ?: false }
     val skipOnRate: Flow<Boolean> = context.dataStore.data
-        .map { it[PreferencesKeys.SKIP_ON_RATE] ?: true}
+        .map { it[PreferencesKeys.SKIP_ON_RATE] ?: false}
     val queueSkip: Flow<Boolean> = context.dataStore.data
-        .map { it[PreferencesKeys.QUEUE_SKIP] ?: true}
+        .map { it[PreferencesKeys.QUEUE_SKIP] ?: false}
+    val darkTheme: Flow<Boolean> = context.dataStore.data
+        .map { it[PreferencesKeys.DARK_THEME] ?: true }
 
     suspend fun setAutoSignIn(autoSignIn: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.AUTO_SIGN_IN] = autoSignIn }
@@ -32,5 +35,8 @@ class SettingsManager(private val context: Context) {
     }
     suspend fun setQueueSkip(queueSkip: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.QUEUE_SKIP] = queueSkip }
+    }
+    suspend fun setDarkTheme(darkTheme: Boolean) {
+        context.dataStore.edit { it[PreferencesKeys.DARK_THEME] = darkTheme }
     }
 }
