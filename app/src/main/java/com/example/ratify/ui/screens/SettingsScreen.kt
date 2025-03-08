@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
@@ -37,7 +38,7 @@ fun SettingsScreen(
     val queueSkip = settings?.queueSkip?.collectAsState(false)
     val libraryImageUri = settings?.libraryImageUri?.collectAsState(true)
     val darkTheme = settings?.darkTheme?.collectAsState(true)
-    val currentTheme = settings?.themeColor?.collectAsState("Default")
+    val themeColor = settings?.themeColor?.collectAsState(0)
 
     Box(
         modifier = Modifier
@@ -120,7 +121,7 @@ fun SettingsScreen(
                 }
             )
             ThemeSelector(
-                currentTheme = currentTheme?.value ?: "Default",
+                currentTheme = themeColor?.value ?: PrimaryColor.DEFAULT.ordinal,
                 onThemeSelected = { newTheme ->
                     scope.launch {
                         settings?.setThemeColor(newTheme)

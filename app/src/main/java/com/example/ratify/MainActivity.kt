@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
+import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyEvent
@@ -78,7 +79,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val darkTheme by settingsManager.darkTheme.collectAsState(true)
-            val themeColor by settingsManager.themeColor.collectAsState("Default")
+            val themeColor by settingsManager.themeColor.collectAsState(PrimaryColor.DEFAULT.ordinal)
 
             RatifyTheme(
                 darkTheme = darkTheme,

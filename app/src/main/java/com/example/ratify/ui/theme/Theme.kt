@@ -10,12 +10,12 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.ratify.settings.PrimaryColor
 
 private val DarkColorScheme = darkColorScheme(
     // Primary colors
-    primary = MyCyan,
+    primary = PrimaryCyan,
     onPrimary = MyBlack,
     inversePrimary = MyDarkCyan,
 
@@ -41,7 +41,7 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = darkColorScheme(
     // Primary colors
-    primary = MyCyan,
+    primary = PrimaryCyan,
     onPrimary = MyBlack,
     inversePrimary = MyLightCyan,
 
@@ -65,17 +65,10 @@ private val LightColorScheme = darkColorScheme(
     onPrimaryContainer = MyBlack
 )
 
-val primaryColorOptions = listOf(
-    "Default" to Color.Blue,
-    "Red" to Color.Red,
-    "Green" to Color.Green,
-    "Purple" to Color.Magenta
-)
-
 @Composable
 fun RatifyTheme(
     darkTheme: Boolean,
-    themeColor: String = "Default",
+    themeColor: Int = PrimaryColor.DEFAULT.ordinal,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,  // Disabling for now
     content: @Composable () -> Unit
@@ -89,12 +82,7 @@ fun RatifyTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    val primaryColor = when (themeColor) {
-        "Red" -> Color.Red
-        "Green" -> Color.Green
-        "Purple" -> Color.Magenta
-        else -> baseColorScheme.primary
-    }
+    val primaryColor = PrimaryColor.entries.toTypedArray()[themeColor].color
     val colorScheme = baseColorScheme.copy(primary = primaryColor)
 
     MaterialTheme(

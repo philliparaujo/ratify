@@ -17,13 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.ui.theme.RatifyTheme
-import com.example.ratify.ui.theme.primaryColorOptions
 
 @Composable
 fun ThemeSelector(
-    currentTheme: String,
-    onThemeSelected: (String) -> Unit,
+    currentTheme: Int,
+    onThemeSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -31,29 +31,41 @@ fun ThemeSelector(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
     ) {
-        Text(text = "Accent:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+        val options = PrimaryColor.entries.toTypedArray()
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            primaryColorOptions.forEach { (themeName, color) ->
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(color)
-                        .border(
-                            width = if (themeName == currentTheme) 3.dp else 0.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = CircleShape
-                        )
-                        .clickable {
-                            onThemeSelected(themeName)
-                        }
-                )
-            }
-        }
+        DropdownSelect(
+            options = options.toList(),
+            selectedOption = options[currentTheme],
+            onSelect = { option -> onThemeSelected(option.ordinal)},
+            label = "Theme",
+            large = true
+        )
+
+//        Row(
+//            horizontalArrangement = Arrangement.spacedBy(10.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            val primaryColors = PrimaryColor.entries.toTypedArray()
+//            primaryColors.forEach { primaryColor ->
+//                Box(
+//                    modifier = Modifier
+//                        .size(32.dp)
+//                        .clip(CircleShape)
+//                        .background(primaryColor.color)
+//                        .border(
+//                            width = if (primaryColor.ordinal == currentTheme) 3.dp else 0.dp,
+//                            color = MaterialTheme.colorScheme.primary,
+//                            shape = CircleShape
+//                        )
+//                        .clickable {
+//                            onThemeSelected(primaryColor.ordinal)
+//                        }
+//                )
+//            }
+//        }
+//
+//        val primaryColor = PrimaryColor.entries.toTypedArray()[currentTheme]
+//        Text(text = "Theme: $primaryColor", fontWeight = FontWeight.Bold, color = primaryColor.color)
     }
 }
 
@@ -65,7 +77,7 @@ fun DarkThemeSelectorPreview() {
         darkTheme = true
     ) {
         ThemeSelector(
-            currentTheme = "Default",
+            currentTheme = PrimaryColor.DEFAULT.ordinal,
             onThemeSelected = { }
         )
     }

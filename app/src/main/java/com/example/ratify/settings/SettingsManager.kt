@@ -3,7 +3,7 @@ package com.example.ratify.settings
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,7 +18,7 @@ class SettingsManager(private val context: Context) {
         val QUEUE_SKIP = booleanPreferencesKey("queue_skip")
         val LIBRARY_IMAGE_URI = booleanPreferencesKey("library_image_uri")
         val DARK_THEME = booleanPreferencesKey("dark_theme")
-        val THEME_COLOR = stringPreferencesKey("theme_color")
+        val THEME_COLOR = intPreferencesKey("theme_color")
     }
 
     val autoSignIn: Flow<Boolean> = context.dataStore.data
@@ -31,8 +31,8 @@ class SettingsManager(private val context: Context) {
         .map { it[PreferencesKeys.LIBRARY_IMAGE_URI] ?: true }
     val darkTheme: Flow<Boolean> = context.dataStore.data
         .map { it[PreferencesKeys.DARK_THEME] ?: true }
-    val themeColor: Flow<String> = context.dataStore.data
-        .map { it[PreferencesKeys.THEME_COLOR] ?: "Default" }
+    val themeColor: Flow<Int> = context.dataStore.data
+        .map { it[PreferencesKeys.THEME_COLOR] ?: PrimaryColor.DEFAULT.ordinal }
 
     suspend fun setAutoSignIn(autoSignIn: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.AUTO_SIGN_IN] = autoSignIn }
@@ -49,7 +49,7 @@ class SettingsManager(private val context: Context) {
     suspend fun setDarkTheme(darkTheme: Boolean) {
         context.dataStore.edit { it[PreferencesKeys.DARK_THEME] = darkTheme }
     }
-    suspend fun setThemeColor(themeColor: String) {
+    suspend fun setThemeColor(themeColor: Int) {
         context.dataStore.edit { it[PreferencesKeys.THEME_COLOR] = themeColor }
     }
 }
