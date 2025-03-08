@@ -127,7 +127,7 @@ fun SettingsScreen(
                         settings?.setThemeColor(newTheme)
                     }
                 },
-                modifier = Modifier.padding(start = 16.dp)
+                modifier = Modifier.padding(start = 12.dp, top = 12.dp)
             )
         }
     }
