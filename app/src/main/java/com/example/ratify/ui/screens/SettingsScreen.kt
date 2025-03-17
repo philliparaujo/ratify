@@ -84,6 +84,16 @@ fun SettingsScreen(
                 )
             }
 
+            ThemeSelector(
+                currentTheme = themeColor?.value ?: PrimaryColor.DEFAULT.ordinal,
+                onThemeSelected = { newTheme ->
+                    scope.launch {
+                        settings?.setThemeColor(newTheme)
+                    }
+                },
+                modifier = Modifier.padding(start = 14.dp, top = 12.dp, bottom = 12.dp)
+            )
+
             BinarySetting(
                 displayText = "Keep me signed in (to Spotify)",
                 state = autoSignIn?.value ?: false,
@@ -119,15 +129,6 @@ fun SettingsScreen(
                         settings?.setLibraryImageUri(newState)
                     }
                 }
-            )
-            ThemeSelector(
-                currentTheme = themeColor?.value ?: PrimaryColor.DEFAULT.ordinal,
-                onThemeSelected = { newTheme ->
-                    scope.launch {
-                        settings?.setThemeColor(newTheme)
-                    }
-                },
-                modifier = Modifier.padding(start = 12.dp, top = 12.dp)
             )
         }
     }

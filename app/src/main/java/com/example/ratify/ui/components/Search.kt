@@ -91,7 +91,7 @@ fun Search(
                     }
                 },
                 colors = SearchBarDefaults.inputFieldColors(
-                    focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     disabledTextColor = MaterialTheme.colorScheme.onPrimary,
                     cursorColor = MaterialTheme.colorScheme.onPrimaryContainer,
