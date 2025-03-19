@@ -1,11 +1,15 @@
 package com.example.ratify.ui.screens
 
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -14,8 +18,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.services.MyService
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
@@ -40,12 +46,30 @@ fun SettingsScreen(
     val darkTheme = settings?.darkTheme?.collectAsState(true)
     val themeColor = settings?.themeColor?.collectAsState(0)
 
+    val contextWrapper = ContextWrapper(LocalContext.current)
+
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .fillMaxSize(),
     ) {
         Column {
+            Button(onClick = {
+                Intent(contextWrapper, MyService::class.java).also {
+                    it.action = MyService.Actions.START.toString()
+                    contextWrapper.startService(it)
+                }
+            }) {
+                Text("Start service")
+            }
+            Button(onClick = {
+                Intent(contextWrapper, MyService::class.java).also {
+                    it.action = MyService.Actions.STOP.toString()
+                    contextWrapper.startService(it)
+                }
+            }) {
+                Text("Stop service")
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),

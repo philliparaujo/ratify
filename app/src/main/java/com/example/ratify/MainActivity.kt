@@ -2,6 +2,7 @@ package com.example.ratify
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
@@ -75,6 +77,19 @@ class MainActivity : ComponentActivity() {
             spotifyViewModel.authRequest.observe(this) { request ->
                 spotifyAuthHelper.launchAuth(request)
             }
+        }
+
+        // The quick media controls needs post notification permissions, so on app launch we need
+        // to request permissions for it
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                    android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+                ),
+                0
+            )
         }
 
         setContent {

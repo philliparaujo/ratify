@@ -4,7 +4,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
+        android:name=".services.ServiceApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -35,6 +40,11 @@
                     android:host="${redirectHostName}" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".services.MyService"
+            android:foregroundServiceType="mediaPlayback"
+        />
+        <receiver android:name=".services.MyBroadcastReceiver" />
     </application>
 
 </manifest>
