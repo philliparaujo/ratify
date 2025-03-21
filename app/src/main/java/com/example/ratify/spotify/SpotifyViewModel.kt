@@ -1,15 +1,19 @@
 package com.example.ratify.spotify
 
 import android.app.Application
+import android.content.ContextWrapper
+import android.content.Intent
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
+import com.example.ratify.services.MyService
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
@@ -97,6 +101,8 @@ class SpotifyViewModel(
                         val existingSong = dao.getSongByPrimaryKey(currentSong.name, currentSong.artists) // Query database
                         val currentTime = System.currentTimeMillis()
 
+                        val context = getApplication<Application>()
+
                         // Insert current song for first time or simply update its lastPlayedTs
                         if (existingSong == null) {
                             if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
@@ -107,6 +113,12 @@ class SpotifyViewModel(
                                     rating = null,
                                     lastRatedTs = null
                                 ))
+
+                                Intent(context, MyService::class.java).also {
+                                    it.action = MyService.Actions.UPDATE.toString()
+                                    it.putExtra("current_rating", "-")
+                                    context.startService(it)
+                                }
                             }
                         } else {
                             onEvent(SpotifyEvent.UpdateLastPlayedTs(
@@ -115,6 +127,12 @@ class SpotifyViewModel(
                                 lastPlayedTs = currentTime,
                                 timesPlayed = existingSong.timesPlayed + 1,
                             ))
+
+                            Intent(context, MyService::class.java).also {
+                                it.action = MyService.Actions.UPDATE.toString()
+                                it.putExtra("current_rating", existingSong.rating?.value.toString() ?: "-")
+                                context.startService(it)
+                            }
                         }
 
                         // Load current rating based on database entry

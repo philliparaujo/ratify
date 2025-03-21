@@ -37,13 +37,27 @@ class MyService: Service() {
             // Set up textView with proper value
             remoteViews.setTextViewText(textViewId, currentRating)
 
+            // Reset all button preferences to default values
+            val editor = sharedPrefs.edit()
             buttonIds.zip(defaultButtonValues).forEach { (id, defaultValue) ->
-                var buttonValue = sharedPrefs.getInt(id.toString(), -1)
-                if (buttonValue == -1) {
-                    Log.d("MyBroadcastReceiver", "stored button value is -1")
-                    sharedPrefs.edit().putInt(id.toString(), defaultValue).apply()
-                    buttonValue = defaultValue
+                editor.putInt(id.toString(), defaultValue)
+            }
+
+            // If current rating matches default button value, flip that button's preference
+            val ratingInt = currentRating.toIntOrNull()
+            if (ratingInt != null) {
+                val matchingIndex = defaultButtonValues.indexOf(ratingInt)
+                if (matchingIndex != -1) {
+                    val id = buttonIds[matchingIndex]
+                    val flippedValue = if (ratingInt % 2 == 0) ratingInt - 1 else ratingInt + 1
+                    editor.putInt(id.toString(), flippedValue)
                 }
+            }
+            editor.apply()
+
+            // Update button UI + intents
+            buttonIds.forEach { id ->
+                val buttonValue = sharedPrefs.getInt(id.toString(), -1)
                 remoteViews.setTextViewText(id, buttonValue.toString())
 
                 val intent = Intent(context, MyBroadcastReceiver::class.java).apply {

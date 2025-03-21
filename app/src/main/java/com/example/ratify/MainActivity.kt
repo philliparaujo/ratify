@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
+import com.example.ratify.services.MyService
 import com.example.ratify.services.ServiceApp
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.settings.SettingsManager
@@ -137,6 +138,16 @@ class MainActivity : ComponentActivity() {
                     spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
                 }
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // Remove notification
+        Intent(this, MyService::class.java).also {
+            it.action = MyService.Actions.STOP.toString()
+            this.startService(it)
         }
     }
 }
