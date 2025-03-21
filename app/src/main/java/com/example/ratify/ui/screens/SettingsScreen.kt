@@ -1,9 +1,6 @@
 package com.example.ratify.ui.screens
 
-import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.services.MyService
+import com.example.ratify.services.startRatingService
+import com.example.ratify.services.stopRatingService
+import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.SongState
@@ -51,6 +50,7 @@ fun SettingsScreen(
     val contextWrapper = ContextWrapper(LocalContext.current)
 
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
+    val currentRating = songState?.value?.currentRating
 
     Box(
         modifier = Modifier
@@ -59,30 +59,17 @@ fun SettingsScreen(
     ) {
         Column {
             Button(onClick = {
-                Intent(contextWrapper, MyService::class.java).also {
-                    it.action = MyService.Actions.START.toString()
-                    Log.d("SettingsScreen", songState?.value?.currentRating?.value.toString())
-                    it.putExtra("current_rating", songState?.value?.currentRating?.value.toString() ?: "-")
-                    contextWrapper.startService(it)
-                }
+                contextWrapper.startRatingService(currentRating)
             }) {
                 Text("Start service")
             }
             Button(onClick = {
-                Intent(contextWrapper, MyService::class.java).also {
-                    it.action = MyService.Actions.UPDATE.toString()
-                    Log.d("SettingsScreen", songState?.value?.currentRating?.value.toString())
-                    it.putExtra("current_rating", songState?.value?.currentRating?.value.toString() ?: "-")
-                    contextWrapper.startService(it)
-                }
+                contextWrapper.updateRatingService(currentRating)
             }) {
                 Text("Update service")
             }
             Button(onClick = {
-                Intent(contextWrapper, MyService::class.java).also {
-                    it.action = MyService.Actions.STOP.toString()
-                    contextWrapper.startService(it)
-                }
+                contextWrapper.stopRatingService()
             }) {
                 Text("Stop service")
             }

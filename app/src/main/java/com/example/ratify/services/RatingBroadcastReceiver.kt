@@ -10,26 +10,26 @@ import com.example.ratify.R
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotifydatabase.Rating
 
-class MyBroadcastReceiver : BroadcastReceiver() {
+class RatingBroadcastReceiver : BroadcastReceiver() {
+    // Triggers on button click within notification
     override fun onReceive(context: Context, intent: Intent?) {
         // Fetch buttonId and buttonValue
-        val buttonId = intent?.getIntExtra("button_id", -1) ?: -1
+        val buttonId = intent?.getIntExtra(BUTTON_ID_EXTRA, -1) ?: -1
         if (buttonId == -1) {
             Log.d("MyBroadcastReceiver", "button id received as -1")
             return
         }
 
-        val sharedPrefs = context.getSharedPreferences("button_prefs", Context.MODE_PRIVATE)
+        val sharedPrefs = context.getSharedPreferences(BUTTON_SHARED_PREFS, Context.MODE_PRIVATE)
         val buttonValue = sharedPrefs.getInt(buttonId.toString(), -1)
         if (buttonValue == -1) {
             Log.d("MyBroadcastReceiver", "button value received as -1")
             return
         }
 
+        // Update UI and database ratings
         val spotifyViewModel = (context.applicationContext as ServiceApp).spotifyViewModel
         val playerState = spotifyViewModel.playerState.value
-        Log.d("MyBroadcastReceiver", spotifyViewModel.toString())
-        Log.d("MyBroadcastReceiver", playerState.toString())
         spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(Rating.from(buttonValue)))
         spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
             name = playerState!!.track.name,
@@ -38,15 +38,14 @@ class MyBroadcastReceiver : BroadcastReceiver() {
             lastRatedTs = System.currentTimeMillis()
         ))
 
-        // Calculate new button value and save it to shared preferences
-        sharedPrefs.edit().putString(textViewId.toString(), buttonValue.toString()).apply()
-
-        val newValue = if (buttonValue % 2 == 0) buttonValue - 1 else buttonValue + 1
+        // Calculate new button value, update shared preferences of button and text view
+        val newValue = flipButtonValue(buttonValue)
         Log.d("MyBroadcastReceiver", "Button ID: $buttonId, Toggled Value: $buttonValue -> $newValue")
+        sharedPrefs.edit().putString(textViewId.toString(), buttonValue.toString()).apply()
         sharedPrefs.edit().putInt(buttonId.toString(), newValue).apply()
 
         // Create and send an updated notification
-        val remoteViews = MyService.createCustomRemoteView(context, buttonValue.toString())
+        val remoteViews = RatingService.createCustomRemoteView(context, buttonValue.toString())
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val existingNotification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -56,7 +55,6 @@ class MyBroadcastReceiver : BroadcastReceiver() {
             .build()
 
         notificationManager.notify(NOTIFICATION_ID, existingNotification)
-        Log.d("MyBroadcastReceiver", "sent new notification")
     }
 }
 

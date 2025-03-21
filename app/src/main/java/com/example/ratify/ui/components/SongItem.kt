@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
 import com.example.ratify.R
+import com.example.ratify.services.nullTextViewValue
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.theme.RatifyTheme
@@ -109,7 +110,7 @@ fun SongItem(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = song.rating?.value?.toString() ?: "-",
+                    text = (song.rating?.value ?: nullTextViewValue).toString(),
                     fontSize = ratingTextSize,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold

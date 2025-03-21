@@ -6,18 +6,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.example.ratify.R
 
-class MyService: Service() {
+class RatingService: Service() {
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val currentRating = intent?.getStringExtra("current_rating") ?: "-"
+        val currentRating = intent?.getStringExtra(CURRENT_RATING_EXTRA) ?: nullTextViewValue
 
         when (intent?.action) {
             Actions.START.toString() -> start(currentRating)
@@ -32,7 +31,7 @@ class MyService: Service() {
             val packageName = context.packageName
             val remoteViews = RemoteViews(packageName, R.layout.custom_notification)
 
-            val sharedPrefs = context.getSharedPreferences("button_prefs", Context.MODE_PRIVATE)
+            val sharedPrefs = context.getSharedPreferences(BUTTON_SHARED_PREFS, Context.MODE_PRIVATE)
 
             // Set up textView with proper value
             remoteViews.setTextViewText(textViewId, currentRating)
@@ -49,7 +48,7 @@ class MyService: Service() {
                 val matchingIndex = defaultButtonValues.indexOf(ratingInt)
                 if (matchingIndex != -1) {
                     val id = buttonIds[matchingIndex]
-                    val flippedValue = if (ratingInt % 2 == 0) ratingInt - 1 else ratingInt + 1
+                    val flippedValue = flipButtonValue(ratingInt)
                     editor.putInt(id.toString(), flippedValue)
                 }
             }
@@ -60,8 +59,8 @@ class MyService: Service() {
                 val buttonValue = sharedPrefs.getInt(id.toString(), -1)
                 remoteViews.setTextViewText(id, buttonValue.toString())
 
-                val intent = Intent(context, MyBroadcastReceiver::class.java).apply {
-                    putExtra("button_id", id)
+                val intent = Intent(context, RatingBroadcastReceiver::class.java).apply {
+                    putExtra(BUTTON_ID_EXTRA, id)
                 }
                 val pendingIntent = PendingIntent.getBroadcast(
                     context, id, intent,

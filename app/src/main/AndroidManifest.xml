@@ -41,10 +41,10 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".services.MyService"
+            android:name=".services.RatingService"
             android:foregroundServiceType="mediaPlayback"
         />
-        <receiver android:name=".services.MyBroadcastReceiver" />
+        <receiver android:name=".services.RatingBroadcastReceiver" />
     </application>
 
 </manifest>
