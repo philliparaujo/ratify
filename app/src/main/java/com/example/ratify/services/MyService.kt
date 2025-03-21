@@ -17,25 +17,26 @@ class MyService: Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val currentRating = intent?.getStringExtra("current_rating") ?: "-"
+
         when (intent?.action) {
-            Actions.START.toString() -> start()
+            Actions.START.toString() -> start(currentRating)
             Actions.STOP.toString() -> stopSelf()
+            Actions.UPDATE.toString() -> update(currentRating)
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
     companion object {
-        fun createCustomRemoteView(context: Context): RemoteViews {
+        fun createCustomRemoteView(context: Context, currentRating: String): RemoteViews {
             val packageName = context.packageName
             val remoteViews = RemoteViews(packageName, R.layout.custom_notification)
 
             val sharedPrefs = context.getSharedPreferences("button_prefs", Context.MODE_PRIVATE)
 
             // Set up textView with proper value
-            val textViewValue = sharedPrefs.getString(textViewId.toString(), "-")
-            remoteViews.setTextViewText(textViewId, textViewValue)
+            remoteViews.setTextViewText(textViewId, currentRating)
 
-            // Set up buttons with proper values and onClicks
             buttonIds.zip(defaultButtonValues).forEach { (id, defaultValue) ->
                 var buttonValue = sharedPrefs.getInt(id.toString(), -1)
                 if (buttonValue == -1) {
@@ -60,16 +61,28 @@ class MyService: Service() {
         }
     }
 
-    private fun start() {
+    private fun start(currentRating: String) {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContent(createCustomRemoteView(this))
+            .setContent(createCustomRemoteView(this, currentRating))
+            .setOngoing(true)
+            .build()
+        startForeground(NOTIFICATION_ID, notification)
+    }
+
+    private fun update(currentRating: String) {
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContent(createCustomRemoteView(this, currentRating))
+            .setOnlyAlertOnce(true)
+            .setOngoing(true)
             .build()
         startForeground(NOTIFICATION_ID, notification)
     }
 
     enum class Actions {
         START,
-        STOP
+        STOP,
+        UPDATE,
     }
 }

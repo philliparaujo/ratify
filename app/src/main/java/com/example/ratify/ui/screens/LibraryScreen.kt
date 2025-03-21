@@ -19,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -51,7 +53,7 @@ fun LibraryScreen(
 ) {
     // Current states (UI and Spotify Player)
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
-    val playerState = spotifyViewModel?.playerState?.observeAsState()?.value
+    val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
 
     // Active search/sort options
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
@@ -111,7 +113,7 @@ fun LibraryScreen(
                 // Update current rating (UI indicator)
                 val ratingValue = Rating.from(rating)
                 if (playerState?.track?.uri == song.uri) {
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
                 }
                 // Update rating in database
                 spotifyViewModel?.onEvent(

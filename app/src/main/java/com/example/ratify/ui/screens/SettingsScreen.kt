@@ -3,6 +3,7 @@ package com.example.ratify.ui.screens
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ratify.services.MyService
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.ThemeSelector
@@ -48,6 +50,8 @@ fun SettingsScreen(
 
     val contextWrapper = ContextWrapper(LocalContext.current)
 
+    val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
+
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -57,10 +61,22 @@ fun SettingsScreen(
             Button(onClick = {
                 Intent(contextWrapper, MyService::class.java).also {
                     it.action = MyService.Actions.START.toString()
+                    Log.d("SettingsScreen", songState?.value?.currentRating?.value.toString())
+                    it.putExtra("current_rating", songState?.value?.currentRating?.value.toString() ?: "-")
                     contextWrapper.startService(it)
                 }
             }) {
                 Text("Start service")
+            }
+            Button(onClick = {
+                Intent(contextWrapper, MyService::class.java).also {
+                    it.action = MyService.Actions.UPDATE.toString()
+                    Log.d("SettingsScreen", songState?.value?.currentRating?.value.toString())
+                    it.putExtra("current_rating", songState?.value?.currentRating?.value.toString() ?: "-")
+                    contextWrapper.startService(it)
+                }
+            }) {
+                Text("Update service")
             }
             Button(onClick = {
                 Intent(contextWrapper, MyService::class.java).also {

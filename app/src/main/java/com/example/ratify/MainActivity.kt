@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
+import com.example.ratify.services.ServiceApp
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper
@@ -49,6 +50,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        (application as ServiceApp).spotifyViewModel = spotifyViewModel
 
         // Initialize database IO helper
         databaseIOHelper = DatabaseIOHelper(

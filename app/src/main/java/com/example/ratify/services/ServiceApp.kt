@@ -6,6 +6,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import com.example.ratify.R
+import com.example.ratify.database.SongDatabaseProvider
+import com.example.ratify.settings.SettingsManager
+import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotify.SpotifyViewModelFactory
 
 const val CHANNEL_ID = "running_channel"
 const val NOTIFICATION_ID = 1
@@ -14,8 +18,16 @@ val textViewId = R.id.currentRating
 val defaultButtonValues = listOf(2, 4, 6, 8, 10)
 
 class ServiceApp: Application() {
+    lateinit var settingsManager: SettingsManager
+        private set
+    lateinit var spotifyViewModel: SpotifyViewModel
+
+    val database by lazy { SongDatabaseProvider.getDatabase(this) }
+
     override fun onCreate() {
         super.onCreate()
+        settingsManager = SettingsManager(this)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,

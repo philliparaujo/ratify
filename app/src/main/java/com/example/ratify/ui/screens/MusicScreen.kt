@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -100,7 +102,7 @@ fun PlayerScreen(
 ) {
     // Player state
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()
-    val playerState = spotifyViewModel?.playerState?.observeAsState()
+    val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
     val currentPlaybackPosition = spotifyViewModel?.currentPlaybackPosition?.observeAsState()
     val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
     val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
@@ -115,11 +117,11 @@ fun PlayerScreen(
 
     @Composable
     fun RenderSongDisplay() {
-        if (playerState?.value != null) {
+        if (playerState != null) {
             SongDisplay(
-                title = playerState.value!!.track.name,
-                artists = getArtistsString(playerState.value!!.track.artists),
-                imageUri = spotifyUriToImageUrl(playerState.value!!.track.imageUri.raw) ?: "",
+                title = playerState!!.track.name,
+                artists = getArtistsString(playerState!!.track.artists),
+                imageUri = spotifyUriToImageUrl(playerState!!.track.imageUri.raw) ?: "",
             )
         } else {
             SongDisplay("Placeholder", "Placeholder", "placeholder")
@@ -128,10 +130,10 @@ fun PlayerScreen(
 
     @Composable
     fun RenderSongControls() {
-        if (playerState?.value != null) {
+        if (playerState != null) {
             PlaybackPosition(
-                currentPositionMs = (if (playerState.value!!.isPaused) playerState.value!!.playbackPosition else currentPlaybackPosition?.value) ?: 0,
-                totalDurationMs = playerState.value!!.track.duration,
+                currentPositionMs = (if (playerState!!.isPaused) playerState!!.playbackPosition else currentPlaybackPosition?.value) ?: 0,
+                totalDurationMs = playerState!!.track.duration,
             )
         } else {
             PlaybackPosition(0, 1000)
@@ -151,15 +153,15 @@ fun PlayerScreen(
                 enabled = playerEnabled,
                 onClick = {
                     if (playerState != null) {
-                        if (playerState.value!!.isPaused) {
-                            spotifyViewModel.onEvent(SpotifyEvent.Resume)
+                        if (playerState!!.isPaused) {
+                            spotifyViewModel?.onEvent(SpotifyEvent.Resume)
                         } else {
-                            spotifyViewModel.onEvent(SpotifyEvent.Pause)
+                            spotifyViewModel?.onEvent(SpotifyEvent.Pause)
                         }
                     }
                 },
                 icon = ImageVector.vectorResource(
-                    id = if (playerState?.value?.isPaused != false) R.drawable.baseline_play_arrow_24 else R.drawable.baseline_pause_24
+                    id = if (playerState?.isPaused != false) R.drawable.baseline_play_arrow_24 else R.drawable.baseline_pause_24
                 ),
                 large = true
             )
@@ -182,8 +184,8 @@ fun PlayerScreen(
 
                     // Update rating in database
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
-                        name = playerState?.value!!.track.name,
-                        artists = playerState.value!!.track.artists,
+                        name = playerState!!.track.name,
+                        artists = playerState!!.track.artists,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))

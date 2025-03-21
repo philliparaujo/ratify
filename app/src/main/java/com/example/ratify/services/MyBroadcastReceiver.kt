@@ -7,6 +7,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.ratify.R
+import com.example.ratify.spotify.SpotifyEvent
+import com.example.ratify.spotifydatabase.Rating
 
 class MyBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -24,6 +26,18 @@ class MyBroadcastReceiver : BroadcastReceiver() {
             return
         }
 
+        val spotifyViewModel = (context.applicationContext as ServiceApp).spotifyViewModel
+        val playerState = spotifyViewModel.playerState.value
+        Log.d("MyBroadcastReceiver", spotifyViewModel.toString())
+        Log.d("MyBroadcastReceiver", playerState.toString())
+        spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(Rating.from(buttonValue)))
+        spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
+            name = playerState!!.track.name,
+            artists = playerState.track.artists,
+            rating = Rating.from(buttonValue),
+            lastRatedTs = System.currentTimeMillis()
+        ))
+
         // Calculate new button value and save it to shared preferences
         sharedPrefs.edit().putString(textViewId.toString(), buttonValue.toString()).apply()
 
@@ -32,7 +46,7 @@ class MyBroadcastReceiver : BroadcastReceiver() {
         sharedPrefs.edit().putInt(buttonId.toString(), newValue).apply()
 
         // Create and send an updated notification
-        val remoteViews = MyService.createCustomRemoteView(context)
+        val remoteViews = MyService.createCustomRemoteView(context, buttonValue.toString())
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val existingNotification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)

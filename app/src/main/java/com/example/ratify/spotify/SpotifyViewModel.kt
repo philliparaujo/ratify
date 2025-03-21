@@ -32,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -79,8 +80,8 @@ class SpotifyViewModel(
     }
 
     // Provides information on current track, playing/paused, playback position, etc.
-    private val _playerState = MutableLiveData<PlayerState?>()
-    val playerState: LiveData<PlayerState?> get() = _playerState
+    private val _playerState = MutableStateFlow<PlayerState?>(null)
+    val playerState: StateFlow<PlayerState?> get() = _playerState
     private var isSubscribedToPlayerState = false
     private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
@@ -122,7 +123,7 @@ class SpotifyViewModel(
                 }
 
                 // Update playerState on state change
-                _playerState.postValue(state)
+                _playerState.value = state
 
                 // Update playback position on play
                 if (!state.isPaused) {
