@@ -7,7 +7,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.widget.RemoteViews
+import androidx.compose.material3.MaterialTheme
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.example.ratify.R
 
 class RatingService: Service() {
@@ -29,7 +31,7 @@ class RatingService: Service() {
     companion object {
         fun createCustomRemoteView(context: Context, currentRating: String): RemoteViews {
             val packageName = context.packageName
-            val remoteViews = RemoteViews(packageName, R.layout.custom_notification)
+            val remoteViews = RemoteViews(packageName, R.layout.rating_notification)
 
             val sharedPrefs = context.getSharedPreferences(BUTTON_SHARED_PREFS, Context.MODE_PRIVATE)
 
@@ -55,9 +57,20 @@ class RatingService: Service() {
             editor.apply()
 
             // Update button UI + intents
-            buttonIds.forEach { id ->
-                val buttonValue = sharedPrefs.getInt(id.toString(), -1)
-                remoteViews.setTextViewText(id, buttonValue.toString())
+            buttonIds.forEachIndexed { i, id ->
+                val halfRatingThreshold = 2*i + 1
+                val ratingIntOrZero = ratingInt ?: 0
+
+                if (ratingIntOrZero > halfRatingThreshold) {
+                    remoteViews.setImageViewResource(id, R.drawable.baseline_star_24)
+                } else if (ratingIntOrZero < halfRatingThreshold) {
+                    remoteViews.setImageViewResource(id, R.drawable.baseline_star_outline_24)
+                } else {
+                    remoteViews.setImageViewResource(id, R.drawable.baseline_star_half_24)
+                }
+
+                val starColor = ContextCompat.getColor(context, R.color.star_yellow)
+                remoteViews.setInt(id, "setColorFilter", starColor)
 
                 val intent = Intent(context, RatingBroadcastReceiver::class.java).apply {
                     putExtra(BUTTON_ID_EXTRA, id)

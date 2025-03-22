@@ -13,7 +13,7 @@ const val CURRENT_RATING_EXTRA = "current_rating"
 
 val textViewId = R.id.currentRating
 
-val buttonIds = listOf(R.id.button2, R.id.button4, R.id.button6, R.id.button8, R.id.button10)
+val buttonIds = listOf(R.id.star1, R.id.star2, R.id.star3, R.id.star4, R.id.star5,)
 val defaultButtonValues = listOf(2, 4, 6, 8, 10)
 
 const val nullTextViewValue = "-"
