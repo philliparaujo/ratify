@@ -16,53 +16,53 @@ import com.example.ratify.settings.PrimaryColor
 private val DarkColorScheme = darkColorScheme(
     // Primary colors
     primary = PrimaryCyan,
-    onPrimary = MyBlack,
-    inversePrimary = MyDarkCyan,
+    onPrimary = Black,
+    inversePrimary = PrimaryDarkCyan,
 
     // Secondary colors
-    secondary = MyGray,
-    onSecondary = MyWhite,
+    secondary = Gray,
+    onSecondary = White,
 
     // Tertiary colors
-    tertiary = MyYellow,
-    onTertiary = MyBlack,
+    tertiary = Yellow,
+    onTertiary = Black,
 
     // Background and surface colors
-    background = MyBlack,
-    onBackground = MyWhite,
+    background = Black,
+    onBackground = White,
 
-    surface = MyBlack,
-    surfaceVariant = MyGray,
-    onSurfaceVariant = MyBlack,
+    surface = Black,
+    surfaceVariant = Gray,
+    onSurfaceVariant = Black,
 
-    primaryContainer = MyDarkGray,
-    onPrimaryContainer = MyWhite
+    primaryContainer = DarkGray,
+    onPrimaryContainer = White
 )
 
 private val LightColorScheme = darkColorScheme(
     // Primary colors
     primary = PrimaryCyan,
-    onPrimary = MyBlack,
-    inversePrimary = MyLightCyan,
+    onPrimary = Black,
+    inversePrimary = PrimaryLightCyan,
 
     // Secondary colors
-    secondary = MyGray,
-    onSecondary = MyWhite,
+    secondary = Gray,
+    onSecondary = White,
 
     // Tertiary colors
-    tertiary = MyYellow,
-    onTertiary = MyBlack,
+    tertiary = Yellow,
+    onTertiary = Black,
 
     // Background and surface colors
-    background = MyWhite,
-    onBackground = MyBlack,
+    background = White,
+    onBackground = Black,
 
-    surface = MyWhite,
-    surfaceVariant = MyGray,
-    onSurfaceVariant = MyBlack,
+    surface = White,
+    surfaceVariant = Gray,
+    onSurfaceVariant = Black,
 
-    primaryContainer = MyLighterGray,
-    onPrimaryContainer = MyBlack
+    primaryContainer = LightGray,
+    onPrimaryContainer = Black
 )
 
 @Composable
@@ -73,6 +73,7 @@ fun RatifyTheme(
     dynamicColor: Boolean = false,  // Disabling for now
     content: @Composable () -> Unit
 ) {
+    // Get proper light/dark theme
     val baseColorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -82,8 +83,20 @@ fun RatifyTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    val primaryColor = PrimaryColor.entries.toTypedArray()[themeColor].color
-    val colorScheme = baseColorScheme.copy(primary = primaryColor)
+
+    // Get primary color values
+    val primaryColorOption = PrimaryColor.entries.toTypedArray()[themeColor]
+    val primaryColor = primaryColorOption.base
+    val inversePrimaryColor = if (darkTheme) {
+        primaryColorOption.darkVariant
+    } else {
+        primaryColorOption.lightVariant
+    }
+
+    val colorScheme = baseColorScheme.copy(
+        primary = primaryColor,
+        inversePrimary = inversePrimaryColor
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,

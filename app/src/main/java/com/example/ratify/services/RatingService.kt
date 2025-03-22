@@ -25,7 +25,14 @@ class RatingService: Service() {
             Actions.STOP.toString() -> stopSelf()
             Actions.UPDATE.toString() -> update(currentRating)
         }
-        return super.onStartCommand(intent, flags, startId)
+
+        return START_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        stopRatingService()
     }
 
     companion object {
