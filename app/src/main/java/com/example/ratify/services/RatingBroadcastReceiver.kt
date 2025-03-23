@@ -47,12 +47,11 @@ class RatingBroadcastReceiver : BroadcastReceiver() {
         // Create and send an updated notification
         val remoteViews = RatingService.createCustomRemoteView(context, buttonValue.toString())
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val existingNotification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setCustomContentView(remoteViews)
-            .setOnlyAlertOnce(true)
-            .setOngoing(true)
-            .build()
+        val existingNotification = setupNotification(
+            context = context,
+            remoteViews = remoteViews,
+            onlyAlertOnce = true
+        ).build()
 
         notificationManager.notify(NOTIFICATION_ID, existingNotification)
     }

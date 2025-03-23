@@ -2,10 +2,8 @@ package com.example.ratify
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,7 +16,6 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.services.ServiceApp
-import com.example.ratify.services.stopRatingService
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper

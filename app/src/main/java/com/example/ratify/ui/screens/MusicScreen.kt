@@ -20,10 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
+import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
@@ -130,6 +132,8 @@ fun PlayerScreen(
 
     @Composable
     fun RenderSongControls() {
+        val context = LocalContext.current
+
         if (playerState != null) {
             PlaybackPosition(
                 currentPositionMs = (if (playerState!!.isPaused) playerState!!.playbackPosition else currentPlaybackPosition?.value) ?: 0,
@@ -181,6 +185,9 @@ fun PlayerScreen(
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+
+                    // Update current rating notification service
+                    context.updateRatingService(ratingValue)
 
                     // Update rating in database
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(

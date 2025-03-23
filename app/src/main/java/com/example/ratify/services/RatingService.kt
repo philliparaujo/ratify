@@ -7,8 +7,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.widget.RemoteViews
-import androidx.compose.material3.MaterialTheme
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.example.ratify.R
 
@@ -40,7 +38,7 @@ class RatingService: Service() {
             val packageName = context.packageName
             val remoteViews = RemoteViews(packageName, R.layout.rating_notification)
 
-            val sharedPrefs = context.getSharedPreferences(BUTTON_SHARED_PREFS, Context.MODE_PRIVATE)
+            val sharedPrefs = context.getSharedPreferences(BUTTON_SHARED_PREFS, MODE_PRIVATE)
 
             // Set up textView with proper value
             remoteViews.setTextViewText(textViewId, currentRating)
@@ -95,21 +93,20 @@ class RatingService: Service() {
     }
 
     private fun start(currentRating: String) {
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContent(createCustomRemoteView(this, currentRating))
-            .setOngoing(true)
-            .build()
+        val notification = setupNotification(
+            context = this,
+            remoteViews = createCustomRemoteView(this, currentRating),
+            onlyAlertOnce = false
+        ).build()
         startForeground(NOTIFICATION_ID, notification)
     }
 
     private fun update(currentRating: String) {
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContent(createCustomRemoteView(this, currentRating))
-            .setOnlyAlertOnce(true)
-            .setOngoing(true)
-            .build()
+        val notification = setupNotification(
+            context = this,
+            remoteViews = createCustomRemoteView(this, currentRating),
+            onlyAlertOnce = true
+        ).build()
         startForeground(NOTIFICATION_ID, notification)
     }
 

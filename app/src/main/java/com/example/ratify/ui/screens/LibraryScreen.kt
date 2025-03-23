@@ -24,12 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.Rating
@@ -101,6 +103,8 @@ fun LibraryScreen(
 
     @Composable
     fun RenderCurrentSongDialog(song: Song) {
+        val context = LocalContext.current
+
         AnimatedVisibility(
             visible = true,
         ) { }
@@ -112,8 +116,10 @@ fun LibraryScreen(
             onRatingSelect = { rating ->
                 // Update current rating (UI indicator)
                 val ratingValue = Rating.from(rating)
+
                 if (playerState?.track?.uri == song.uri) {
                     spotifyViewModel?.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    context.updateRatingService(ratingValue)
                 }
                 // Update rating in database
                 spotifyViewModel?.onEvent(
