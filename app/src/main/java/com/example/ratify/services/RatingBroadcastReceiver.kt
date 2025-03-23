@@ -5,8 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.example.ratify.R
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotifydatabase.Rating
 

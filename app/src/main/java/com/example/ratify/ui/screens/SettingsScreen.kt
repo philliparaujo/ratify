@@ -1,13 +1,11 @@
 package com.example.ratify.ui.screens
 
-import android.content.ContextWrapper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -16,15 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.services.startRatingService
-import com.example.ratify.services.stopRatingService
-import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.ThemeSelector
@@ -47,32 +40,12 @@ fun SettingsScreen(
     val darkTheme = settings?.darkTheme?.collectAsState(true)
     val themeColor = settings?.themeColor?.collectAsState(0)
 
-    val contextWrapper = ContextWrapper(LocalContext.current)
-
-    val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
-    val currentRating = songState?.value?.currentRating
-
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .fillMaxSize(),
     ) {
         Column {
-            Button(onClick = {
-                contextWrapper.startRatingService(currentRating)
-            }) {
-                Text("Start service")
-            }
-            Button(onClick = {
-                contextWrapper.updateRatingService(currentRating)
-            }) {
-                Text("Update service")
-            }
-            Button(onClick = {
-                contextWrapper.stopRatingService()
-            }) {
-                Text("Stop service")
-            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),

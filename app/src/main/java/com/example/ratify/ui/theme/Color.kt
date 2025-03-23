@@ -13,7 +13,7 @@ val LightGray = Color(0xFFD3D3D3)
 // Base primary colors
 val PrimaryCyan = Color(0xFF00BCD4)
 val PrimaryGreen = Color(0xFF1ED760)
-val PrimaryPurple = Color(0xFFBB55DD)
+val PrimaryPurple = Color(0xFFCB7FE8)
 val PrimaryYellow = Color(0xFFFFCB10)
 val PrimaryGray = Color(0xFFBBBBBB)
 
