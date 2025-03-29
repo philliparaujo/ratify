@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +29,7 @@ fun ThemeSelector(
     onThemeSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val options = PrimaryColor.entries.toTypedArray()
+    val options = PrimaryColor.entries.toList()
     val selectedOption = options[currentTheme]
 
     ThemeDropdown(
@@ -46,12 +43,13 @@ fun ThemeSelector(
 
 @Composable
 fun ThemeDropdown(
-    options: Array<PrimaryColor>,
+    options: List<PrimaryColor>,
     selectedOption: PrimaryColor,
     onThemeSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val setExpanded = { newValue: Boolean -> expanded = newValue }
 
     val circleSize = 20.dp
     val selectionWidth = 160.dp
@@ -66,7 +64,7 @@ fun ThemeDropdown(
                 modifier = Modifier
                     .size(circleSize)
                     .background(selectedOption.base, CircleShape)
-                    .clickable { expanded = true }
+                    .clickable { setExpanded(true) }
             )
 
             // Label text
@@ -87,45 +85,29 @@ fun ThemeDropdown(
         }
 
         // The actual dropdown menu
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(selectionWidth),
-            containerColor = MaterialTheme.colorScheme.surface
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(circleSize)
-                                    .background(option.base, CircleShape)
-                            )
-                            Text(
-                                text = option.toString(),
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        }
-                    },
-                    onClick = {
-                        onThemeSelected(option.ordinal)
-                        expanded = false
-                    },
-                    colors = MenuItemColors(
-                        textColor = MaterialTheme.colorScheme.onBackground,
-                        leadingIconColor = MaterialTheme.colorScheme.onBackground,
-                        trailingIconColor = MaterialTheme.colorScheme.onBackground,
-                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
-                        disabledTrailingIconColor = MaterialTheme.colorScheme.onBackground
+        GenericDropdown(
+            options = options,
+            onSelect = { option -> onThemeSelected(option.ordinal) },
+            renderText = {
+                option -> Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(circleSize)
+                            .background(option.base, CircleShape)
                     )
-                )
-            }
-        }
+                    Text(
+                        text = option.toString(),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            },
+            expanded = expanded,
+            setExpanded = setExpanded,
+            modifier = Modifier.width(selectionWidth)
+        )
     }
 }
 

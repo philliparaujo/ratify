@@ -10,7 +10,7 @@ const val NOTIFICATION_ID = 1
 
 // Notification styles
 val NOTIFICATION_ICON = R.drawable.ic_launcher_foreground
-const val NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_HIGH
+const val NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_MAX
 
 // SharedPrefs names
 const val BUTTON_SHARED_PREFS = "rating_button_prefs"

@@ -9,12 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -47,6 +45,7 @@ fun <T> DropdownSelect(
     large: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(startExpanded) }
+    val setExpanded = { newValue: Boolean -> expanded = newValue }
 
     val fontSize = 16f
     val height = if (large) 56.dp else 56.dp
@@ -54,7 +53,7 @@ fun <T> DropdownSelect(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { setExpanded(it) },
         modifier = Modifier
             .height(height)
             .width(width)
@@ -100,40 +99,20 @@ fun <T> DropdownSelect(
                     .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
             )
         }
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = option.toString(),
-                            modifier = Modifier.fillMaxSize(),
-                            textAlign = TextAlign.Center,
-                            fontSize = TextUnit(
-                                fontSize,
-                                TextUnitType.Sp
-                            )
-                        )
-                    },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    },
-                    colors = MenuItemColors(
-                        textColor = MaterialTheme.colorScheme.onBackground,
-                        leadingIconColor = MaterialTheme.colorScheme.onBackground,
-                        trailingIconColor = MaterialTheme.colorScheme.onBackground,
-                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onBackground,
-                        disabledTrailingIconColor = MaterialTheme.colorScheme.onBackground
-                    )
+        GenericDropdown(
+            options = options,
+            onSelect = onSelect,
+            renderText = { option ->
+                Text(
+                    text = option.toString(),
+                    modifier = Modifier.fillMaxSize(),
+                    textAlign = TextAlign.Center,
                 )
-            }
-        }
-
+            },
+            expanded = expanded,
+            setExpanded = setExpanded,
+            modifier = Modifier.width(width)
+        )
     }
 }
 
