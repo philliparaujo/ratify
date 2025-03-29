@@ -1,11 +1,14 @@
 package com.example.ratify.spotifydatabase
 
-enum class SortType(val displayName: String) {
-    LAST_PLAYED_TS("Last played"),
-    LAST_RATED_TS("Last rated"),
-    RATING("Rating"),
-    NAME("Name"),
-    TIMES_PLAYED("Times Played");
+enum class SortType(
+    private val displayName: String,
+    val sortAscendingPreference: Boolean
+) {
+    LAST_PLAYED_TS("Last played",false),
+    LAST_RATED_TS("Last rated", false),
+    RATING("Rating", false),
+    NAME("Name", true),
+    TIMES_PLAYED("Times Played", false);
 
     override fun toString(): String {
         return displayName

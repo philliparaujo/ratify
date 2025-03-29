@@ -10,7 +10,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
-import com.example.ratify.services.nullTextViewValue
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotifydatabase.Rating
@@ -215,30 +214,33 @@ class SpotifyViewModel(
     private val _searchType = MutableStateFlow(SearchType.NAME)
     private val _searchQuery = MutableStateFlow("")
     private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
+    private val _sortAscending = MutableStateFlow(false)
     private val _rating = MutableStateFlow<Rating?>(null)
     private val _showSongDialog = MutableStateFlow<Song?>(null)
     private val _visualizerShowing = MutableStateFlow(false)
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _songs = combine(_searchType, _searchQuery, _sortType) { searchType, searchQuery, sortType ->
-        dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType))
+    private val _songs = combine(_searchType, _searchQuery, _sortType, _sortAscending) { searchType, searchQuery, sortType, sortAscending ->
+        dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType, sortAscending))
     }.flatMapLatest { it }
 
     private val _state = MutableStateFlow(SongState())
     val state = combine(
-        listOf(_state, _searchType, _sortType, _rating, _showSongDialog, _visualizerShowing, _songs, _searchQuery)
+        listOf(_state, _searchType, _sortType, _sortAscending, _rating, _showSongDialog, _visualizerShowing, _songs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as SongState
         val searchType = flows[1] as SearchType
         val sortType = flows[2] as SortType
-        val rating = flows[3] as Rating?
-        val showSongDialog = flows[4] as Song?
-        val visualizerShowing = flows[5] as Boolean
-        val songs = flows[6] as List<Song>
-        val searchQuery = flows[7] as String
+        val sortAscending = flows[3] as Boolean
+        val rating = flows[4] as Rating?
+        val showSongDialog = flows[5] as Song?
+        val visualizerShowing = flows[6] as Boolean
+        val songs = flows[7] as List<Song>
+        val searchQuery = flows[8] as String
 
         state.copy(
             searchType = searchType,
             sortType = sortType,
+            sortAscending = sortAscending,
             currentRating = rating,
             currentSongDialog = showSongDialog,
             visualizerShowing = visualizerShowing,
@@ -270,7 +272,17 @@ class SpotifyViewModel(
                 _searchType.value = event.searchType
             }
             is SpotifyEvent.UpdateSortType -> {
+                // If reselect same sort type, flip sort ascending
+                if (_sortType.value == event.sortType) {
+                    onEvent(SpotifyEvent.UpdateSortAscending(!_sortAscending.value))
+                } else {
+                    onEvent(SpotifyEvent.UpdateSortAscending(event.sortType.sortAscendingPreference))
+                }
+
                 _sortType.value = event.sortType
+            }
+            is SpotifyEvent.UpdateSortAscending -> {
+                _sortAscending.value = event.sortAscending
             }
             is SpotifyEvent.UpdateCurrentRating -> {
                 _rating.value = event.rating

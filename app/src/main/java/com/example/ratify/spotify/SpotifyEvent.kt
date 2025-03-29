@@ -27,6 +27,7 @@ sealed interface SpotifyEvent {
     // State updates
     data class UpdateSearchType(val searchType: SearchType): SpotifyEvent
     data class UpdateSortType(val sortType: SortType): SpotifyEvent
+    data class UpdateSortAscending(val sortAscending: Boolean): SpotifyEvent
     data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
     data class UpdateShowSongDialog(val showSongDialog: Song?): SpotifyEvent
     data class UpdateVisualizerShowing(val visualizerShowing: Boolean): SpotifyEvent

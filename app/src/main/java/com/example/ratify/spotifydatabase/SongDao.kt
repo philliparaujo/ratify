@@ -31,6 +31,7 @@ interface SongDao {
         searchType: SearchType?,
         searchQuery: String?,
         sortType: SortType?,
+        ascending: Boolean,
     ): SimpleSQLiteQuery {
         val baseQuery = StringBuilder("SELECT * FROM songs")
         val args = mutableListOf<Any>()
@@ -61,13 +62,16 @@ interface SongDao {
         // Sorting
         if (sortType != null) {
             baseQuery.append(" ORDER BY ")
-            when (sortType) {
-                SortType.LAST_PLAYED_TS -> baseQuery.append("lastPlayedTs DESC")
-                SortType.LAST_RATED_TS -> baseQuery.append("lastRatedTs DESC")
-                SortType.RATING -> baseQuery.append("rating DESC")
-                SortType.NAME -> baseQuery.append("name COLLATE NOCASE ASC")
-                SortType.TIMES_PLAYED -> baseQuery.append("timesPlayed DESC")
-            }
+            baseQuery.append(
+                when (sortType) {
+                    SortType.LAST_PLAYED_TS -> "lastPlayedTs"
+                    SortType.LAST_RATED_TS -> "lastRatedTs"
+                    SortType.RATING -> "rating"
+                    SortType.NAME -> "name COLLATE NOCASE"
+                    SortType.TIMES_PLAYED -> "timesPlayed"
+                }
+            )
+            baseQuery.append(if (ascending) " ASC" else " DESC")
         }
 
         return SimpleSQLiteQuery(baseQuery.toString(), args.toTypedArray())
