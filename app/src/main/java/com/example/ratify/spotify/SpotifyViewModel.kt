@@ -266,6 +266,7 @@ class SpotifyViewModel(
             is SpotifyEvent.Resume -> resume()
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
+            is SpotifyEvent.SeekTo -> seekTo(event.positionMs)
             is SpotifyEvent.PlayerEventWhenNotConnected -> playerEventWhenNotConnected()
 
             is SpotifyEvent.UpdateSearchType -> {
@@ -401,6 +402,10 @@ class SpotifyViewModel(
 
     private fun skipPrevious() {
         spotifyAppRemote?.playerApi?.skipPrevious()
+    }
+
+    private fun seekTo(positionMs: Long) {
+        spotifyAppRemote?.playerApi?.seekTo(positionMs)
     }
 
     private fun playerEventWhenNotConnected() {

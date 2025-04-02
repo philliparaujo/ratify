@@ -1,6 +1,7 @@
 package com.example.ratify.ui.screens
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,12 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -40,6 +44,7 @@ import com.example.ratify.ui.components.getArtistsString
 import com.example.ratify.ui.components.spotifyUriToImageUrl
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @Composable
 fun MusicScreen(
@@ -134,12 +139,36 @@ fun PlayerScreen(
     fun RenderSongControls() {
         val context = LocalContext.current
 
+        var userDragging by remember { mutableStateOf(false) }
+        var dragPositionMs by remember { mutableLongStateOf(0L) }
+
+        LaunchedEffect(userDragging, dragPositionMs, currentPlaybackPosition?.value) {
+            if (userDragging) {
+                val actualPosition = currentPlaybackPosition?.value ?: 0L
+                if (abs(dragPositionMs - actualPosition) < 1000) {
+                    userDragging = false
+                }
+            }
+        }
+
         if (playerState != null) {
             PlaybackPosition(
-                currentPositionMs = (if (playerState!!.isPaused) playerState!!.playbackPosition else currentPlaybackPosition?.value) ?: 0,
+                currentPositionMs = if (userDragging) dragPositionMs else {
+                    if (playerState!!.isPaused) playerState!!.playbackPosition
+                    else currentPlaybackPosition?.value
+                } ?: 0,
                 totalDurationMs = playerState!!.track.duration,
+                onValueChanging = {
+                    dragPositionMs = it
+                    userDragging = true
+                },
+                onValueChangeFinished = {
+                    spotifyViewModel?.onEvent(SpotifyEvent.SeekTo(it))
+                    Log.d("Slider", "pp finalvalue: ${it.toString()}, pp dragpos: ${dragPositionMs.toString()}, pp playbackpos (old): ${playerState!!.playbackPosition.toString()}, pp duration: ${playerState!!.track.duration}")
+                }
             )
         } else {
+            // Placeholder playbackPosition
             PlaybackPosition(0, 1000)
         }
         Row(

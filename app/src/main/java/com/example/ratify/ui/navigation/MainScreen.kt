@@ -13,7 +13,11 @@ fun MainScreen(
     val navController = rememberNavController()
 
     // Controls pages that show up on bottom nav bar (portrait) and nav drawer (landscape)
-    val targets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget)
+    val targets = listOf(
+        MusicNavigationTarget,
+        LibraryNavigationTarget,
+        FavoritesNavigationTarget,
+        SettingsNavigationTarget)
     val startTarget = MusicNavigationTarget
 
     NavigationRenderer(

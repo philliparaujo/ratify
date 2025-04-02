@@ -6,9 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,6 +17,7 @@ import com.example.ratify.settings.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
+import com.example.ratify.ui.components.MySwitch
 import com.example.ratify.ui.components.ThemeSelector
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.launch
@@ -61,28 +59,16 @@ fun SettingsScreen(
                 )
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.padding(start = 16.dp)
-            ) {
-                Text(
-                    "Light Theme",
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Switch(
-                    checked = darkTheme?.value ?: true,
-                    onCheckedChange = { newState ->
-                        scope.launch {
-                            settings?.setDarkTheme(newState)
-                        }
-                    },
-                )
-                Text(
-                    "Dark Theme",
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
+            MySwitch(
+                leftText = "Light Theme",
+                rightText = "Dark Theme",
+                checked = darkTheme?.value ?: true,
+                onCheckedChange = { newState ->
+                    scope.launch {
+                        settings?.setDarkTheme(newState)
+                    }
+                }
+            )
 
             ThemeSelector(
                 currentTheme = themeColor?.value ?: PrimaryColor.DEFAULT.ordinal,

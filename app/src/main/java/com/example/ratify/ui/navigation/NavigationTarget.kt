@@ -1,6 +1,7 @@
 package com.example.ratify.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -22,6 +23,12 @@ object MusicNavigationTarget : NavigationTarget {
 object LibraryNavigationTarget : NavigationTarget {
     override val title = "Library"
     override val icon = Icons.Default.Menu
+}
+
+@Serializable
+object FavoritesNavigationTarget : NavigationTarget {
+    override val title = "Favorites"
+    override val icon = Icons.Default.Favorite
 }
 
 @Serializable
