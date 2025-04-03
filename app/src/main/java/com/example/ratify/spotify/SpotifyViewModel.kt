@@ -12,11 +12,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.SettingsManager
+import com.example.ratify.spotifydatabase.FavoritesState
+import com.example.ratify.spotifydatabase.GroupType
+import com.example.ratify.spotifydatabase.GroupedSong
+import com.example.ratify.spotifydatabase.LibraryState
+import com.example.ratify.spotifydatabase.MusicState
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongDao
-import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
@@ -218,36 +222,62 @@ class SpotifyViewModel(
     private val _rating = MutableStateFlow<Rating?>(null)
     private val _showSongDialog = MutableStateFlow<Song?>(null)
     private val _visualizerShowing = MutableStateFlow(false)
+    private val _groupType = MutableStateFlow(GroupType.ARTIST)
+    private val _minEntriesThreshold = MutableStateFlow(5)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _songs = combine(_searchType, _searchQuery, _sortType, _sortAscending) { searchType, searchQuery, sortType, sortAscending ->
-        dao.querySongs(dao.buildQuery(searchType, searchQuery, sortType, sortAscending))
+    private val _librarySongs = combine(_searchType, _searchQuery, _sortType, _sortAscending) { searchType, searchQuery, sortType, sortAscending ->
+        dao.querySongs(dao.buildLibraryQuery(searchType, searchQuery, sortType, sortAscending))
     }.flatMapLatest { it }
 
-    private val _state = MutableStateFlow(SongState())
-    val state = combine(
-        listOf(_state, _searchType, _sortType, _sortAscending, _rating, _showSongDialog, _visualizerShowing, _songs, _searchQuery)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _favoritesSongs = combine(_groupType, _sortType, _sortAscending, _minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
+        dao.queryGroupedSongs(dao.buildFavoritesQuery(groupType, sortType, sortAscending, minEntriesThreshold))
+    }.flatMapLatest { it }
+
+    // Individual screen states
+    private val _libraryState = MutableStateFlow(LibraryState())
+    val libraryState = combine(
+        listOf(_libraryState, _searchType, _sortType, _showSongDialog, _visualizerShowing, _librarySongs, _searchQuery)
     ) { flows: Array<Any?> ->
-        val state = flows[0] as SongState
+        val state = flows[0] as LibraryState
         val searchType = flows[1] as SearchType
         val sortType = flows[2] as SortType
-        val sortAscending = flows[3] as Boolean
-        val rating = flows[4] as Rating?
-        val showSongDialog = flows[5] as Song?
-        val visualizerShowing = flows[6] as Boolean
-        val songs = flows[7] as List<Song>
-        val searchQuery = flows[8] as String
+        val showSongDialog = flows[3] as Song?
+        val visualizerShowing = flows[4] as Boolean
+        val songs = flows[5] as List<Song>
+        val searchQuery = flows[6] as String
 
         state.copy(
+            songs = songs,
+            searchQuery = searchQuery,
             searchType = searchType,
             sortType = sortType,
-            sortAscending = sortAscending,
-            currentRating = rating,
-            currentSongDialog = showSongDialog,
             visualizerShowing = visualizerShowing,
-            songs = songs,
-            searchQuery = searchQuery
+            currentSongDialog = showSongDialog
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SongState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryState())
+
+    private val _musicState = MutableStateFlow(MusicState())
+    val musicState: StateFlow<MusicState> = _musicState
+
+    private val _favoritesState = MutableStateFlow(FavoritesState())
+    val favoritesState = combine(
+        listOf(_favoritesState, _favoritesSongs, _groupType, _sortType, _minEntriesThreshold)
+    ) { flows: Array<Any?> ->
+        val state = flows[0] as FavoritesState
+        val songs = flows[1] as List<GroupedSong>
+        val groupType = flows[2] as GroupType
+        val sortType = flows[3] as SortType
+        val minEntriesThreshold = flows[4] as Int
+
+        state.copy(
+            groupedSongs = songs,
+            groupType = groupType,
+            sortType = sortType,
+            minEntriesThreshold = minEntriesThreshold
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FavoritesState())
 
     fun onSearchTextChange(text: String) {
         _searchQuery.value = text
@@ -282,6 +312,9 @@ class SpotifyViewModel(
 
                 _sortType.value = event.sortType
             }
+            is SpotifyEvent.UpdateGroupType -> {
+                _groupType.value = event.groupType
+            }
             is SpotifyEvent.UpdateSortAscending -> {
                 _sortAscending.value = event.sortAscending
             }
@@ -293,6 +326,9 @@ class SpotifyViewModel(
             }
             is SpotifyEvent.UpdateVisualizerShowing -> {
                 _visualizerShowing.value = event.visualizerShowing
+            }
+            is SpotifyEvent.UpdateMinEntriesThreshold -> {
+                _minEntriesThreshold.value = event.newThreshold
             }
 
             is SpotifyEvent.UpsertSong -> {

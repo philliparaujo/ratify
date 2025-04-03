@@ -11,26 +11,35 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.theme.RatifyTheme
 import com.spotify.protocol.types.Artist
+import com.spotify.protocol.types.ImageUri
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 @Composable
 fun ArtistItem(
-    artist: Artist,
-    songs: List<Song>,
+    name: String,
+    songCount: Int,
+    averageRating: Float,
+    imageUri: ImageUri?
 ) {
-    val averageRating = songs.map { it.rating?.value ?: 0 }.average()
     val averageRatingInt = averageRating.toInt()
     val ratingColor = getRatingColor(if (averageRatingInt == 0) null else Rating.from(averageRatingInt) )
 
     GenericItem(
-        title = artist.name,
-        subtitle = "${songs.size} entries",
+        title = name,
+        subtitle = "${songCount} entries",
         ratingColor = ratingColor,
-        ratingText = averageRating.toString(),
+        ratingText = averageRating.roundTo(1).toString(),
         displayButton = null,
         onClick = {},
         onLongClick = null,
-        imageUri = null
+        imageUri = imageUri
     )
+}
+
+fun Float.roundTo(n: Int): Float {
+    val factor = 10.0.pow(n)
+    return (this * factor).roundToInt() / factor.toFloat()
 }
 
 // Previews
@@ -49,18 +58,18 @@ fun DarkArtistItemsPreview() {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
         }
     }
 }
@@ -76,18 +85,18 @@ fun LightArtistItemsPreview() {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
-            ArtistItem(
-                artist = mockArtist,
-                songs = listOf(mockSong, mockSong, mockSong)
-            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
+//            ArtistItem(
+//                artist = mockArtist,
+//                songs = listOf(mockSong, mockSong, mockSong)
+//            )
         }
     }
 }

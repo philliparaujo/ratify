@@ -34,10 +34,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.LibraryState
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
@@ -54,7 +54,7 @@ fun LibraryScreen(
     navController: NavController
 ) {
     // Current states (UI and Spotify Player)
-    val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())?.value ?: SongState()
+    val libraryState = spotifyViewModel?.libraryState?.collectAsState(initial = LibraryState())?.value ?: LibraryState()
     val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
 
     // Active search/sort options
@@ -95,7 +95,7 @@ fun LibraryScreen(
     fun RenderVisualizer() {
         Visualizer(
             heights = (1..10).map { rating ->
-                songState.songs.count {
+                libraryState.songs.count {
                         song -> song.rating?.value == rating }.toFloat()
             }
         )
@@ -150,7 +150,7 @@ fun LibraryScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            items(songState.songs) { song ->
+            items(libraryState.songs) { song ->
                 SongItem(
                     song = song,
                     onClick = {
@@ -184,16 +184,16 @@ fun LibraryScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Search(
-                query = songState.searchQuery,
+                query = libraryState.searchQuery,
                 onQueryChange = { spotifyViewModel?.onSearchTextChange(it) },
                 placeholderText = "Search",
                 trailingIcon = Icons.Default.MoreVert,
                 dropdownLabels = listOf(
-                    if (songState.visualizerShowing) "Hide visualizer" else "Show visualizer",
+                    if (libraryState.visualizerShowing) "Hide visualizer" else "Show visualizer",
                     "Delete unrated songs"
                 ),
                 dropdownOptionOnClick = listOf(
-                    { spotifyViewModel?.onEvent(SpotifyEvent.UpdateVisualizerShowing(!songState.visualizerShowing)) },
+                    { spotifyViewModel?.onEvent(SpotifyEvent.UpdateVisualizerShowing(!libraryState.visualizerShowing)) },
                     { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
                         playerState?.track?.name ?: "",
                         playerState?.track?.artists ?: listOf())) }
@@ -204,7 +204,7 @@ fun LibraryScreen(
             // Searching dropdown
             DropdownSelect(
                 options = searchTypes,
-                selectedOption = songState.searchType,
+                selectedOption = libraryState.searchType,
                 onSelect = { searchType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
                 label = "Search by",
                 modifier = Modifier.wrapContentWidth()
@@ -223,11 +223,11 @@ fun LibraryScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "${songState.songs.count()} entries",
+                    "${libraryState.songs.count()} entries",
                     color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp
                 )
-                val totalRatings = songState.songs.mapNotNull { song -> song.rating?.value }
+                val totalRatings = libraryState.songs.mapNotNull { song -> song.rating?.value }
                 val averageScore = if (totalRatings.isNotEmpty()) {
                     totalRatings.sum().toFloat() / totalRatings.size
                 } else {
@@ -243,7 +243,7 @@ fun LibraryScreen(
             // Sorting dropdown
             DropdownSelect(
                 options = sortTypes,
-                selectedOption = songState.sortType,
+                selectedOption = libraryState.sortType,
                 onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
                 label = "Sort by",
                 large = true
@@ -271,12 +271,12 @@ fun LibraryScreen(
 
                 RenderListDetails(modifier = Modifier.weight(3f))
             }
-            if (songState.visualizerShowing) {
+            if (libraryState.visualizerShowing) {
                 RenderVisualizer()
             }
         } else {
             RenderSearch()
-            if (songState.visualizerShowing) {
+            if (libraryState.visualizerShowing) {
                 RenderVisualizer()
             }
             RenderListDetails(modifier = Modifier.fillMaxWidth())
@@ -285,8 +285,8 @@ fun LibraryScreen(
         HorizontalDivider()
 
         RenderSongList()
-        if (songState.currentSongDialog != null) {
-            RenderCurrentSongDialog(songState.currentSongDialog)
+        if (libraryState.currentSongDialog != null) {
+            RenderCurrentSongDialog(libraryState.currentSongDialog)
         }
     }
 }

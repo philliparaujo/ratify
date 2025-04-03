@@ -27,7 +27,10 @@ interface SongDao {
     @RawQuery(observedEntities = [Song::class])
     fun querySongs(query: SupportSQLiteQuery): Flow<List<Song>>
 
-    fun buildQuery(
+    @RawQuery(observedEntities = [Song::class])
+    fun queryGroupedSongs(query: SupportSQLiteQuery): Flow<List<GroupedSong>>
+
+    fun buildLibraryQuery(
         searchType: SearchType?,
         searchQuery: String?,
         sortType: SortType?,
@@ -75,5 +78,66 @@ interface SongDao {
         }
 
         return SimpleSQLiteQuery(baseQuery.toString(), args.toTypedArray())
+    }
+
+    fun buildFavoritesQuery(
+        groupType: GroupType,
+        sortType: SortType?,
+        ascending: Boolean,
+        minEntriesThreshold: Int = 1,
+    ): SimpleSQLiteQuery {
+        val groupColumn = when (groupType) {
+            GroupType.ARTIST -> "artist"
+            GroupType.ALBUM -> "album"
+        }
+
+        val baseQuery = StringBuilder(
+            """
+        SELECT 
+            songs.artist,
+            songs.album,
+            grouped.count,
+            grouped.averageRating,
+            songs.imageUri
+        FROM (
+            SELECT 
+                $groupColumn AS groupName,
+                COUNT(*) AS count,
+                AVG(rating) AS averageRating
+            FROM songs
+            WHERE rating IS NOT NULL
+            GROUP BY $groupColumn
+            HAVING COUNT(*) >= $minEntriesThreshold
+        ) AS grouped
+        JOIN songs ON songs.$groupColumn = grouped.groupName
+        WHERE songs.rowid = (
+            SELECT rowid FROM songs AS s
+            WHERE s.$groupColumn = grouped.groupName
+              AND s.rating IS NOT NULL
+            ORDER BY 
+                s.rating DESC,
+                s.timesPlayed DESC,
+                s.lastPlayedTs DESC
+            LIMIT 1
+        )
+        """.trimIndent()
+        )
+
+        // Sorting
+        if (sortType != null) {
+            baseQuery.append(" ORDER BY ")
+            baseQuery.append(
+                when (sortType) {
+                    SortType.LAST_PLAYED_TS -> "songs.lastPlayedTs"
+                    SortType.LAST_RATED_TS -> "songs.lastRatedTs"
+                    SortType.RATING -> "grouped.averageRating"
+                    SortType.NAME -> "songs.$groupColumn COLLATE NOCASE"
+                    SortType.TIMES_PLAYED -> "songs.timesPlayed"
+                }
+            )
+            baseQuery.append(if (ascending) " ASC" else " DESC")
+        }
+
+        return SimpleSQLiteQuery(baseQuery.toString())
     }
 }

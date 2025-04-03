@@ -32,8 +32,8 @@ import com.example.ratify.R
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.MusicState
 import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.SongState
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
@@ -112,7 +112,7 @@ fun PlayerScreen(
     val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
     val currentPlaybackPosition = spotifyViewModel?.currentPlaybackPosition?.observeAsState()
     val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
-    val songState = spotifyViewModel?.state?.collectAsState(initial = SongState())
+    val musicState = spotifyViewModel?.musicState?.collectAsState(initial = MusicState())
 
     // Orientation logic
     val configuration = LocalConfiguration.current
@@ -231,7 +231,7 @@ fun PlayerScreen(
                     }
                 }
             },
-            currentRating = songState?.value?.currentRating
+            currentRating = musicState?.value?.currentRating
         )
     }
 
