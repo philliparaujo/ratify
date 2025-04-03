@@ -27,7 +27,7 @@ fun NavigationHost(
     ) {
         composable<MusicNavigationTarget> { MusicScreen(spotifyViewModel = spotifyViewModel) }
         composable<LibraryNavigationTarget> { LibraryScreen(spotifyViewModel = spotifyViewModel, navController = navController) }
-        composable<FavoritesNavigationTarget> { FavoritesScreen() }
+        composable<FavoritesNavigationTarget> { FavoritesScreen(spotifyViewModel = spotifyViewModel) }
         composable<SettingsNavigationTarget> { SettingsScreen(spotifyViewModel = spotifyViewModel, onExportClick = onExportClick, onImportClick = onImportClick) }
     }
 }
