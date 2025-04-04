@@ -1,6 +1,6 @@
 package com.example.ratify.spotifydatabase
 
-enum class SortType(
+enum class LibrarySortType(
     private val displayName: String,
     val sortAscendingPreference: Boolean
 ) {

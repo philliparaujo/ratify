@@ -1,10 +1,11 @@
 package com.example.ratify.spotify
 
+import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.GroupType
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.spotifydatabase.LibrarySortType
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Track
 
@@ -28,10 +29,13 @@ sealed interface SpotifyEvent {
 
     // State updates
     data class UpdateSearchType(val searchType: SearchType): SpotifyEvent
-    data class UpdateSortType(val sortType: SortType): SpotifyEvent
+    data class UpdateLibrarySortType(val librarySortType: LibrarySortType): SpotifyEvent
+    data class UpdateFavoritesSortType(val favoritesSortType: FavoritesSortType): SpotifyEvent
     data class UpdateGroupType(val groupType: GroupType): SpotifyEvent
 
-    data class UpdateSortAscending(val sortAscending: Boolean): SpotifyEvent
+    data class UpdateLibrarySortAscending(val sortAscending: Boolean): SpotifyEvent
+    data class UpdateFavoritesSortAscending(val sortAscending: Boolean): SpotifyEvent
+
     data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
     data class UpdateShowSongDialog(val showSongDialog: Song?): SpotifyEvent
     data class UpdateVisualizerShowing(val visualizerShowing: Boolean): SpotifyEvent

@@ -10,5 +10,7 @@ data class GroupedSong(
     val count: Int,
     val totalTimesPlayed: Int,
     val averageRating: Float,
-    val imageUri: ImageUri?,
+    val lastPlayedTs: Long,
+    val lastRatedTs: Long,
+    val imageUri: ImageUri?
 )

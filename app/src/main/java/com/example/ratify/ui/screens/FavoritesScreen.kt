@@ -30,15 +30,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.FavoritesState
 import com.example.ratify.spotifydatabase.GroupType
-import com.example.ratify.spotifydatabase.SortType
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.MySlider
 import com.example.ratify.ui.components.MySwitch
-import com.example.ratify.ui.components.SongDisplay
 import com.example.ratify.ui.components.spotifyUriToImageUrl
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.roundToInt
@@ -49,7 +48,14 @@ fun FavoritesScreen(
 ) {
     val favoritesState = spotifyViewModel?.favoritesState?.collectAsState(initial = FavoritesState())?.value ?: FavoritesState()
 
-    val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS, SortType.TIMES_PLAYED, SortType.NAME)
+    val favoritesSortTypes = listOf(
+        FavoritesSortType.RATING,
+        FavoritesSortType.NAME,
+        FavoritesSortType.NUM_ENTRIES,
+        FavoritesSortType.TIMES_PLAYED,
+        FavoritesSortType.LAST_RATED_TS,
+        FavoritesSortType.LAST_PLAYED_TS
+    )
 
     val maxValue: Long = 30
     var currentValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
@@ -68,6 +74,7 @@ fun FavoritesScreen(
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 MySwitch(
@@ -81,9 +88,9 @@ fun FavoritesScreen(
                 )
 
                 DropdownSelect(
-                    options = sortTypes,
-                    selectedOption = favoritesState.sortType,
-                    onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
+                    options = favoritesSortTypes,
+                    selectedOption = favoritesState.favoritesSortType,
+                    onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
                     label = "Sort by",
                     large = true
                 )

@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.SettingsManager
+import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.FavoritesState
 import com.example.ratify.spotifydatabase.GroupType
 import com.example.ratify.spotifydatabase.GroupedSong
@@ -21,7 +22,7 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongDao
-import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.spotifydatabase.LibrarySortType
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -217,8 +218,10 @@ class SpotifyViewModel(
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)
     private val _searchQuery = MutableStateFlow("")
-    private val _sortType = MutableStateFlow(SortType.LAST_PLAYED_TS)
-    private val _sortAscending = MutableStateFlow(false)
+    private val _librarySortType = MutableStateFlow(LibrarySortType.LAST_PLAYED_TS)
+    private val _favoritesSortType = MutableStateFlow(FavoritesSortType.RATING)
+    private val _librarySortAscending = MutableStateFlow(false)
+    private val _favoritesSortAscending = MutableStateFlow(false)
     private val _rating = MutableStateFlow<Rating?>(null)
     private val _showSongDialog = MutableStateFlow<Song?>(null)
     private val _visualizerShowing = MutableStateFlow(false)
@@ -226,23 +229,23 @@ class SpotifyViewModel(
     private val _minEntriesThreshold = MutableStateFlow(5)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _librarySongs = combine(_searchType, _searchQuery, _sortType, _sortAscending) { searchType, searchQuery, sortType, sortAscending ->
+    private val _librarySongs = combine(_searchType, _searchQuery, _librarySortType, _librarySortAscending) { searchType, searchQuery, sortType, sortAscending ->
         dao.querySongs(dao.buildLibraryQuery(searchType, searchQuery, sortType, sortAscending))
     }.flatMapLatest { it }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _favoritesSongs = combine(_groupType, _sortType, _sortAscending, _minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
+    private val _favoritesSongs = combine(_groupType, _favoritesSortType, _favoritesSortAscending, _minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
         dao.queryGroupedSongs(dao.buildFavoritesQuery(groupType, sortType, sortAscending, minEntriesThreshold))
     }.flatMapLatest { it }
 
     // Individual screen states
     private val _libraryState = MutableStateFlow(LibraryState())
     val libraryState = combine(
-        listOf(_libraryState, _searchType, _sortType, _showSongDialog, _visualizerShowing, _librarySongs, _searchQuery)
+        listOf(_libraryState, _searchType, _librarySortType, _showSongDialog, _visualizerShowing, _librarySongs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as LibraryState
         val searchType = flows[1] as SearchType
-        val sortType = flows[2] as SortType
+        val librarySortType = flows[2] as LibrarySortType
         val showSongDialog = flows[3] as Song?
         val visualizerShowing = flows[4] as Boolean
         val songs = flows[5] as List<Song>
@@ -252,7 +255,7 @@ class SpotifyViewModel(
             songs = songs,
             searchQuery = searchQuery,
             searchType = searchType,
-            sortType = sortType,
+            librarySortType = librarySortType,
             visualizerShowing = visualizerShowing,
             currentSongDialog = showSongDialog
         )
@@ -272,18 +275,18 @@ class SpotifyViewModel(
 
     private val _favoritesState = MutableStateFlow(FavoritesState())
     val favoritesState = combine(
-        listOf(_favoritesState, _favoritesSongs, _groupType, _sortType, _minEntriesThreshold)
+        listOf(_favoritesState, _favoritesSongs, _groupType, _favoritesSortType, _minEntriesThreshold)
     ) { flows: Array<Any?> ->
         val state = flows[0] as FavoritesState
         val songs = flows[1] as List<GroupedSong>
         val groupType = flows[2] as GroupType
-        val sortType = flows[3] as SortType
+        val favoritesSortType = flows[3] as FavoritesSortType
         val minEntriesThreshold = flows[4] as Int
 
         state.copy(
             groupedSongs = songs,
             groupType = groupType,
-            sortType = sortType,
+            favoritesSortType = favoritesSortType,
             minEntriesThreshold = minEntriesThreshold
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FavoritesState())
@@ -311,21 +314,34 @@ class SpotifyViewModel(
             is SpotifyEvent.UpdateSearchType -> {
                 _searchType.value = event.searchType
             }
-            is SpotifyEvent.UpdateSortType -> {
+            is SpotifyEvent.UpdateLibrarySortType -> {
                 // If reselect same sort type, flip sort ascending
-                if (_sortType.value == event.sortType) {
-                    onEvent(SpotifyEvent.UpdateSortAscending(!_sortAscending.value))
+                if (_librarySortType.value == event.librarySortType) {
+                    onEvent(SpotifyEvent.UpdateLibrarySortAscending(!_librarySortAscending.value))
                 } else {
-                    onEvent(SpotifyEvent.UpdateSortAscending(event.sortType.sortAscendingPreference))
+                    onEvent(SpotifyEvent.UpdateLibrarySortAscending(event.librarySortType.sortAscendingPreference))
                 }
 
-                _sortType.value = event.sortType
+                _librarySortType.value = event.librarySortType
+            }
+            is SpotifyEvent.UpdateFavoritesSortType -> {
+                // If reselect some same sort type, flip sort ascending
+                if (_favoritesSortType.value == event.favoritesSortType) {
+                    onEvent(SpotifyEvent.UpdateFavoritesSortAscending(!_favoritesSortAscending.value))
+                } else {
+                    onEvent(SpotifyEvent.UpdateFavoritesSortAscending(event.favoritesSortType.sortAscendingPreference))
+                }
+
+                _favoritesSortType.value = event.favoritesSortType
             }
             is SpotifyEvent.UpdateGroupType -> {
                 _groupType.value = event.groupType
             }
-            is SpotifyEvent.UpdateSortAscending -> {
-                _sortAscending.value = event.sortAscending
+            is SpotifyEvent.UpdateLibrarySortAscending -> {
+                _librarySortAscending.value = event.sortAscending
+            }
+            is SpotifyEvent.UpdateFavoritesSortAscending -> {
+                _favoritesSortAscending.value = event.sortAscending
             }
             is SpotifyEvent.UpdateCurrentRating -> {
                 _rating.value = event.rating

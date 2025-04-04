@@ -33,7 +33,7 @@ interface SongDao {
     fun buildLibraryQuery(
         searchType: SearchType?,
         searchQuery: String?,
-        sortType: SortType?,
+        librarySortType: LibrarySortType?,
         ascending: Boolean,
     ): SimpleSQLiteQuery {
         val baseQuery = StringBuilder("SELECT * FROM songs")
@@ -63,15 +63,15 @@ interface SongDao {
         }
 
         // Sorting
-        if (sortType != null) {
+        if (librarySortType != null) {
             baseQuery.append(" ORDER BY ")
             baseQuery.append(
-                when (sortType) {
-                    SortType.LAST_PLAYED_TS -> "lastPlayedTs"
-                    SortType.LAST_RATED_TS -> "lastRatedTs"
-                    SortType.RATING -> "rating"
-                    SortType.NAME -> "name COLLATE NOCASE"
-                    SortType.TIMES_PLAYED -> "timesPlayed"
+                when (librarySortType) {
+                    LibrarySortType.LAST_PLAYED_TS -> "lastPlayedTs"
+                    LibrarySortType.LAST_RATED_TS -> "lastRatedTs"
+                    LibrarySortType.RATING -> "rating"
+                    LibrarySortType.NAME -> "name COLLATE NOCASE"
+                    LibrarySortType.TIMES_PLAYED -> "timesPlayed"
                 }
             )
             baseQuery.append(if (ascending) " ASC" else " DESC")
@@ -82,7 +82,7 @@ interface SongDao {
 
     fun buildFavoritesQuery(
         groupType: GroupType,
-        sortType: SortType?,
+        favoritesSortType: FavoritesSortType?,
         ascending: Boolean,
         minEntriesThreshold: Int = 1,
     ): SimpleSQLiteQuery {
@@ -99,13 +99,17 @@ interface SongDao {
             grouped.count,
             grouped.averageRating,
             grouped.totalTimesPlayed,
+            grouped.lastPlayedTs,
+            grouped.lastRatedTs,
             songs.imageUri
         FROM (
             SELECT 
                 $groupColumn AS groupName,
                 COUNT(*) AS count,
                 AVG(rating) AS averageRating,
-                SUM(timesPlayed) AS totalTimesPlayed
+                SUM(timesPlayed) AS totalTimesPlayed,
+                MAX(lastPlayedTs) AS lastPlayedTs,
+                MAX(lastRatedTs) AS lastRatedTs
             FROM songs
             WHERE rating IS NOT NULL
             GROUP BY $groupColumn
@@ -126,15 +130,16 @@ interface SongDao {
         )
 
         // Sorting
-        if (sortType != null) {
+        if (favoritesSortType != null) {
             baseQuery.append(" ORDER BY ")
             baseQuery.append(
-                when (sortType) {
-                    SortType.LAST_PLAYED_TS -> "songs.lastPlayedTs"
-                    SortType.LAST_RATED_TS -> "songs.lastRatedTs"
-                    SortType.RATING -> "grouped.averageRating"
-                    SortType.NAME -> "songs.$groupColumn COLLATE NOCASE"
-                    SortType.TIMES_PLAYED -> "grouped.totalTimesPlayed"
+                when (favoritesSortType) {
+                    FavoritesSortType.LAST_PLAYED_TS -> "grouped.lastPlayedTs"
+                    FavoritesSortType.LAST_RATED_TS -> "grouped.lastRatedTs"
+                    FavoritesSortType.RATING -> "grouped.averageRating"
+                    FavoritesSortType.NAME -> "grouped.groupName COLLATE NOCASE"
+                    FavoritesSortType.TIMES_PLAYED -> "grouped.totalTimesPlayed"
+                    FavoritesSortType.NUM_ENTRIES -> "grouped.count"
                 }
             )
             baseQuery.append(if (ascending) " ASC" else " DESC")

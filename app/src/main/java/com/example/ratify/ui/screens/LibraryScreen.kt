@@ -38,7 +38,7 @@ import com.example.ratify.spotifydatabase.LibraryState
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.SortType
+import com.example.ratify.spotifydatabase.LibrarySortType
 import com.example.ratify.ui.components.Dialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
@@ -59,7 +59,7 @@ fun LibraryScreen(
 
     // Active search/sort options
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
-    val sortTypes = listOf(SortType.RATING, SortType.LAST_PLAYED_TS, SortType.LAST_RATED_TS, SortType.TIMES_PLAYED, SortType.NAME)
+    val librarySortTypes = listOf(LibrarySortType.RATING, LibrarySortType.LAST_PLAYED_TS, LibrarySortType.LAST_RATED_TS, LibrarySortType.TIMES_PLAYED, LibrarySortType.NAME)
 
     // Player enabled logic
     val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
@@ -242,9 +242,9 @@ fun LibraryScreen(
 
             // Sorting dropdown
             DropdownSelect(
-                options = sortTypes,
-                selectedOption = libraryState.sortType,
-                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSortType(sortType)) },
+                options = librarySortTypes,
+                selectedOption = libraryState.librarySortType,
+                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibrarySortType(sortType)) },
                 label = "Sort by",
                 large = true
             )
