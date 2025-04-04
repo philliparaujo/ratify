@@ -259,7 +259,16 @@ class SpotifyViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryState())
 
     private val _musicState = MutableStateFlow(MusicState())
-    val musicState: StateFlow<MusicState> = _musicState
+    val musicState = combine(
+        listOf(_musicState, _rating)
+    ) { flows: Array<Any?> ->
+        val state = flows[0] as MusicState
+        val currentRating = flows[1] as Rating?
+
+        state.copy(
+            currentRating = currentRating
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MusicState())
 
     private val _favoritesState = MutableStateFlow(FavoritesState())
     val favoritesState = combine(
