@@ -8,6 +8,7 @@ data class GroupedSong(
     val artist: Artist?,
     val album: Album?,
     val count: Int,
+    val totalTimesPlayed: Int,
     val averageRating: Float,
     val imageUri: ImageUri?,
 )

@@ -29,5 +29,5 @@ data class FavoritesState(
     val groupedSongs: List<GroupedSong> = emptyList(),
     val groupType: GroupType = GroupType.ARTIST,
     val sortType: SortType = SortType.RATING,
-    val minEntriesThreshold: Int = 1,
+    val minEntriesThreshold: Int = 5,
 )

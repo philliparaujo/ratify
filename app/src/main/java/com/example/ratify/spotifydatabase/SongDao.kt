@@ -98,12 +98,14 @@ interface SongDao {
             songs.album,
             grouped.count,
             grouped.averageRating,
+            grouped.totalTimesPlayed,
             songs.imageUri
         FROM (
             SELECT 
                 $groupColumn AS groupName,
                 COUNT(*) AS count,
-                AVG(rating) AS averageRating
+                AVG(rating) AS averageRating,
+                SUM(timesPlayed) AS totalTimesPlayed
             FROM songs
             WHERE rating IS NOT NULL
             GROUP BY $groupColumn
@@ -132,7 +134,7 @@ interface SongDao {
                     SortType.LAST_RATED_TS -> "songs.lastRatedTs"
                     SortType.RATING -> "grouped.averageRating"
                     SortType.NAME -> "songs.$groupColumn COLLATE NOCASE"
-                    SortType.TIMES_PLAYED -> "songs.timesPlayed"
+                    SortType.TIMES_PLAYED -> "grouped.totalTimesPlayed"
                 }
             )
             baseQuery.append(if (ascending) " ASC" else " DESC")

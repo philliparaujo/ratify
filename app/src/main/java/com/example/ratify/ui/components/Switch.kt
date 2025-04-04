@@ -26,7 +26,7 @@ fun MySwitch(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier.padding(start = 16.dp)
+        modifier = modifier
     ) {
         Text(
             leftText,

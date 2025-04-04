@@ -67,7 +67,8 @@ fun SettingsScreen(
                     scope.launch {
                         settings?.setDarkTheme(newState)
                     }
-                }
+                },
+                modifier = Modifier.padding(start = 16.dp)
             )
 
             ThemeSelector(
