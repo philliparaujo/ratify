@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.FavoritesSortType
@@ -82,10 +84,10 @@ fun FavoritesScreen(
     )
 
     // Slider values
-    val maxValue: Long = 30
-    var currentValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
+    val maxSliderValue: Long = 30
+    var currentSliderValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
     LaunchedEffect(favoritesState.minEntriesThreshold) {
-        currentValue = favoritesState.minEntriesThreshold.toLong()
+        currentSliderValue = favoritesState.minEntriesThreshold.toLong()
     }
 
     // Orientation logic
@@ -107,58 +109,69 @@ fun FavoritesScreen(
     }
 
     @Composable
-    fun RenderSettings() {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    fun RenderSettings(modifier: Modifier = Modifier) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                MySwitch(
-                    leftText = "Artists",
-                    rightText = "Albums",
-                    checked = favoritesState.groupType == GroupType.ALBUM,
-                    onCheckedChange = { newState ->
-                        val newGroupType = if (newState) GroupType.ALBUM else GroupType.ARTIST
-                        spotifyViewModel?.onEvent(SpotifyEvent.UpdateGroupType(newGroupType))
-                    }
-                )
+            MySwitch(
+                leftText = "Artists",
+                rightText = "Albums",
+                checked = favoritesState.groupType == GroupType.ALBUM,
+                onCheckedChange = { newState ->
+                    val newGroupType = if (newState) GroupType.ALBUM else GroupType.ARTIST
+                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateGroupType(newGroupType))
+                }
+            )
 
-                DropdownSelect(
-                    options = favoritesSortTypes,
-                    selectedOption = favoritesState.favoritesSortType,
-                    onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
-                    label = "Sort by",
-                    large = true
-                )
-            }
+            DropdownSelect(
+                options = favoritesSortTypes,
+                selectedOption = favoritesState.favoritesSortType,
+                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
+                label = "Sort by",
+                large = true
+            )
+        }
+    }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+    @Composable
+    fun RenderSlider(modifier: Modifier = Modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = modifier
+        ) {
+            Column(
+                modifier = Modifier.width(96.dp).padding(end = 16.dp)
             ) {
-                MySlider(
-                    currentValue = currentValue,
-                    maxValue = maxValue,
-                    onValueChanging = { newValue ->
-                        currentValue = newValue.toFloat().roundToInt().toLong()
-                    },
-                    onValueChangeFinished = { newValue ->
-                        val newInt = newValue.toFloat().roundToInt()
-                        currentValue = newInt.toLong()
-                        spotifyViewModel?.onEvent(SpotifyEvent.UpdateMinEntriesThreshold(newInt))
-                    },
-                    modifier = Modifier.weight(6f)
-                )
                 Text(
-                    currentValue.toString(),
+                    "≥$currentSliderValue entries",
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "${favoritesState.groupedSongs.size} groups",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp,
                 )
             }
+
+            MySlider(
+                currentValue = currentSliderValue,
+                maxValue = maxSliderValue,
+                onValueChanging = { newValue ->
+                    currentSliderValue = newValue.toFloat().roundToInt().toLong()
+                },
+                onValueChangeFinished = { newValue ->
+                    val newInt = newValue.toFloat().roundToInt()
+                    currentSliderValue = newInt.toLong()
+                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateMinEntriesThreshold(newInt))
+                },
+            )
+
         }
     }
 
@@ -247,7 +260,19 @@ fun FavoritesScreen(
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        RenderSettings()
+        if (isLandscape) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(48.dp),
+                verticalAlignment = Alignment.Bottom,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                RenderSettings(modifier = Modifier.weight(5f))
+                RenderSlider(modifier = Modifier.weight(4f))
+            }
+        } else {
+            RenderSettings(modifier = Modifier.fillMaxWidth())
+            RenderSlider()
+        }
 
         HorizontalDivider()
 
