@@ -1,6 +1,7 @@
 package com.example.ratify.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,13 +35,17 @@ import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.FavoritesState
 import com.example.ratify.spotifydatabase.GroupType
+import com.example.ratify.spotifydatabase.GroupedSong
+import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
+import com.example.ratify.ui.components.GroupedSongDialog
 import com.example.ratify.ui.components.MySlider
 import com.example.ratify.ui.components.MySwitch
 import com.example.ratify.ui.components.spotifyUriToImageUrl
 import com.example.ratify.ui.theme.RatifyTheme
+import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
 @Composable
@@ -48,6 +54,24 @@ fun FavoritesScreen(
 ) {
     val favoritesState = spotifyViewModel?.favoritesState?.collectAsState(initial = FavoritesState())?.value ?: FavoritesState()
 
+    // Player enabled logic
+    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
+    val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
+
+    // Fetching songs for dialog based on selected group and group type
+    val songs by remember(favoritesState.groupType, favoritesState.favoritesDialog) {
+        val groupType = favoritesState.groupType
+        val dialog = favoritesState.favoritesDialog
+
+        val (groupName, groupUri) = when (favoritesState.groupType) {
+            GroupType.ALBUM -> dialog?.album?.name to dialog?.album?.uri
+            GroupType.ARTIST -> dialog?.artist?.name to dialog?.artist?.uri
+        }
+
+        groupName?.let { spotifyViewModel?.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
+    }.collectAsState(initial = emptyList())
+
+    // Sort button options
     val favoritesSortTypes = listOf(
         FavoritesSortType.RATING,
         FavoritesSortType.NAME,
@@ -57,6 +81,7 @@ fun FavoritesScreen(
         FavoritesSortType.LAST_PLAYED_TS
     )
 
+    // Slider values
     val maxValue: Long = 30
     var currentValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
     LaunchedEffect(favoritesState.minEntriesThreshold) {
@@ -66,6 +91,20 @@ fun FavoritesScreen(
     // Orientation logic
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    // Settings variables
+    val settings = spotifyViewModel?.settings
+    val showImageUri = settings?.libraryImageUri?.collectAsState(true)
+    val queueSkip = settings?.queueSkip?.collectAsState(false)
+    fun realPlay(song: Song) {
+        if (queueSkip?.value == true) {
+            spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+            Thread.sleep(1000)
+            spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
+        } else {
+            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
+        }
+    }
 
     @Composable
     fun RenderSettings() {
@@ -147,7 +186,8 @@ fun FavoritesScreen(
                                         name = groupedSong.artist?.name ?: "N/A",
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
-                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: ""
+                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
+                                        onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
                                     )
                                 }
                                 GroupType.ALBUM -> {
@@ -156,7 +196,8 @@ fun FavoritesScreen(
                                         artistName = groupedSong.artist?.name ?: "N/A",
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
-                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: ""
+                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
+                                        onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
                                     )
                                 }
                             }
@@ -174,7 +215,31 @@ fun FavoritesScreen(
         }
     }
 
-
+    @Composable
+    fun RenderDialog(groupedSong: GroupedSong, groupType: GroupType, songs: List<Song>) {
+        AnimatedVisibility(
+            visible = true,
+        ) { }
+        GroupedSongDialog(
+            groupedSong = groupedSong,
+            groupType = groupType,
+            songs = songs,
+            onDismissRequest = {
+                spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(null))
+            },
+            playEnabled = playerEnabled,
+            showImageUri = showImageUri?.value ?: false,
+            onLongClick = { song ->
+                if (playerEnabled) {
+                    spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+                } else {
+                    spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                }
+            },
+            onPlay = { song -> realPlay(song) },
+            onDisabledPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)}
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -187,6 +252,13 @@ fun FavoritesScreen(
         HorizontalDivider()
 
         RenderItemList()
+        if (favoritesState.favoritesDialog != null) {
+            RenderDialog(
+                favoritesState.favoritesDialog,
+                favoritesState.groupType,
+                songs
+            )
+        }
     }
 }
 

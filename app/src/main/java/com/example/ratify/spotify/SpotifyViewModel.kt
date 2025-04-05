@@ -16,17 +16,18 @@ import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.FavoritesState
 import com.example.ratify.spotifydatabase.GroupType
 import com.example.ratify.spotifydatabase.GroupedSong
+import com.example.ratify.spotifydatabase.LibrarySortType
 import com.example.ratify.spotifydatabase.LibraryState
 import com.example.ratify.spotifydatabase.MusicState
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.SongDao
-import com.example.ratify.spotifydatabase.LibrarySortType
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
@@ -36,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -223,7 +225,8 @@ class SpotifyViewModel(
     private val _librarySortAscending = MutableStateFlow(false)
     private val _favoritesSortAscending = MutableStateFlow(false)
     private val _rating = MutableStateFlow<Rating?>(null)
-    private val _showSongDialog = MutableStateFlow<Song?>(null)
+    private val _libraryDialog = MutableStateFlow<Song?>(null)
+    private val _favoritesDialog = MutableStateFlow<GroupedSong?>(null)
     private val _visualizerShowing = MutableStateFlow(false)
     private val _groupType = MutableStateFlow(GroupType.ARTIST)
     private val _minEntriesThreshold = MutableStateFlow(5)
@@ -241,12 +244,12 @@ class SpotifyViewModel(
     // Individual screen states
     private val _libraryState = MutableStateFlow(LibraryState())
     val libraryState = combine(
-        listOf(_libraryState, _searchType, _librarySortType, _showSongDialog, _visualizerShowing, _librarySongs, _searchQuery)
+        listOf(_libraryState, _searchType, _librarySortType, _libraryDialog, _visualizerShowing, _librarySongs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as LibraryState
         val searchType = flows[1] as SearchType
         val librarySortType = flows[2] as LibrarySortType
-        val showSongDialog = flows[3] as Song?
+        val libraryDialog = flows[3] as Song?
         val visualizerShowing = flows[4] as Boolean
         val songs = flows[5] as List<Song>
         val searchQuery = flows[6] as String
@@ -257,7 +260,7 @@ class SpotifyViewModel(
             searchType = searchType,
             librarySortType = librarySortType,
             visualizerShowing = visualizerShowing,
-            currentSongDialog = showSongDialog
+            libraryDialog = libraryDialog
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryState())
 
@@ -275,18 +278,20 @@ class SpotifyViewModel(
 
     private val _favoritesState = MutableStateFlow(FavoritesState())
     val favoritesState = combine(
-        listOf(_favoritesState, _favoritesSongs, _groupType, _favoritesSortType, _minEntriesThreshold)
+        listOf(_favoritesState, _favoritesSongs, _groupType, _favoritesSortType, _favoritesDialog, _minEntriesThreshold)
     ) { flows: Array<Any?> ->
         val state = flows[0] as FavoritesState
         val songs = flows[1] as List<GroupedSong>
         val groupType = flows[2] as GroupType
         val favoritesSortType = flows[3] as FavoritesSortType
-        val minEntriesThreshold = flows[4] as Int
+        val favoritesDialog = flows[4] as GroupedSong?
+        val minEntriesThreshold = flows[5] as Int
 
         state.copy(
             groupedSongs = songs,
             groupType = groupType,
             favoritesSortType = favoritesSortType,
+            favoritesDialog = favoritesDialog,
             minEntriesThreshold = minEntriesThreshold
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FavoritesState())
@@ -346,8 +351,11 @@ class SpotifyViewModel(
             is SpotifyEvent.UpdateCurrentRating -> {
                 _rating.value = event.rating
             }
-            is SpotifyEvent.UpdateShowSongDialog -> {
-                _showSongDialog.value = event.showSongDialog
+            is SpotifyEvent.UpdateLibraryDialog -> {
+                _libraryDialog.value = event.song
+            }
+            is SpotifyEvent.UpdateFavoritesDialog -> {
+                _favoritesDialog.value = event.groupedSong
             }
             is SpotifyEvent.UpdateVisualizerShowing -> {
                 _visualizerShowing.value = event.visualizerShowing
@@ -518,6 +526,13 @@ class SpotifyViewModel(
             if (song != null) {
                 dao.upsertSong(song.copy(lastRatedTs = lastRatedTs, rating = rating))
             }
+        }
+    }
+
+    fun getSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>> {
+        return when (groupType) {
+            GroupType.ALBUM -> dao.getSongsByAlbum(Album(groupName, uri))
+            GroupType.ARTIST -> dao.getSongsByArtist(Artist(groupName, uri))
         }
     }
 }

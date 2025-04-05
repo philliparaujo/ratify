@@ -2,6 +2,7 @@ package com.example.ratify.spotify
 
 import com.example.ratify.spotifydatabase.FavoritesSortType
 import com.example.ratify.spotifydatabase.GroupType
+import com.example.ratify.spotifydatabase.GroupedSong
 import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
@@ -37,7 +38,8 @@ sealed interface SpotifyEvent {
     data class UpdateFavoritesSortAscending(val sortAscending: Boolean): SpotifyEvent
 
     data class UpdateCurrentRating(val rating: Rating?): SpotifyEvent
-    data class UpdateShowSongDialog(val showSongDialog: Song?): SpotifyEvent
+    data class UpdateLibraryDialog(val song: Song?): SpotifyEvent
+    data class UpdateFavoritesDialog(val groupedSong: GroupedSong?): SpotifyEvent
     data class UpdateVisualizerShowing(val visualizerShowing: Boolean): SpotifyEvent
     data class UpdateMinEntriesThreshold(val newThreshold: Int): SpotifyEvent
 

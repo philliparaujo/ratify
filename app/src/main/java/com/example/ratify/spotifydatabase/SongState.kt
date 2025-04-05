@@ -11,12 +11,13 @@ data class LibraryState(
     val searchType: SearchType = SearchType.NAME,
     val librarySortType: LibrarySortType = LibrarySortType.LAST_PLAYED_TS,
     val visualizerShowing: Boolean = false,
-    val currentSongDialog: Song? = null,  // Represents currently shown dialog for a song
+    val libraryDialog: Song? = null,  // Represents currently shown dialog for a song
 )
 
 data class FavoritesState(
     val groupedSongs: List<GroupedSong> = emptyList(),
     val groupType: GroupType = GroupType.ARTIST,
     val favoritesSortType: FavoritesSortType = FavoritesSortType.RATING,
+    val favoritesDialog: GroupedSong? = null,  // Represents currently shown dialog for a GroupedSong
     val minEntriesThreshold: Int = 5,
 )

@@ -39,7 +39,7 @@ import com.example.ratify.spotifydatabase.Rating
 import com.example.ratify.spotifydatabase.SearchType
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.spotifydatabase.LibrarySortType
-import com.example.ratify.ui.components.Dialog
+import com.example.ratify.ui.components.SongDialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongItem
@@ -106,11 +106,11 @@ fun LibraryScreen(
         val context = LocalContext.current
 
         AnimatedVisibility(
-            visible = true,
+                visible = true,
         ) { }
-        Dialog(
+        SongDialog(
             onDismissRequest = {
-                spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(null))
+                spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibraryDialog(null))
             },
             song = song,
             onRatingSelect = { rating ->
@@ -154,7 +154,7 @@ fun LibraryScreen(
                 SongItem(
                     song = song,
                     onClick = {
-                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateShowSongDialog(song))
+                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibraryDialog(song))
                     },
                     onLongClick = {
                         if (isScreenActive) {
@@ -285,8 +285,8 @@ fun LibraryScreen(
         HorizontalDivider()
 
         RenderSongList()
-        if (libraryState.currentSongDialog != null) {
-            RenderCurrentSongDialog(libraryState.currentSongDialog)
+        if (libraryState.libraryDialog != null) {
+            RenderCurrentSongDialog(libraryState.libraryDialog)
         }
     }
 }

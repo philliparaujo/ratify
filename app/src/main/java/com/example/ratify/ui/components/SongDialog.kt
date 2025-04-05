@@ -1,6 +1,5 @@
 package com.example.ratify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -24,8 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.ratify.R
 import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.screens.landscapeDevice
@@ -35,7 +31,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun Dialog(
+fun SongDialog(
     song: Song,
     onRatingSelect: (Int) -> Unit,
     onPlay: () -> Unit,
@@ -46,9 +42,6 @@ fun Dialog(
     deleteEnabled: Boolean = true,
 ) {
     val textColor = MaterialTheme.colorScheme.onBackground
-
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     @Composable
     fun RenderSongDisplay() {
@@ -160,94 +153,63 @@ fun Dialog(
         )
     }
 
-    Dialog(onDismissRequest = { onDismissRequest() }, properties = DialogProperties(
-        usePlatformDefaultWidth = false
-    )) {
-        if (isLandscape) {
-            Box(
+    GenericDialog(
+        renderLandscapeContent = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier = Modifier.aspectRatio(1f)
+                ) {
+                    RenderSongDisplay()
+                }
+            }
+            Column(
                 modifier = Modifier
-                    .padding(32.dp)
+                    .align(Alignment.CenterVertically)
                     .fillMaxHeight()
-                    .padding(horizontal = 64.dp)
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
             ) {
-                Row(
+                Box(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.Center),
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.TopEnd
                 ) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Box(
-                            modifier = Modifier.aspectRatio(1f)
-                        ) {
-                            RenderSongDisplay()
-                        }
-                    }
-                    Column(
                         modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(
+                            space = 24.dp,
+                            alignment = Alignment.Bottom
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight(),
-                            contentAlignment = Alignment.TopEnd
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxHeight(),
-                                verticalArrangement = Arrangement.spacedBy(
-                                    space = 24.dp,
-                                    alignment = Alignment.Bottom
-                                ),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                RenderSongControls()
-                            }
-                            MyIconButton(
-                                icon = ImageVector.vectorResource(R.drawable.baseline_close_24),
-                                onClick = { onDismissRequest() },
-                            )
-                        }
+                        RenderSongControls()
                     }
+                    MyIconButton(
+                        icon = ImageVector.vectorResource(R.drawable.baseline_close_24),
+                        onClick = { onDismissRequest() },
+                    )
                 }
             }
-        }
-        else {
+        },
+        renderPortraitContent = {
             Box(
                 modifier = Modifier
-                    .padding(32.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.TopEnd
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.TopEnd
-                    ) {
-                        RenderSongDisplay()
-                        MyIconButton(
-                            icon = ImageVector.vectorResource(R.drawable.baseline_close_24),
-                            onClick = { onDismissRequest() },
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    }
-                    RenderSongControls()
-                }
+                RenderSongDisplay()
+                MyIconButton(
+                    icon = ImageVector.vectorResource(R.drawable.baseline_close_24),
+                    onClick = { onDismissRequest() },
+                    modifier = Modifier.padding(8.dp)
+                )
             }
-        }
-    }
+            RenderSongControls()
+        },
+        onDismissRequest = onDismissRequest
+    )
 }
 
 fun timestampToDate(timestamp: Long?): String? {
@@ -271,7 +233,7 @@ fun DarkTestDialogPreview() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Dialog(
+            SongDialog(
                 song = mockSong,
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },
@@ -293,7 +255,7 @@ fun TestDialogPreview() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Dialog(
+            SongDialog(
                 song = mockSong,
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },
@@ -315,7 +277,7 @@ fun DarkLandscapeTestDialogPreview() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Dialog(
+            SongDialog(
                 song = mockSong,
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },
@@ -337,7 +299,7 @@ fun LightLandscapeTestDialogPreview() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Dialog(
+            SongDialog(
                 song = mockSong,
                 onDismissRequest = {},
                 onRatingSelect = { _ -> },

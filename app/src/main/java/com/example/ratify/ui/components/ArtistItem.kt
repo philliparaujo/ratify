@@ -18,11 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.Song
 import com.example.ratify.ui.theme.RatifyTheme
 import com.spotify.protocol.types.Artist
-import com.spotify.protocol.types.ImageUri
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -32,11 +29,13 @@ fun ArtistItem(
     songCount: Int,
     averageRating: Float,
     imageUri: String,
+    onClick: () -> Unit
 ) {
     val ratingText = averageRating.roundTo(1).toString()
 
     ImageOverlay(
         imageUri = imageUri,
+        onClick = onClick,
         renderContent = {
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -65,18 +64,6 @@ fun ArtistItem(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                 ) {
-//                    Text(
-//                        text = name,
-//                        color = MaterialTheme.colorScheme.onSecondary,
-//                        fontSize = 14.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        textAlign = TextAlign.Center,
-//                        overflow = TextOverflow.Ellipsis,
-//                        maxLines = 1,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(start = 8.dp, end = 8.dp)
-//                    )
                     Text(
                         text = name,
                         color = MaterialTheme.colorScheme.onSecondary,
@@ -119,19 +106,22 @@ fun DarkArtistItemsPreview() {
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             ArtistItem(
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             ArtistItem(
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
         }
     }
@@ -152,19 +142,22 @@ fun LightArtistItemsPreview() {
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             ArtistItem(
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             ArtistItem(
                 name = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
         }
     }

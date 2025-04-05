@@ -7,6 +7,7 @@ import androidx.room.RawQuery
 import androidx.room.Upsert
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,12 @@ interface SongDao {
 
     @Query("SELECT * FROM songs WHERE name = :name AND artists = :artists LIMIT 1")
     suspend fun getSongByPrimaryKey(name: String, artists: List<Artist>): Song?
+
+    @Query("SELECT * FROM songs WHERE artist = :artist")
+    fun getSongsByArtist(artist: Artist): Flow<List<Song>>
+
+    @Query("SELECT * FROM songs WHERE album = :album")
+    fun getSongsByAlbum(album: Album): Flow<List<Song>>
 
     @RawQuery(observedEntities = [Song::class])
     fun querySongs(query: SupportSQLiteQuery): Flow<List<Song>>

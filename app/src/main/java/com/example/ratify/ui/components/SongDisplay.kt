@@ -50,7 +50,7 @@ fun SongDisplay(
                         .padding(start = 8.dp, end = 8.dp)
                 )
                 Text(
-                    text=  artists,
+                    text = artists,
                     color = MaterialTheme.colorScheme.onSecondary,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,

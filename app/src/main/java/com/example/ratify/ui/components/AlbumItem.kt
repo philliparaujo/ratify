@@ -27,12 +27,14 @@ fun AlbumItem(
     artistName: String,
     songCount: Int,
     averageRating: Float,
-    imageUri: String
+    imageUri: String,
+    onClick: () -> Unit
 ) {
     val ratingText = averageRating.roundTo(1).toString()
 
     ImageOverlay(
         imageUri = imageUri,
+        onClick = onClick,
         renderContent = {
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -111,21 +113,24 @@ fun DarkAlbumItemsPreview() {
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             AlbumItem(
                 name = mockAlbum.name,
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             AlbumItem(
                 name = mockAlbum.name,
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
         }
     }
@@ -147,21 +152,24 @@ fun LightAlbumItemsPreview() {
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             AlbumItem(
                 name = mockAlbum.name,
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
             AlbumItem(
                 name = mockAlbum.name,
                 artistName = mockArtist.name,
                 songCount = 2,
                 averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
+                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
+                onClick = {}
             )
         }
     }
