@@ -1,4 +1,4 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.core.model
 
 enum class SearchType(
     val displayName: String

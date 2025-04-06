@@ -34,11 +34,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotifydatabase.LibraryState
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.SearchType
-import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.LibrarySortType
+import com.example.ratify.core.state.LibraryState
+import com.example.ratify.core.model.Rating
+import com.example.ratify.core.model.SearchType
+import com.example.ratify.database.Song
+import com.example.ratify.core.model.LibrarySortType
 import com.example.ratify.ui.components.SongDialog
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search

@@ -1,4 +1,4 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.core.model
 
 enum class GroupType(
     val displayName: String

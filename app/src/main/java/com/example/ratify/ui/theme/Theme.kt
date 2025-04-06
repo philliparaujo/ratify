@@ -11,7 +11,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.example.ratify.settings.PrimaryColor
+import com.example.ratify.core.model.PrimaryColor
 
 private val DarkColorScheme = darkColorScheme(
     // Primary colors

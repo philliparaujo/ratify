@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
-import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.core.model.Rating
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.PI
 import kotlin.math.cos

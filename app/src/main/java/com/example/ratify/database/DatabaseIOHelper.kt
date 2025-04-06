@@ -1,8 +1,7 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.database
 
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.ratify.database.SongDatabaseProvider
 
 class DatabaseIOHelper(
     private val activity: ComponentActivity,

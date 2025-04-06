@@ -13,7 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.settings.PrimaryColor
+import com.example.ratify.core.model.PrimaryColor
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton

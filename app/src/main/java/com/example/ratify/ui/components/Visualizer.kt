@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
-import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.core.model.Rating
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.max
 

@@ -18,9 +18,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.spotifydatabase.GroupType
-import com.example.ratify.spotifydatabase.GroupedSong
-import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.core.model.GroupType
+import com.example.ratify.database.GroupedSong
+import com.example.ratify.database.Song
 
 @Composable
 fun GroupedSongDialog(

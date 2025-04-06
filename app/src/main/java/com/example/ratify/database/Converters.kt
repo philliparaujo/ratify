@@ -1,6 +1,7 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.database
 
 import androidx.room.TypeConverter
+import com.example.ratify.core.model.Rating
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.spotify.protocol.types.Album

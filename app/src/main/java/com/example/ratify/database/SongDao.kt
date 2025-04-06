@@ -1,4 +1,4 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.database
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -7,6 +7,10 @@ import androidx.room.RawQuery
 import androidx.room.Upsert
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.example.ratify.core.model.FavoritesSortType
+import com.example.ratify.core.model.GroupType
+import com.example.ratify.core.model.LibrarySortType
+import com.example.ratify.core.model.SearchType
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import kotlinx.coroutines.flow.Flow

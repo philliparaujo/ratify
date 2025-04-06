@@ -1,4 +1,4 @@
-package com.example.ratify.settings
+package com.example.ratify.core.model
 
 import androidx.compose.ui.graphics.Color
 import com.example.ratify.ui.theme.PrimaryDarkCyan

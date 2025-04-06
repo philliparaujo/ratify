@@ -1,4 +1,4 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

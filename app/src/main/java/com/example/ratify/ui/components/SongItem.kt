@@ -14,8 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.services.nullTextViewValue
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.core.model.Rating
+import com.example.ratify.database.Song
 import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable

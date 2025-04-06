@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotifydatabase.FavoritesSortType
-import com.example.ratify.spotifydatabase.FavoritesState
-import com.example.ratify.spotifydatabase.GroupType
-import com.example.ratify.spotifydatabase.GroupedSong
-import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.core.model.FavoritesSortType
+import com.example.ratify.core.state.FavoritesState
+import com.example.ratify.core.model.GroupType
+import com.example.ratify.database.GroupedSong
+import com.example.ratify.database.Song
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect

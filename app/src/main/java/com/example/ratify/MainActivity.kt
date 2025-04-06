@@ -16,13 +16,13 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.services.ServiceApp
-import com.example.ratify.settings.PrimaryColor
+import com.example.ratify.core.model.PrimaryColor
 import com.example.ratify.settings.SettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModelFactory
-import com.example.ratify.spotifydatabase.DatabaseIOHelper
+import com.example.ratify.database.DatabaseIOHelper
 import com.example.ratify.ui.navigation.MainScreen
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.flow.first

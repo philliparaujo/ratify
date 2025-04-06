@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
-import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.core.model.Rating
 
 fun flipButtonValue(value: Int): Int {
     return if (value % 2 == 0) value - 1 else value + 1

@@ -1,12 +1,12 @@
 package com.example.ratify.spotify
 
-import com.example.ratify.spotifydatabase.FavoritesSortType
-import com.example.ratify.spotifydatabase.GroupType
-import com.example.ratify.spotifydatabase.GroupedSong
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.SearchType
-import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.LibrarySortType
+import com.example.ratify.core.model.FavoritesSortType
+import com.example.ratify.core.model.GroupType
+import com.example.ratify.database.GroupedSong
+import com.example.ratify.core.model.Rating
+import com.example.ratify.core.model.SearchType
+import com.example.ratify.database.Song
+import com.example.ratify.core.model.LibrarySortType
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Track
 

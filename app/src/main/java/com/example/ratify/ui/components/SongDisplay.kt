@@ -16,8 +16,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.core.model.Rating
+import com.example.ratify.database.Song
 import com.example.ratify.ui.theme.RatifyTheme
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist

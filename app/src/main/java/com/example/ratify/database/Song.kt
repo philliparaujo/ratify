@@ -1,10 +1,12 @@
-package com.example.ratify.spotifydatabase
+package com.example.ratify.database
 
 import androidx.room.Entity
+import com.example.ratify.core.model.Rating
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
 
+// Individual entry in database
 @Entity(tableName = "songs", primaryKeys = ["name", "artists"])
 data class Song(
     // Track info (unchanging)

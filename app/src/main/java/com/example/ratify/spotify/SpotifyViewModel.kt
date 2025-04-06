@@ -1,5 +1,6 @@
 package com.example.ratify.spotify
 
+import MusicState
 import android.app.Application
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
@@ -12,17 +13,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.SettingsManager
-import com.example.ratify.spotifydatabase.FavoritesSortType
-import com.example.ratify.spotifydatabase.FavoritesState
-import com.example.ratify.spotifydatabase.GroupType
-import com.example.ratify.spotifydatabase.GroupedSong
-import com.example.ratify.spotifydatabase.LibrarySortType
-import com.example.ratify.spotifydatabase.LibraryState
-import com.example.ratify.spotifydatabase.MusicState
-import com.example.ratify.spotifydatabase.Rating
-import com.example.ratify.spotifydatabase.SearchType
-import com.example.ratify.spotifydatabase.Song
-import com.example.ratify.spotifydatabase.SongDao
+import com.example.ratify.core.model.FavoritesSortType
+import com.example.ratify.core.state.FavoritesState
+import com.example.ratify.core.model.GroupType
+import com.example.ratify.database.GroupedSong
+import com.example.ratify.core.model.LibrarySortType
+import com.example.ratify.core.state.LibraryState
+import com.example.ratify.core.model.Rating
+import com.example.ratify.core.model.SearchType
+import com.example.ratify.database.Song
+import com.example.ratify.database.SongDao
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector

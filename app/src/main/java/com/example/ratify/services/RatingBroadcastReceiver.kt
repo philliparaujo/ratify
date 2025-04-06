@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.spotifydatabase.Rating
+import com.example.ratify.core.model.Rating
 
 class RatingBroadcastReceiver : BroadcastReceiver() {
     // Triggers on button click within notification

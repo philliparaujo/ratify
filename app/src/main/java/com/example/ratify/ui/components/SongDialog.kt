@@ -23,7 +23,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.spotifydatabase.Song
+import com.example.ratify.database.Song
 import com.example.ratify.ui.screens.landscapeDevice
 import com.example.ratify.ui.theme.RatifyTheme
 import java.text.SimpleDateFormat
