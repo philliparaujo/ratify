@@ -13,16 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.mocks.Preview
 import com.example.ratify.spotify.ISpotifyViewModel
-import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MySwitch
 import com.example.ratify.ui.components.ThemeSelector
-import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.launch
 
 @Composable

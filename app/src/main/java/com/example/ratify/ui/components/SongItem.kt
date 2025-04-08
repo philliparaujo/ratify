@@ -13,10 +13,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.services.nullTextViewValue
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Song
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
+import com.example.ratify.services.nullTextViewValue
 
 @Composable
 fun SongItem(
@@ -68,9 +68,7 @@ fun getRatingColor(rating: Rating?): Color {
 @Preview(name = "Dark Song Items")
 @Composable
 fun DarkSongItemsPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -104,9 +102,7 @@ fun DarkSongItemsPreview() {
 @Preview(name = "Light Song Items")
 @Composable
 fun LightSongItemsPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

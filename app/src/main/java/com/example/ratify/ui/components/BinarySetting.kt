@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.mocks.Preview
 import com.example.ratify.ui.screens.landscapeDevice
-import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun BinarySetting(
@@ -60,9 +60,7 @@ fun BinarySetting(
 @Preview(name = "Dark BinarySettings")
 @Composable
 fun DarkBinarySettingsPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,9 +83,7 @@ fun DarkBinarySettingsPreview() {
 @Preview(name = "Light BinarySettings")
 @Composable
 fun LightBinarySettingsPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -113,9 +109,7 @@ fun LightBinarySettingsPreview() {
 )
 @Composable
 fun DarkLandscapeBinarySettingsPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -141,9 +135,7 @@ fun DarkLandscapeBinarySettingsPreview() {
 )
 @Composable
 fun LightLandscapeBinarySettings() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,9 +127,7 @@ fun Search(
 @Preview(name = "Dark Search Bar")
 @Composable
 fun DarkSearchBarPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -156,9 +154,7 @@ fun DarkSearchBarPreview() {
 @Preview(name = "Light Search Bar")
 @Composable
 fun LightSearchBarPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

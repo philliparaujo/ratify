@@ -46,7 +46,6 @@ import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.isRouteOnTarget
-import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun LibraryScreen(

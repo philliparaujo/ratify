@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
+import com.example.ratify.mocks.Preview
 import com.example.ratify.core.model.Rating
-import com.example.ratify.ui.theme.RatifyTheme
 import kotlin.math.max
 
 @Composable
@@ -82,9 +82,7 @@ fun Visualizer(
 @Preview(name = "Dark Visualizer")
 @Composable
 fun DarkVisualizerPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -98,9 +96,7 @@ fun DarkVisualizerPreview() {
 @Preview(name = "Light Visualizer")
 @Composable
 fun LightVisualizerPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

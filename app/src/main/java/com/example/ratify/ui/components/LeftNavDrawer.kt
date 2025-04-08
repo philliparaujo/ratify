@@ -14,12 +14,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.mocks.Preview
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
 import com.example.ratify.ui.navigation.NavigationTarget
 import com.example.ratify.ui.navigation.RenderTarget
 import com.example.ratify.ui.navigation.SettingsNavigationTarget
-import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun LeftNavDrawer(
@@ -72,9 +72,7 @@ fun LeftNavDrawer(
 @Preview(name = "Dark Landscape Nav Drawer", widthDp = 640, heightDp = 360)
 @Composable
 fun DarkLandscapeNavDrawerPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         LeftNavDrawer(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
@@ -86,9 +84,7 @@ fun DarkLandscapeNavDrawerPreview() {
 @Preview(name = "Light Landscape Nav Drawer", widthDp = 640, heightDp = 360)
 @Composable
 fun LightLandscapeNavDrawerPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         LeftNavDrawer(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),

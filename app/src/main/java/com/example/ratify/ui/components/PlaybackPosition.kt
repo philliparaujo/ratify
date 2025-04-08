@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @Composable
 fun PlaybackPosition(
@@ -62,9 +62,7 @@ fun formatTime(timeMs: Long): String {
 @Preview(name = "Dark Player Position")
 @Composable
 fun DarkPlayerPositionPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column {
             Box(
                 Modifier.background(color = MaterialTheme.colorScheme.background)
@@ -102,9 +100,7 @@ fun DarkPlayerPositionPreview() {
 @Preview(name = "Light Player Position")
 @Composable
 fun LightPlayerPositionPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column {
             Box(
                 Modifier.background(color = MaterialTheme.colorScheme.background)

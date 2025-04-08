@@ -10,12 +10,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.mocks.Preview
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
 import com.example.ratify.ui.navigation.NavigationTarget
 import com.example.ratify.ui.navigation.RenderTarget
 import com.example.ratify.ui.navigation.SettingsNavigationTarget
-import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun BottomNavBar(
@@ -61,9 +61,7 @@ fun BottomNavBar(
 @Preview(name = "Dark Portrait Bottom Nav", widthDp = 360, heightDp = 640)
 @Composable
 fun DarkPortraitBottomNavPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         BottomNavBar(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
@@ -75,9 +73,7 @@ fun DarkPortraitBottomNavPreview() {
 @Preview(name = "Light Portrait Bottom Nav", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPortraitBottomNavPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         BottomNavBar(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),

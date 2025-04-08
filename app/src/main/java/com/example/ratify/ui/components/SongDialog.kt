@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.database.Song
+import com.example.ratify.mocks.Preview
 import com.example.ratify.ui.screens.landscapeDevice
-import com.example.ratify.ui.theme.RatifyTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -226,9 +226,7 @@ fun timestampToDate(timestamp: Long?): String? {
 @Preview(name = "Dark Test Dialog")
 @Composable
 fun DarkTestDialogPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -248,9 +246,7 @@ fun DarkTestDialogPreview() {
 @Preview(name = "Light Test Dialog")
 @Composable
 fun TestDialogPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -270,9 +266,7 @@ fun TestDialogPreview() {
 @Preview(name = "Dark Landscape Test Dialog", device = landscapeDevice)
 @Composable
 fun DarkLandscapeTestDialogPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -292,9 +286,7 @@ fun DarkLandscapeTestDialogPreview() {
 @Preview(name = "Light Landscape Test Dialog", device = landscapeDevice)
 @Composable
 fun LightLandscapeTestDialogPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

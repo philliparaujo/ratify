@@ -1,6 +1,5 @@
 package com.example.ratify.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -28,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @Composable
 fun MySlider(
@@ -123,9 +122,7 @@ fun MySlider(
 @Preview(name = "Dark Slider")
 @Composable
 fun DarkSliderPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -140,9 +137,7 @@ fun DarkSliderPreview() {
 @Preview(name = "Light Slider")
 @Composable
 fun LightSliderPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

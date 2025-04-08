@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @Composable
 fun MyButton(
@@ -83,9 +83,7 @@ const val bigButtonText = "Connect to Spotify"
 @Preview(name = "Dark Enabled Button")
 @Composable
 fun DarkEnabledButtonPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -100,9 +98,7 @@ fun DarkEnabledButtonPreview() {
 @Preview(name = "Light Enabled Button")
 @Composable
 fun LightEnabledButtonPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

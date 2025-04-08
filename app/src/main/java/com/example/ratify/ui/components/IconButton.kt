@@ -19,7 +19,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @Composable
 fun MyIconButton(
@@ -74,9 +74,7 @@ fun MyIconButton(
 @Preview(name = "Dark Enabled Icon Button")
 @Composable
 fun DarkEnabledIconButtonPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -113,9 +111,7 @@ fun DarkEnabledIconButtonPreview() {
 @Preview(name = "Light Enabled Icon Button")
 @Composable
 fun LightEnabledIconButtonPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

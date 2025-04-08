@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -120,9 +120,7 @@ fun <T> DropdownSelect(
 @Preview(name = "Dark Dropdown Select")
 @Composable
 fun DarkDropdownSelectPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -174,9 +172,7 @@ fun DarkDropdownSelectPreview() {
 @Preview(name = "Light Dropdown Select")
 @Composable
 fun LightDropdownSelectPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

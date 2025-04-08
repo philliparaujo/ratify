@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 import com.spotify.protocol.types.Album
 
 @Composable
@@ -100,9 +100,7 @@ val mockAlbum = Album(
 @Preview(name = "Dark Album Items")
 @Composable
 fun DarkAlbumItemsPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -139,9 +137,7 @@ fun DarkAlbumItemsPreview() {
 @Preview(name = "Light Album Items")
 @Composable
 fun LightAlbumItemsPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

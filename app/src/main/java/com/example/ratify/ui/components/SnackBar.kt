@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 
 @Composable
 fun MySnackBar(
@@ -77,9 +77,7 @@ fun MySnackBar(
 @Preview(name = "Dark SnackBar")
 @Composable
 fun DarkSnackBarPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,9 +117,7 @@ fun DarkSnackBarPreview() {
 @Preview(name = "Light SnackBar")
 @Composable
 fun LightSnackBarPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

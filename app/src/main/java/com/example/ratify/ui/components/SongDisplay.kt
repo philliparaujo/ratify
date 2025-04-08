@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Song
-import com.example.ratify.ui.theme.RatifyTheme
+import com.example.ratify.mocks.Preview
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
@@ -143,9 +143,7 @@ val longMockSong = Song(
 @Preview(name = "Dark Song Display")
 @Composable
 fun DarkSongDisplayPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -162,9 +160,7 @@ fun DarkSongDisplayPreview() {
 @Preview(name = "Light Song Display")
 @Composable
 fun LightSongDisplayPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -181,9 +177,7 @@ fun LightSongDisplayPreview() {
 @Preview(name = "Dark Long Name Song Display")
 @Composable
 fun DarkLongNameSongDisplayPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -200,9 +194,7 @@ fun DarkLongNameSongDisplayPreview() {
 @Preview(name = "Light Long Name Song Display")
 @Composable
 fun LightLongNameSongDisplayPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
