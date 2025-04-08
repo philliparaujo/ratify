@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.sp
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Song
 import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.longMockSong
+import com.example.ratify.mocks.mockSong
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
@@ -79,67 +81,6 @@ fun getArtistsString(artists: List<Artist>): String {
 
 // Previews
 // Network images don't work with previews
-const val unspecifiedString = "foo"
-const val songName = "Touchdown (feat. Bankrol Hayden)"
-val mockSong = Song(
-    album = Album(
-        songName,
-        unspecifiedString
-    ),
-    artist = Artist(
-        "YSB Tril", unspecifiedString
-    ),
-    artists = listOf(
-        Artist(
-            "YSB Tril", unspecifiedString
-        ),
-        Artist(
-            "Bankrol Hayden", unspecifiedString
-        )
-    ),
-    duration = 141581,
-    imageUri = ImageUri(
-        "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305"
-    ),
-    name = songName,
-    uri = "spotify:track:7xWnMfIVVnI3Y3zPp9Ukvi",
-    lastPlayedTs = 1737132383109,
-    timesPlayed = 1,
-    lastRatedTs = 1737132383109,
-    rating = Rating.from(10)
-)
-const val longSongName = "Symphony No. 40 in G Minor, K. 550: I.Allegro molto"
-val longMockSong = Song(
-    album = Album(
-        longSongName,
-        unspecifiedString
-    ),
-    artist = Artist(
-        "Wolfgang Amadeus Mozart", unspecifiedString
-    ),
-    artists = listOf(
-        Artist(
-            "Wolfgang Amadeus Mozart", unspecifiedString
-        ),
-        Artist(
-            "Capella Instropolitana", unspecifiedString
-        ),
-        Artist(
-            "Barry Wordsworth", unspecifiedString
-        )
-    ),
-    duration = 451333,
-    imageUri = ImageUri(
-        unspecifiedString
-    ),
-    name = longSongName,
-    uri = unspecifiedString,
-    lastPlayedTs = 1737132383109,
-    timesPlayed = 1,
-    lastRatedTs = 1737132383109,
-    rating = Rating.from(10)
-)
-
 @Preview(name = "Dark Song Display")
 @Composable
 fun DarkSongDisplayPreview() {

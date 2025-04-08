@@ -16,6 +16,7 @@ import com.example.ratify.R
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Song
 import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.mockSong
 import com.example.ratify.services.nullTextViewValue
 
 @Composable

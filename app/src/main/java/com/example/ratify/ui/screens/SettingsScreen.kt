@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
@@ -140,7 +141,7 @@ fun LightSettingsScreenPreview() {
 
 @Preview(
     name = "Dark Landscape Settings Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapeSettingsScreenPreview() {
@@ -151,7 +152,7 @@ fun DarkLandscapeSettingsScreenPreview() {
 
 @Preview(
     name = "Light Landscape Settings Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapeSettingsScreenPreview() {

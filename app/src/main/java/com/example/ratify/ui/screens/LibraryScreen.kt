@@ -35,6 +35,7 @@ import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Song
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -314,7 +315,7 @@ fun LightLibraryScreenPreview() {
 
 @Preview(
     name = "Dark Landscape Library Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapeLibraryScreenPreview() {
@@ -327,7 +328,7 @@ fun DarkLandscapeLibraryScreenPreview() {
 
 @Preview(
     name = "Light Landscape Library Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapeLibraryScreenPreview() {

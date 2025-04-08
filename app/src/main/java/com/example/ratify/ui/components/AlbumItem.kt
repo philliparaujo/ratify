@@ -19,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.mockAlbum
+import com.example.ratify.mocks.mockArtist
 import com.spotify.protocol.types.Album
 
 @Composable
@@ -93,9 +95,6 @@ fun AlbumItem(
 }
 
 // Previews
-val mockAlbum = Album(
-    "HOTSHOT", unspecifiedString
-)
 
 @Preview(name = "Dark Album Items")
 @Composable

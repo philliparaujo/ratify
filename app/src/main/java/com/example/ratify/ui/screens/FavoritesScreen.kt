@@ -38,6 +38,7 @@ import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
@@ -307,7 +308,7 @@ fun LightFavoritesScreenPreview() {
 
 @Preview(
     name = "Dark Landscape Favorites Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapeFavoritesScreenPreview() {
@@ -318,7 +319,7 @@ fun DarkLandscapeFavoritesScreenPreview() {
 
 @Preview(
     name = "Light Landscape Favorites Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapeFavoritesScreenPreview() {

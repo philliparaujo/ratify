@@ -24,8 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.database.Song
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
-import com.example.ratify.ui.screens.landscapeDevice
+import com.example.ratify.mocks.mockSong
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -263,7 +264,7 @@ fun TestDialogPreview() {
     }
 }
 
-@Preview(name = "Dark Landscape Test Dialog", device = landscapeDevice)
+@Preview(name = "Dark Landscape Test Dialog", device = LANDSCAPE_DEVICE)
 @Composable
 fun DarkLandscapeTestDialogPreview() {
     Preview(darkTheme = true) {
@@ -283,7 +284,7 @@ fun DarkLandscapeTestDialogPreview() {
     }
 }
 
-@Preview(name = "Light Landscape Test Dialog", device = landscapeDevice)
+@Preview(name = "Light Landscape Test Dialog", device = LANDSCAPE_DEVICE)
 @Composable
 fun LightLandscapeTestDialogPreview() {
     Preview(darkTheme = false) {

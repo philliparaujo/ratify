@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
-import com.example.ratify.ui.screens.landscapeDevice
 
 @Composable
 fun BinarySetting(
@@ -105,7 +105,7 @@ fun LightBinarySettingsPreview() {
 
 @Preview(
     name = "Dark Landscape BinarySettings",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapeBinarySettingsPreview() {
@@ -131,7 +131,7 @@ fun DarkLandscapeBinarySettingsPreview() {
 
 @Preview(
     name = "Light Landscape BinarySettings",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapeBinarySettings() {

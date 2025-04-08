@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.Rating
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -310,10 +311,9 @@ fun LightPlayerScreenPreview() {
     }
 }
 
-const val landscapeDevice = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
 @Preview(
     name = "Dark Landscape Login Screen",
-    device = landscapeDevice  // A hack to force landscape render of previews
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapeLoginScreenPreview() {
@@ -324,7 +324,7 @@ fun DarkLandscapeLoginScreenPreview() {
 
 @Preview(
     name = "Light Landscape Login Screen",
-    device = landscapeDevice  // A hack to force landscape render of previews
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapeLoginScreenPreview() {
@@ -335,7 +335,7 @@ fun LightLandscapeLoginScreenPreview() {
 
 @Preview(
     name = "Dark Landscape Player Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun DarkLandscapePlayerScreenPreview() {
@@ -346,7 +346,7 @@ fun DarkLandscapePlayerScreenPreview() {
 
 @Preview(
     name = "Light Landscape Player Screen",
-    device = landscapeDevice
+    device = LANDSCAPE_DEVICE
 )
 @Composable
 fun LightLandscapePlayerScreenPreview() {
