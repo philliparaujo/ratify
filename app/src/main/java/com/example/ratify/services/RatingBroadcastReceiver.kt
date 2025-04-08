@@ -7,6 +7,8 @@ import android.content.Intent
 import android.util.Log
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.core.model.Rating
+import com.example.ratify.spotify.SpotifyViewModel
+import org.koin.core.context.GlobalContext
 
 class RatingBroadcastReceiver : BroadcastReceiver() {
     // Triggers on button click within notification
@@ -26,7 +28,9 @@ class RatingBroadcastReceiver : BroadcastReceiver() {
         }
 
         // Update UI and database ratings
-        val spotifyViewModel = (context.applicationContext as ServiceApp).spotifyViewModel
+//        val spotifyViewModel = (context.applicationContext as ServiceApp).spotifyViewModel
+        val koin = GlobalContext.get()
+        val spotifyViewModel = koin.get<SpotifyViewModel>()
         val playerState = spotifyViewModel.playerState.value
         spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(Rating.from(buttonValue)))
         spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(

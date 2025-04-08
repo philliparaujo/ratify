@@ -13,7 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.core.model.PrimaryColor
+import androidx.navigation.compose.rememberNavController
+import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.Preview
+import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
@@ -24,19 +27,20 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsScreen(
-    spotifyViewModel: SpotifyViewModel?,
-    onExportClick: () -> Unit,
-    onImportClick: () -> Unit
+    onExportClick: () -> Unit = {},
+    onImportClick: () -> Unit = {}
 ) {
-    val settings = spotifyViewModel?.settings
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+
+    val settings = spotifyViewModel.settings
     val scope = rememberCoroutineScope()
 
-    val autoSignIn = settings?.autoSignIn?.collectAsState(false)
-    val skipOnRate = settings?.skipOnRate?.collectAsState(false)
-    val queueSkip = settings?.queueSkip?.collectAsState(false)
-    val libraryImageUri = settings?.libraryImageUri?.collectAsState(true)
-    val darkTheme = settings?.darkTheme?.collectAsState(true)
-    val themeColor = settings?.themeColor?.collectAsState(0)
+    val autoSignIn = settings.autoSignIn.collectAsState(false)
+    val skipOnRate = settings.skipOnRate.collectAsState(false)
+    val queueSkip = settings.queueSkip.collectAsState(false)
+    val libraryImageUri = settings.libraryImageUri.collectAsState(true)
+    val darkTheme = settings.darkTheme.collectAsState(true)
+    val themeColor = settings.themeColor.collectAsState(0)
 
     Box(
         modifier = Modifier
@@ -62,20 +66,20 @@ fun SettingsScreen(
             MySwitch(
                 leftText = "Light Theme",
                 rightText = "Dark Theme",
-                checked = darkTheme?.value ?: true,
+                checked = darkTheme.value,
                 onCheckedChange = { newState ->
                     scope.launch {
-                        settings?.setDarkTheme(newState)
+                        settings.setDarkTheme(newState)
                     }
                 },
                 modifier = Modifier.padding(start = 16.dp)
             )
 
             ThemeSelector(
-                currentTheme = themeColor?.value ?: PrimaryColor.DEFAULT.ordinal,
+                currentTheme = themeColor.value,
                 onThemeSelected = { newTheme ->
                     scope.launch {
-                        settings?.setThemeColor(newTheme)
+                        settings.setThemeColor(newTheme)
                     }
                 },
                 modifier = Modifier.padding(start = 14.dp, top = 12.dp, bottom = 12.dp)
@@ -83,37 +87,37 @@ fun SettingsScreen(
 
             BinarySetting(
                 displayText = "Keep me signed in (to Spotify)",
-                state = autoSignIn?.value ?: false,
+                state = autoSignIn.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings?.setAutoSignIn(newState)
+                        settings.setAutoSignIn(newState)
                     }
                 }
             )
             BinarySetting(
                 displayText = "Automatically skip to next on song rate",
-                state = skipOnRate?.value ?: false,
+                state = skipOnRate.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings?.setSkipOnRate(newState)
+                        settings.setSkipOnRate(newState)
                     }
                 }
             )
             BinarySetting(
                 displayText = "Set play button to queue + skip",
-                state = queueSkip?.value ?: false,
+                state = queueSkip.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings?.setQueueSkip(newState)
+                        settings.setQueueSkip(newState)
                     }
                 }
             )
             BinarySetting(
                 displayText = "Show song images in Library",
-                state = libraryImageUri?.value ?: true,
+                state = libraryImageUri.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings?.setLibraryImageUri(newState)
+                        settings.setLibraryImageUri(newState)
                     }
                 }
             )
@@ -124,28 +128,16 @@ fun SettingsScreen(
 @Preview(name = "Dark Settings Screen")
 @Composable
 fun DarkSettingsScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        SettingsScreen(
-            spotifyViewModel = null,
-            onExportClick = { },
-            onImportClick = { }
-        )
+    Preview(darkTheme = true) {
+        SettingsScreen()
     }
 }
 
 @Preview(name = "Light Settings Screen")
 @Composable
 fun LightSettingsScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        SettingsScreen(
-            spotifyViewModel = null,
-            onExportClick = { },
-            onImportClick = { }
-        )
+    Preview(darkTheme = false) {
+        SettingsScreen()
     }
 }
 
@@ -155,14 +147,8 @@ fun LightSettingsScreenPreview() {
 )
 @Composable
 fun DarkLandscapeSettingsScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        SettingsScreen(
-            spotifyViewModel = null,
-            onExportClick = { },
-            onImportClick = { }
-        )
+    Preview(darkTheme = true) {
+        SettingsScreen()
     }
 }
 
@@ -172,14 +158,8 @@ fun DarkLandscapeSettingsScreenPreview() {
 )
 @Composable
 fun LightLandscapeSettingsScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        SettingsScreen(
-            spotifyViewModel = null,
-            onExportClick = { },
-            onImportClick = { }
-        )
+    Preview(darkTheme = false) {
+        SettingsScreen()
     }
 }
 

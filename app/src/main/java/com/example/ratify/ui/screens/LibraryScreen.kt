@@ -19,8 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -31,17 +29,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.ratify.services.updateRatingService
-import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.core.state.LibraryState
+import com.example.ratify.core.model.LibrarySortType
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.model.SearchType
+import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Song
-import com.example.ratify.core.model.LibrarySortType
-import com.example.ratify.ui.components.SongDialog
+import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.Preview
+import com.example.ratify.services.updateRatingService
+import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
+import com.example.ratify.ui.components.SongDialog
 import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
@@ -50,19 +50,20 @@ import com.example.ratify.ui.theme.RatifyTheme
 
 @Composable
 fun LibraryScreen(
-    spotifyViewModel: SpotifyViewModel?,
     navController: NavController
 ) {
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+
     // Current states (UI and Spotify Player)
-    val libraryState = spotifyViewModel?.libraryState?.collectAsState(initial = LibraryState())?.value ?: LibraryState()
-    val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
+    val libraryState = spotifyViewModel.libraryState.collectAsState(initial = LibraryState()).value
+    val playerState by spotifyViewModel.playerState.collectAsState()
 
     // Active search/sort options
     val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
     val librarySortTypes = listOf(LibrarySortType.RATING, LibrarySortType.LAST_PLAYED_TS, LibrarySortType.LAST_RATED_TS, LibrarySortType.TIMES_PLAYED, LibrarySortType.NAME)
 
     // Player enabled logic
-    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
+    val userCapabilities = spotifyViewModel.userCapabilities.observeAsState().value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
     // Orientation logic
@@ -78,16 +79,16 @@ fun LibraryScreen(
     val isScreenActive = isRouteOnTarget(currentRoute, LibraryNavigationTarget)
 
     // Settings variables
-    val settings = spotifyViewModel?.settings
-    val showImageUri = settings?.libraryImageUri?.collectAsState(true)
-    val queueSkip = settings?.queueSkip?.collectAsState(false)
+    val settings = spotifyViewModel.settings
+    val showImageUri = settings.libraryImageUri.collectAsState(true)
+    val queueSkip = settings.queueSkip.collectAsState(false)
     fun realPlay(song: Song) {
-        if (queueSkip?.value == true) {
+        if (queueSkip.value) {
             spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
             Thread.sleep(1000)
             spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
         } else {
-            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
+            spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
         }
     }
 
@@ -110,7 +111,7 @@ fun LibraryScreen(
         ) { }
         SongDialog(
             onDismissRequest = {
-                spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibraryDialog(null))
+                spotifyViewModel.onEvent(SpotifyEvent.UpdateLibraryDialog(null))
             },
             song = song,
             onRatingSelect = { rating ->
@@ -118,11 +119,11 @@ fun LibraryScreen(
                 val ratingValue = Rating.from(rating)
 
                 if (playerState?.track?.uri == song.uri) {
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
                     context.updateRatingService(ratingValue)
                 }
                 // Update rating in database
-                spotifyViewModel?.onEvent(
+                spotifyViewModel.onEvent(
                     SpotifyEvent.UpdateRating(
                         name = song.name,
                         artists = song.artists,
@@ -133,10 +134,10 @@ fun LibraryScreen(
             },
             onPlay = { realPlay(song) },
             onDisabledPlay = {
-                spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
             },
             onDelete = {
-                spotifyViewModel?.onEvent(SpotifyEvent.DeleteSong(song))
+                spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(song))
             },
             playEnabled = playerEnabled,
             deleteEnabled = true
@@ -154,23 +155,23 @@ fun LibraryScreen(
                 SongItem(
                     song = song,
                     onClick = {
-                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibraryDialog(song))
+                        if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.UpdateLibraryDialog(song))
                     },
                     onLongClick = {
                         if (isScreenActive) {
                             if (playerEnabled) {
-                                spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+                                spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
                             } else {
-                                spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                                spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                             }
                         }
                     },
                     onPlay = { if (isScreenActive) realPlay(song) },
                     onDisabledPlay = {
-                        if (isScreenActive) spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                        if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                     },
                     playEnabled = playerEnabled,
-                    showImageUri = showImageUri?.value ?: true
+                    showImageUri = showImageUri.value
                 )
             }
         }
@@ -185,7 +186,7 @@ fun LibraryScreen(
         ) {
             Search(
                 query = libraryState.searchQuery,
-                onQueryChange = { spotifyViewModel?.onSearchTextChange(it) },
+                onQueryChange = { spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchText(it)) },
                 placeholderText = "Search",
                 trailingIcon = Icons.Default.MoreVert,
                 dropdownLabels = listOf(
@@ -193,8 +194,8 @@ fun LibraryScreen(
                     "Delete unrated songs"
                 ),
                 dropdownOptionOnClick = listOf(
-                    { spotifyViewModel?.onEvent(SpotifyEvent.UpdateVisualizerShowing(!libraryState.visualizerShowing)) },
-                    { spotifyViewModel?.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
+                    { spotifyViewModel.onEvent(SpotifyEvent.UpdateVisualizerShowing(!libraryState.visualizerShowing)) },
+                    { spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
                         playerState?.track?.name ?: "",
                         playerState?.track?.artists ?: listOf())) }
                 ),
@@ -205,7 +206,7 @@ fun LibraryScreen(
             DropdownSelect(
                 options = searchTypes,
                 selectedOption = libraryState.searchType,
-                onSelect = { searchType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
+                onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
                 label = "Search by",
                 modifier = Modifier.wrapContentWidth()
             )
@@ -244,7 +245,7 @@ fun LibraryScreen(
             DropdownSelect(
                 options = librarySortTypes,
                 selectedOption = libraryState.librarySortType,
-                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateLibrarySortType(sortType)) },
+                onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateLibrarySortType(sortType)) },
                 label = "Sort by",
                 large = true
             )
@@ -295,11 +296,8 @@ fun LibraryScreen(
 @Preview(name = "Dark Library Screen")
 @Composable
 fun DarkLibraryScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         LibraryScreen(
-            spotifyViewModel = null,
             navController = rememberNavController()
         )
     }
@@ -308,11 +306,8 @@ fun DarkLibraryScreenPreview() {
 @Preview(name = "Light Library Screen")
 @Composable
 fun LightLibraryScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
+    Preview(darkTheme = false) {
         LibraryScreen(
-            spotifyViewModel = null,
             navController = rememberNavController()
         )
     }
@@ -324,11 +319,8 @@ fun LightLibraryScreenPreview() {
 )
 @Composable
 fun DarkLandscapeLibraryScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = true) {
         LibraryScreen(
-            spotifyViewModel = null,
             navController = rememberNavController()
         )
     }
@@ -340,11 +332,8 @@ fun DarkLandscapeLibraryScreenPreview() {
 )
 @Composable
 fun LightLandscapeLibraryScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
+    Preview(darkTheme = false) {
         LibraryScreen(
-            spotifyViewModel = null,
             navController = rememberNavController()
         )
     }

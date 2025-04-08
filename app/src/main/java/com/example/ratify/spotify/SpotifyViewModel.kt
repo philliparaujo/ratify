@@ -11,18 +11,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
-import com.example.ratify.services.updateRatingService
-import com.example.ratify.settings.SettingsManager
 import com.example.ratify.core.model.FavoritesSortType
-import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.model.GroupType
-import com.example.ratify.database.GroupedSong
 import com.example.ratify.core.model.LibrarySortType
-import com.example.ratify.core.state.LibraryState
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.model.SearchType
+import com.example.ratify.core.state.FavoritesState
+import com.example.ratify.core.state.LibraryState
+import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.example.ratify.database.SongDao
+import com.example.ratify.services.updateRatingService
+import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -49,8 +49,8 @@ import kotlinx.coroutines.launch
 class SpotifyViewModel(
     application: Application,
     private val dao: SongDao,
-    private val settingsManager: SettingsManager
-): AndroidViewModel(application) {
+    private val settingsManager: ISettingsManager
+): AndroidViewModel(application), ISpotifyViewModel {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
     private val redirectUri: String by lazy { BuildConfig.SPOTIFY_REDIRECT_URI }
@@ -65,15 +65,15 @@ class SpotifyViewModel(
 
     // Saves request to launch authentication, done in MainActivity
     private val _authRequest = MutableLiveData<AuthorizationRequest>()
-    val authRequest = _authRequest
+    override val authRequest = _authRequest
 
     // Answers "is the user connected?"
     private val _spotifyConnectionState = MutableLiveData<Boolean>()
-    val spotifyConnectionState: LiveData<Boolean> get() = _spotifyConnectionState
+    override val spotifyConnectionState: LiveData<Boolean> get() = _spotifyConnectionState
 
     // Provides information on whether the user can play on demand
     private val _userCapabilities = MutableLiveData<Capabilities>()
-    val userCapabilities: LiveData<Capabilities> get() = _userCapabilities
+    override val userCapabilities: LiveData<Capabilities> get() = _userCapabilities
     private var isSubscribedToUserCapabilities = false
     private fun subscribeToUserCapabilities() {
         if (spotifyAppRemote != null && !isSubscribedToUserCapabilities) {
@@ -89,7 +89,7 @@ class SpotifyViewModel(
 
     // Provides information on current track, playing/paused, playback position, etc.
     private val _playerState = MutableStateFlow<PlayerState?>(null)
-    val playerState: StateFlow<PlayerState?> get() = _playerState
+    override val playerState: StateFlow<PlayerState?> get() = _playerState
     private var isSubscribedToPlayerState = false
     private fun subscribeToPlayerState() {
         if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
@@ -150,7 +150,7 @@ class SpotifyViewModel(
 
     // Provides information on live playback position by incrementing a timer on song being played
     private val _currentPlaybackPosition = MutableLiveData<Long>()
-    val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
+    override val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
     private var playbackJob: Job? = null
     private fun startUpdatingPlaybackPosition(initialPosition: Long) {
         stopUpdatingPlaybackPosition() // Stop any existing jobs
@@ -187,7 +187,7 @@ class SpotifyViewModel(
         playbackJob = null
     }
 
-    fun syncPlaybackPositionNow() {
+    override fun syncPlaybackPositionNow() {
         viewModelScope.launch(Dispatchers.IO) {
             val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
             syncedPosition?.let {
@@ -197,8 +197,8 @@ class SpotifyViewModel(
     }
 
     // Keeps Snackbars active across any UI changes / screen rotations
-    val snackbarHostState = SnackbarHostState()
-    fun showSnackbar(message: String, action: SnackbarAction? = null) {
+    override val snackbarHostState = SnackbarHostState()
+    override fun showSnackbar(message: String, action: SnackbarAction?) {
         snackbarHostState.currentSnackbarData?.dismiss()
 
         viewModelScope.launch {
@@ -214,8 +214,8 @@ class SpotifyViewModel(
         }
     }
 
-    // Settings
-    val settings = settingsManager
+    // Handles management of settings preferences
+    override val settings = settingsManager
 
     // Database variables
     private val _searchType = MutableStateFlow(SearchType.NAME)
@@ -243,7 +243,7 @@ class SpotifyViewModel(
 
     // Individual screen states
     private val _libraryState = MutableStateFlow(LibraryState())
-    val libraryState = combine(
+    override val libraryState = combine(
         listOf(_libraryState, _searchType, _librarySortType, _libraryDialog, _visualizerShowing, _librarySongs, _searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as LibraryState
@@ -265,7 +265,7 @@ class SpotifyViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryState())
 
     private val _musicState = MutableStateFlow(MusicState())
-    val musicState = combine(
+    override val musicState = combine(
         listOf(_musicState, _rating)
     ) { flows: Array<Any?> ->
         val state = flows[0] as MusicState
@@ -277,7 +277,7 @@ class SpotifyViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MusicState())
 
     private val _favoritesState = MutableStateFlow(FavoritesState())
-    val favoritesState = combine(
+    override val favoritesState = combine(
         listOf(_favoritesState, _favoritesSongs, _groupType, _favoritesSortType, _favoritesDialog, _minEntriesThreshold)
     ) { flows: Array<Any?> ->
         val state = flows[0] as FavoritesState
@@ -296,11 +296,7 @@ class SpotifyViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FavoritesState())
 
-    fun onSearchTextChange(text: String) {
-        _searchQuery.value = text
-    }
-
-    fun onEvent(event: SpotifyEvent) {
+    override fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
             is SpotifyEvent.ConnectSpotify -> connectSpotifyAppRemote()
@@ -318,6 +314,9 @@ class SpotifyViewModel(
 
             is SpotifyEvent.UpdateSearchType -> {
                 _searchType.value = event.searchType
+            }
+            is SpotifyEvent.UpdateSearchText -> {
+                _searchQuery.value = event.text
             }
             is SpotifyEvent.UpdateLibrarySortType -> {
                 // If reselect same sort type, flip sort ascending
@@ -529,7 +528,7 @@ class SpotifyViewModel(
         }
     }
 
-    fun getSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>> {
+    override fun getSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>> {
         return when (groupType) {
             GroupType.ALBUM -> dao.getSongsByAlbum(Album(groupName, uri))
             GroupType.ARTIST -> dao.getSongsByArtist(Artist(groupName, uri))

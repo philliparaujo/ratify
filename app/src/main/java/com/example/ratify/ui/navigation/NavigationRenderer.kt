@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BottomNavBar
 import com.example.ratify.ui.components.LeftNavDrawer
@@ -41,7 +42,7 @@ fun NavigationRenderer(
     navController: NavHostController,
     startNavigationTarget: NavigationTarget,
     navigationTargets: List<NavigationTarget>,
-    spotifyViewModel: SpotifyViewModel,
+    spotifyViewModel: ISpotifyViewModel,
     onExportClick: () -> Unit,
     onImportClick: () -> Unit
 ) {
@@ -66,7 +67,6 @@ fun NavigationRenderer(
             navController,
             startNavigationTarget,
             modifier = Modifier.padding(innerPadding),
-            spotifyViewModel,
             onExportClick = onExportClick,
             onImportClick = onImportClick
         )

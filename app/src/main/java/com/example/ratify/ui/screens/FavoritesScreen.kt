@@ -32,13 +32,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.core.model.FavoritesSortType
-import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.model.GroupType
+import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
+import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.Preview
+import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
@@ -46,18 +48,17 @@ import com.example.ratify.ui.components.GroupedSongDialog
 import com.example.ratify.ui.components.MySlider
 import com.example.ratify.ui.components.MySwitch
 import com.example.ratify.ui.components.spotifyUriToImageUrl
-import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
 @Composable
-fun FavoritesScreen(
-    spotifyViewModel: SpotifyViewModel?
-) {
-    val favoritesState = spotifyViewModel?.favoritesState?.collectAsState(initial = FavoritesState())?.value ?: FavoritesState()
+fun FavoritesScreen() {
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+
+    val favoritesState = spotifyViewModel.favoritesState.collectAsState(initial = FavoritesState()).value
 
     // Player enabled logic
-    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()?.value
+    val userCapabilities = spotifyViewModel.userCapabilities.observeAsState().value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
     // Fetching songs for dialog based on selected group and group type
@@ -70,7 +71,7 @@ fun FavoritesScreen(
             GroupType.ARTIST -> dialog?.artist?.name to dialog?.artist?.uri
         }
 
-        groupName?.let { spotifyViewModel?.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
+        groupName?.let { spotifyViewModel.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
 
     // Sort button options
@@ -95,16 +96,16 @@ fun FavoritesScreen(
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
-    val settings = spotifyViewModel?.settings
-    val showImageUri = settings?.libraryImageUri?.collectAsState(true)
-    val queueSkip = settings?.queueSkip?.collectAsState(false)
+    val settings = spotifyViewModel.settings
+    val showImageUri = settings.libraryImageUri.collectAsState(true)
+    val queueSkip = settings.queueSkip.collectAsState(false)
     fun realPlay(song: Song) {
-        if (queueSkip?.value == true) {
+        if (queueSkip.value) {
             spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
             Thread.sleep(1000)
             spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
         } else {
-            spotifyViewModel?.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
+            spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
         }
     }
 
@@ -121,14 +122,14 @@ fun FavoritesScreen(
                 checked = favoritesState.groupType == GroupType.ALBUM,
                 onCheckedChange = { newState ->
                     val newGroupType = if (newState) GroupType.ALBUM else GroupType.ARTIST
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateGroupType(newGroupType))
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateGroupType(newGroupType))
                 }
             )
 
             DropdownSelect(
                 options = favoritesSortTypes,
                 selectedOption = favoritesState.favoritesSortType,
-                onSelect = { sortType -> spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
+                onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
                 label = "Sort by",
                 large = true
             )
@@ -168,7 +169,7 @@ fun FavoritesScreen(
                 onValueChangeFinished = { newValue ->
                     val newInt = newValue.toFloat().roundToInt()
                     currentSliderValue = newInt.toLong()
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateMinEntriesThreshold(newInt))
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateMinEntriesThreshold(newInt))
                 },
             )
 
@@ -200,7 +201,7 @@ fun FavoritesScreen(
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
                                         imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
+                                        onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
                                     )
                                 }
                                 GroupType.ALBUM -> {
@@ -210,7 +211,7 @@ fun FavoritesScreen(
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
                                         imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
+                                        onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
                                     )
                                 }
                             }
@@ -238,19 +239,19 @@ fun FavoritesScreen(
             groupType = groupType,
             songs = songs,
             onDismissRequest = {
-                spotifyViewModel?.onEvent(SpotifyEvent.UpdateFavoritesDialog(null))
+                spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(null))
             },
             playEnabled = playerEnabled,
-            showImageUri = showImageUri?.value ?: false,
+            showImageUri = showImageUri.value,
             onLongClick = { song ->
                 if (playerEnabled) {
-                    spotifyViewModel?.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+                    spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
                 } else {
-                    spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                    spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                 }
             },
             onPlay = { song -> realPlay(song) },
-            onDisabledPlay = { spotifyViewModel?.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)}
+            onDisabledPlay = { spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)}
         )
     }
 
@@ -291,24 +292,16 @@ fun FavoritesScreen(
 @Preview(name = "Dark Favorites Screen")
 @Composable
 fun DarkFavoritesScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        FavoritesScreen(
-            spotifyViewModel = null,
-        )
+    Preview(darkTheme = true) {
+        FavoritesScreen()
     }
 }
 
 @Preview(name = "Light Favorites Screen")
 @Composable
 fun LightFavoritesScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        FavoritesScreen(
-            spotifyViewModel = null,
-        )
+    Preview(darkTheme = false) {
+        FavoritesScreen()
     }
 }
 
@@ -318,12 +311,8 @@ fun LightFavoritesScreenPreview() {
 )
 @Composable
 fun DarkLandscapeFavoritesScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        FavoritesScreen(
-            spotifyViewModel = null,
-        )
+    Preview(darkTheme = true) {
+        FavoritesScreen()
     }
 }
 
@@ -333,11 +322,7 @@ fun DarkLandscapeFavoritesScreenPreview() {
 )
 @Composable
 fun LightLandscapeFavoritesScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        FavoritesScreen(
-            spotifyViewModel = null,
-        )
+    Preview(darkTheme = false) {
+        FavoritesScreen()
     }
 }

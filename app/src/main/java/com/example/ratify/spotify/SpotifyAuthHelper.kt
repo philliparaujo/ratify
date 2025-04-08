@@ -10,7 +10,7 @@ import com.spotify.sdk.android.auth.AuthorizationResponse
 
 class SpotifyAuthHelper(
     private val activity: ComponentActivity,
-    private val spotifyViewModel: SpotifyViewModel
+    private val spotifyViewModel: ISpotifyViewModel
 ) {
     private val authLauncher =
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

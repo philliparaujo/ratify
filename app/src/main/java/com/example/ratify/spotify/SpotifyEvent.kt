@@ -30,6 +30,8 @@ sealed interface SpotifyEvent {
 
     // State updates
     data class UpdateSearchType(val searchType: SearchType): SpotifyEvent
+    data class UpdateSearchText(val text: String): SpotifyEvent
+
     data class UpdateLibrarySortType(val librarySortType: LibrarySortType): SpotifyEvent
     data class UpdateFavoritesSortType(val favoritesSortType: FavoritesSortType): SpotifyEvent
     data class UpdateGroupType(val groupType: GroupType): SpotifyEvent

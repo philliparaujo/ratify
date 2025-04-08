@@ -2,7 +2,6 @@ package com.example.ratify.ui.screens
 
 import MusicState
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,10 +29,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.services.updateRatingService
-import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.core.model.Rating
+import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.mocks.Preview
+import com.example.ratify.services.updateRatingService
+import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
@@ -42,35 +43,29 @@ import com.example.ratify.ui.components.SongDisplay
 import com.example.ratify.ui.components.StarRow
 import com.example.ratify.ui.components.getArtistsString
 import com.example.ratify.ui.components.spotifyUriToImageUrl
-import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @Composable
-fun MusicScreen(
-    spotifyViewModel: SpotifyViewModel,
-) {
+fun MusicScreen() {
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val spotifyConnectionState by spotifyViewModel.spotifyConnectionState.observeAsState()
     val connected = spotifyConnectionState == true
 
     if (!connected) {
-        LoginScreen(
-            spotifyViewModel
-        )
+        LoginScreen()
     } else {
-        PlayerScreen(
-            spotifyViewModel
-        )
+        PlayerScreen()
     }
 }
 
 @Composable
-fun LoginScreen(
-    spotifyViewModel: SpotifyViewModel?
-) {
-    val settings = spotifyViewModel?.settings
+fun LoginScreen() {
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+
+    val settings = spotifyViewModel.settings
     val scope = rememberCoroutineScope()
-    val autoSignIn = settings?.autoSignIn?.collectAsState(initial = false)
+    val autoSignIn = settings.autoSignIn.collectAsState(initial = false)
 
     Box(
         modifier = Modifier
@@ -85,17 +80,17 @@ fun LoginScreen(
             MyButton(
                 enabled = true,
                 onClick = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                    spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
                 },
                 text = "Connect to Spotify",
                 large = true,
             )
             BinarySetting(
                 displayText = "Keep me signed in",
-                state = autoSignIn?.value ?: false,
+                state = autoSignIn.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings?.setAutoSignIn(newState)
+                        settings.setAutoSignIn(newState)
                     }
                 }
             )
@@ -104,23 +99,23 @@ fun LoginScreen(
 }
 
 @Composable
-fun PlayerScreen(
-    spotifyViewModel: SpotifyViewModel?
-) {
+fun PlayerScreen() {
+    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+
     // Player state
-    val userCapabilities = spotifyViewModel?.userCapabilities?.observeAsState()
-    val playerState by spotifyViewModel?.playerState?.collectAsState() ?: remember { mutableStateOf(null) }
-    val currentPlaybackPosition = spotifyViewModel?.currentPlaybackPosition?.observeAsState()
-    val playerEnabled = userCapabilities?.value != null && userCapabilities.value!!.canPlayOnDemand
-    val musicState = spotifyViewModel?.musicState?.collectAsState(initial = MusicState())?.value ?: MusicState()
+    val userCapabilities = spotifyViewModel.userCapabilities.observeAsState()
+    val playerState by spotifyViewModel.playerState.collectAsState()
+    val currentPlaybackPosition = spotifyViewModel.currentPlaybackPosition.observeAsState()
+    val playerEnabled = userCapabilities.value != null && userCapabilities.value!!.canPlayOnDemand
+    val musicState = spotifyViewModel.musicState.collectAsState(initial = MusicState()).value
 
     // Orientation logic
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
-    val settings = spotifyViewModel?.settings
-    val skipOnRate = settings?.skipOnRate?.collectAsState(initial = false)
+    val settings = spotifyViewModel.settings
+    val skipOnRate = settings.skipOnRate.collectAsState(initial = false)
 
     @Composable
     fun RenderSongDisplay() {
@@ -142,9 +137,9 @@ fun PlayerScreen(
         var userDragging by remember { mutableStateOf(false) }
         var dragPositionMs by remember { mutableLongStateOf(0L) }
 
-        LaunchedEffect(userDragging, dragPositionMs, currentPlaybackPosition?.value) {
+        LaunchedEffect(userDragging, dragPositionMs, currentPlaybackPosition.value) {
             if (userDragging) {
-                val actualPosition = currentPlaybackPosition?.value ?: 0L
+                val actualPosition = currentPlaybackPosition.value ?: 0L
                 if (abs(dragPositionMs - actualPosition) < 1000) {
                     userDragging = false
                 }
@@ -155,7 +150,7 @@ fun PlayerScreen(
             PlaybackPosition(
                 currentPositionMs = if (userDragging) dragPositionMs else {
                     if (playerState!!.isPaused) playerState!!.playbackPosition
-                    else currentPlaybackPosition?.value
+                    else currentPlaybackPosition.value
                 } ?: 0,
                 totalDurationMs = playerState!!.track.duration,
                 onValueChanging = {
@@ -163,8 +158,7 @@ fun PlayerScreen(
                     userDragging = true
                 },
                 onValueChangeFinished = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.SeekTo(it))
-                    Log.d("Slider", "pp finalvalue: ${it.toString()}, pp dragpos: ${dragPositionMs.toString()}, pp playbackpos (old): ${playerState!!.playbackPosition.toString()}, pp duration: ${playerState!!.track.duration}")
+                    spotifyViewModel.onEvent(SpotifyEvent.SeekTo(it))
                 }
             )
         } else {
@@ -178,7 +172,7 @@ fun PlayerScreen(
             MyIconButton(
                 enabled = playerEnabled,
                 onClick = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.SkipPrevious)
+                    spotifyViewModel.onEvent(SpotifyEvent.SkipPrevious)
                 },
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_previous_24)
             )
@@ -187,9 +181,9 @@ fun PlayerScreen(
                 onClick = {
                     if (playerState != null) {
                         if (playerState!!.isPaused) {
-                            spotifyViewModel?.onEvent(SpotifyEvent.Resume)
+                            spotifyViewModel.onEvent(SpotifyEvent.Resume)
                         } else {
-                            spotifyViewModel?.onEvent(SpotifyEvent.Pause)
+                            spotifyViewModel.onEvent(SpotifyEvent.Pause)
                         }
                     }
                 },
@@ -201,7 +195,7 @@ fun PlayerScreen(
             MyIconButton(
                 enabled = playerEnabled,
                 onClick = {
-                    spotifyViewModel?.onEvent(SpotifyEvent.SkipNext)
+                    spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
                 },
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_next_24)
             )
@@ -213,20 +207,20 @@ fun PlayerScreen(
                 if (playerEnabled) {
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
 
                     // Update current rating notification service
                     context.updateRatingService(ratingValue)
 
                     // Update rating in database
-                    spotifyViewModel?.onEvent(SpotifyEvent.UpdateRating(
+                    spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
                         name = playerState!!.track.name,
                         artists = playerState!!.track.artists,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     ))
 
-                    if (skipOnRate?.value == true) {
+                    if (skipOnRate.value) {
                         spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
                     }
                 }
@@ -287,48 +281,32 @@ fun PlayerScreen(
 @Preview(name = "Dark Login Screen")
 @Composable
 fun DarkLoginScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        LoginScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = true) {
+        LoginScreen()
     }
 }
 
 @Preview(name = "Light Login Screen")
 @Composable
 fun LightLoginScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        LoginScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = false) {
+        LoginScreen()
     }
 }
 
 @Preview(name = "Dark Player Screen")
 @Composable
 fun DarkPlayerScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        PlayerScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = true) {
+        PlayerScreen()
     }
 }
 
 @Preview(name = "Light Player Screen")
 @Composable
 fun LightPlayerScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        PlayerScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = false) {
+        PlayerScreen()
     }
 }
 
@@ -339,12 +317,8 @@ const val landscapeDevice = "spec:width=411dp,height=891dp,dpi=420,isRound=false
 )
 @Composable
 fun DarkLandscapeLoginScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        LoginScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = true) {
+        LoginScreen()
     }
 }
 
@@ -354,12 +328,8 @@ fun DarkLandscapeLoginScreenPreview() {
 )
 @Composable
 fun LightLandscapeLoginScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        LoginScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = false) {
+        LoginScreen()
     }
 }
 
@@ -369,12 +339,8 @@ fun LightLandscapeLoginScreenPreview() {
 )
 @Composable
 fun DarkLandscapePlayerScreenPreview() {
-    RatifyTheme(
-        darkTheme = true
-    ) {
-        PlayerScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = true) {
+        PlayerScreen()
     }
 }
 
@@ -384,11 +350,7 @@ fun DarkLandscapePlayerScreenPreview() {
 )
 @Composable
 fun LightLandscapePlayerScreenPreview() {
-    RatifyTheme(
-        darkTheme = false
-    ) {
-        PlayerScreen(
-            spotifyViewModel = null
-        )
+    Preview(darkTheme = false) {
+        PlayerScreen()
     }
 }

@@ -98,4 +98,9 @@ dependencies {
 
     // Settings
     implementation(libs.androidx.datastore.preferences)
+
+    // Dependency Injection
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.core)
 }
