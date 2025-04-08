@@ -1,5 +1,6 @@
 package com.example.ratify.ui.screens
 
+import SongRepository
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
+import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
@@ -55,6 +57,7 @@ import kotlin.math.roundToInt
 @Composable
 fun FavoritesScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+    val songRepository: SongRepository = LocalSongRepository.current
 
     val favoritesState = spotifyViewModel.favoritesState.collectAsState(initial = FavoritesState()).value
 
@@ -72,7 +75,7 @@ fun FavoritesScreen() {
             GroupType.ARTIST -> dialog?.artist?.name to dialog?.artist?.uri
         }
 
-        groupName?.let { spotifyViewModel.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
+        groupName?.let { songRepository.GetSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
 
     // Sort button options

@@ -1,5 +1,6 @@
 package com.example.ratify.ui.screens
 
+import SongRepository
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -34,12 +36,15 @@ import com.example.ratify.core.model.Rating
 import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Song
+import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
+import com.example.ratify.spotify.StateRepository
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongDialog
@@ -47,12 +52,15 @@ import com.example.ratify.ui.components.SongItem
 import com.example.ratify.ui.components.Visualizer
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.isRouteOnTarget
+import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryScreen(
     navController: NavController
 ) {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+    val songRepository: SongRepository = LocalSongRepository.current
+    val stateRepository: StateRepository = LocalStateRepository.current
 
     // Current states (UI and Spotify Player)
     val libraryState = spotifyViewModel.libraryState.collectAsState(initial = LibraryState()).value
@@ -105,6 +113,7 @@ fun LibraryScreen(
     @Composable
     fun RenderCurrentSongDialog(song: Song) {
         val context = LocalContext.current
+        val scope = rememberCoroutineScope()
 
         AnimatedVisibility(
                 visible = true,
@@ -119,25 +128,28 @@ fun LibraryScreen(
                 val ratingValue = Rating.from(rating)
 
                 if (playerState?.track?.uri == song.uri) {
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    stateRepository.updateCurrentRating(ratingValue)
+//                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
                     context.updateRatingService(ratingValue)
                 }
                 // Update rating in database
-                spotifyViewModel.onEvent(
-                    SpotifyEvent.UpdateRating(
+                scope.launch {
+                    songRepository.UpdateRating(
                         name = song.name,
                         artists = song.artists,
                         rating = ratingValue,
                         lastRatedTs = System.currentTimeMillis()
                     )
-                )
+                }
             },
             onPlay = { realPlay(song) },
             onDisabledPlay = {
                 spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
             },
             onDelete = {
-                spotifyViewModel.onEvent(SpotifyEvent.DeleteSong(song))
+                scope.launch {
+                    songRepository.DeleteSong(song)
+                }
             },
             playEnabled = playerEnabled,
             deleteEnabled = true
@@ -179,6 +191,8 @@ fun LibraryScreen(
 
     @Composable
     fun RenderSearch() {
+        val scope = rememberCoroutineScope()
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom,
@@ -195,9 +209,12 @@ fun LibraryScreen(
                 ),
                 dropdownOptionOnClick = listOf(
                     { spotifyViewModel.onEvent(SpotifyEvent.UpdateVisualizerShowing(!libraryState.visualizerShowing)) },
-                    { spotifyViewModel.onEvent(SpotifyEvent.DeleteSongsWithNullRating(
-                        playerState?.track?.name ?: "",
-                        playerState?.track?.artists ?: listOf())) }
+                    { scope.launch {
+                        songRepository.DeleteSongsWithNullRating(
+                            playerState?.track?.name ?: "",
+                            playerState?.track?.artists ?: listOf()
+                        )
+                    } }
                 ),
                 modifier = Modifier.weight(1f)
             )

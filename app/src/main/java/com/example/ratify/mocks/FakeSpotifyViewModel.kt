@@ -4,10 +4,8 @@ import MusicState
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.state.LibraryState
-import com.example.ratify.database.Song
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
@@ -15,10 +13,8 @@ import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 
 class FakeSpotifyViewModel: ISpotifyViewModel {
     override val authRequest: LiveData<AuthorizationRequest>
@@ -52,13 +48,5 @@ class FakeSpotifyViewModel: ISpotifyViewModel {
 
     override fun syncPlaybackPositionNow() {
 
-    }
-
-    override fun getSongsByGroup(
-        groupType: GroupType,
-        groupName: String,
-        uri: String
-    ): Flow<List<Song>> {
-        return flowOf(emptyList())
     }
 }

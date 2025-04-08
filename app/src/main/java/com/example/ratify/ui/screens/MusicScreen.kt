@@ -30,7 +30,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.Rating
+import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.services.updateRatingService
@@ -102,6 +104,8 @@ fun LoginScreen() {
 @Composable
 fun PlayerScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+    val songRepository = LocalSongRepository.current
+    val stateRepository = LocalStateRepository.current
 
     // Player state
     val userCapabilities = spotifyViewModel.userCapabilities.observeAsState()
@@ -134,6 +138,7 @@ fun PlayerScreen() {
     @Composable
     fun RenderSongControls() {
         val context = LocalContext.current
+        val scope = rememberCoroutineScope()
 
         var userDragging by remember { mutableStateOf(false) }
         var dragPositionMs by remember { mutableLongStateOf(0L) }
@@ -208,18 +213,21 @@ fun PlayerScreen() {
                 if (playerEnabled) {
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
+                    stateRepository.updateCurrentRating(ratingValue)
+//                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
 
                     // Update current rating notification service
                     context.updateRatingService(ratingValue)
 
                     // Update rating in database
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateRating(
-                        name = playerState!!.track.name,
-                        artists = playerState!!.track.artists,
-                        rating = ratingValue,
-                        lastRatedTs = System.currentTimeMillis()
-                    ))
+                    scope.launch {
+                        songRepository.UpdateRating(
+                            name = playerState!!.track.name,
+                            artists = playerState!!.track.artists,
+                            rating = ratingValue,
+                            lastRatedTs = System.currentTimeMillis()
+                        )
+                    }
 
                     if (skipOnRate.value) {
                         spotifyViewModel.onEvent(SpotifyEvent.SkipNext)

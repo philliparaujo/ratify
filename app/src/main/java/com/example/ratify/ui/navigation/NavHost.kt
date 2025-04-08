@@ -5,8 +5,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.ratify.spotify.ISpotifyViewModel
-import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.screens.FavoritesScreen
 import com.example.ratify.ui.screens.LibraryScreen
 import com.example.ratify.ui.screens.MusicScreen

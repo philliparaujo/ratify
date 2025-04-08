@@ -1,5 +1,6 @@
 package com.example.ratify
 
+import SongRepository
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -16,11 +17,14 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.core.model.PrimaryColor
 import com.example.ratify.database.DatabaseIOHelper
+import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
+import com.example.ratify.spotify.StateRepository
 import com.example.ratify.ui.navigation.MainScreen
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.flow.first
@@ -30,6 +34,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val spotifyViewModel: SpotifyViewModel by viewModel()
+    private val songRepository: SongRepository by inject()
+    private val stateRepository: StateRepository by inject()
+
     private val settingsManager: ISettingsManager by inject()
     private lateinit var spotifyAuthHelper: SpotifyAuthHelper
     private lateinit var databaseIOHelper: DatabaseIOHelper
@@ -79,7 +86,11 @@ class MainActivity : ComponentActivity() {
             )
         }
         setContent {
-            CompositionLocalProvider(LocalSpotifyViewModel provides spotifyViewModel) {
+            CompositionLocalProvider(
+                LocalSpotifyViewModel provides spotifyViewModel,
+                LocalSongRepository provides songRepository,
+                LocalStateRepository provides stateRepository
+            ) {
                 val darkTheme by settingsManager.darkTheme.collectAsState(true)
                 val themeColor by settingsManager.themeColor.collectAsState(PrimaryColor.DEFAULT.ordinal)
 

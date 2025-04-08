@@ -1,7 +1,9 @@
 package com.example.ratify.spotify
 
 import MusicState
+import SongRepository
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -18,17 +20,18 @@ import com.example.ratify.core.model.Rating
 import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.state.LibraryState
+import com.example.ratify.database.Converters
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
-import com.example.ratify.database.SongDao
+import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
+import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
+import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
-import com.spotify.protocol.types.Album
-import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
@@ -37,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -48,7 +50,8 @@ import kotlinx.coroutines.launch
 
 class SpotifyViewModel(
     application: Application,
-    private val dao: SongDao,
+    private val songRepository: SongRepository,
+    private val stateRepository: StateRepository,
     private val settingsManager: ISettingsManager
 ): AndroidViewModel(application), ISpotifyViewModel {
     // Keys added in local.properties, accessed in build.gradle
@@ -102,35 +105,44 @@ class SpotifyViewModel(
                     Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
 
                     viewModelScope.launch {
-                        val existingSong = dao.getSongByPrimaryKey(currentSong.name, currentSong.artists) // Query database
+                        val existingSong = songRepository.GetSongByPrimaryKey(currentSong)
                         val currentTime = System.currentTimeMillis()
 
                         val context = getApplication<Application>()
+                        val prefs = context.getSharedPreferences(PLAYER_STATE_SHARED_PREFS, Context.MODE_PRIVATE)
 
-                        // Insert current song for first time or simply update its lastPlayedTs
+                        // In database, insert current song for first time or update existing song's lastPlayedTs, timesPlayed
                         if (existingSong == null) {
                             if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
-                                onEvent(SpotifyEvent.UpsertSong(
+                                songRepository.UpsertSong(
                                     track = currentSong,
                                     lastPlayedTs = currentTime,
                                     timesPlayed = 1,
                                     rating = null,
                                     lastRatedTs = null
-                                ))
+                                )
                                 context.updateRatingService(null)
                             }
                         } else {
-                            onEvent(SpotifyEvent.UpdateLastPlayedTs(
+                            songRepository.UpdateLastPlayedTs(
                                 name = existingSong.name,
                                 artists = existingSong.artists,
                                 lastPlayedTs = currentTime,
-                                timesPlayed = existingSong.timesPlayed + 1,
-                            ))
+                                timesPlayed = existingSong.timesPlayed + 1
+                            )
                             context.updateRatingService(existingSong.rating)
                         }
 
+                        // Update player state for RatingService
+                        val converters = Converters()
+                        prefs.edit()
+                            .putString(TRACK_NAME_SHARED_PREFS, currentSong.name)
+                            .putString(TRACK_ARTISTS_SHARED_PREFS, converters.fromArtistList(currentSong.artists))
+                            .apply()
+
                         // Load current rating based on database entry
-                        _rating.value = existingSong?.rating
+//                        _rating.value = existingSong?.rating
+                        stateRepository.updateCurrentRating(existingSong?.rating)
                     }
                 }
 
@@ -224,7 +236,7 @@ class SpotifyViewModel(
     private val _favoritesSortType = MutableStateFlow(FavoritesSortType.RATING)
     private val _librarySortAscending = MutableStateFlow(false)
     private val _favoritesSortAscending = MutableStateFlow(false)
-    private val _rating = MutableStateFlow<Rating?>(null)
+//    private val _rating = MutableStateFlow<Rating?>(null)
     private val _libraryDialog = MutableStateFlow<Song?>(null)
     private val _favoritesDialog = MutableStateFlow<GroupedSong?>(null)
     private val _visualizerShowing = MutableStateFlow(false)
@@ -233,12 +245,12 @@ class SpotifyViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _librarySongs = combine(_searchType, _searchQuery, _librarySortType, _librarySortAscending) { searchType, searchQuery, sortType, sortAscending ->
-        dao.querySongs(dao.buildLibraryQuery(searchType, searchQuery, sortType, sortAscending))
+        songRepository.GetLibrarySongs(searchType, searchQuery, sortType, sortAscending)
     }.flatMapLatest { it }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _favoritesSongs = combine(_groupType, _favoritesSortType, _favoritesSortAscending, _minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
-        dao.queryGroupedSongs(dao.buildFavoritesQuery(groupType, sortType, sortAscending, minEntriesThreshold))
+        songRepository.GetFavoritesSongs(groupType, sortType, sortAscending, minEntriesThreshold)
     }.flatMapLatest { it }
 
     // Individual screen states
@@ -266,7 +278,7 @@ class SpotifyViewModel(
 
     private val _musicState = MutableStateFlow(MusicState())
     override val musicState = combine(
-        listOf(_musicState, _rating)
+        listOf(_musicState, stateRepository.currentRating)
     ) { flows: Array<Any?> ->
         val state = flows[0] as MusicState
         val currentRating = flows[1] as Rating?
@@ -347,9 +359,6 @@ class SpotifyViewModel(
             is SpotifyEvent.UpdateFavoritesSortAscending -> {
                 _favoritesSortAscending.value = event.sortAscending
             }
-            is SpotifyEvent.UpdateCurrentRating -> {
-                _rating.value = event.rating
-            }
             is SpotifyEvent.UpdateLibraryDialog -> {
                 _libraryDialog.value = event.song
             }
@@ -361,36 +370,6 @@ class SpotifyViewModel(
             }
             is SpotifyEvent.UpdateMinEntriesThreshold -> {
                 _minEntriesThreshold.value = event.newThreshold
-            }
-
-            is SpotifyEvent.UpsertSong -> {
-                upsertSong(
-                    Song(
-                        album = event.track.album,
-                        artist = event.track.artist,
-                        artists = event.track.artists,
-                        duration = event.track.duration,
-                        imageUri = event.track.imageUri,
-                        name = event.track.name,
-                        uri = event.track.uri,
-                        lastPlayedTs = event.lastPlayedTs,
-                        timesPlayed = event.timesPlayed,
-                        lastRatedTs = event.lastRatedTs,
-                        rating = event.rating,
-                    )
-                )
-            }
-            is SpotifyEvent.DeleteSong -> {
-                deleteSong(event.song)
-            }
-            is SpotifyEvent.DeleteSongsWithNullRating -> {
-                deleteSongWithNullRating(event.exceptName, event.exceptArtists)
-            }
-            is SpotifyEvent.UpdateLastPlayedTs -> {
-                updateLastPlayedTs(event.name, event.artists, event.lastPlayedTs, event.timesPlayed)
-            }
-            is SpotifyEvent.UpdateRating -> {
-                updateRating(event.name, event.artists, event.rating, event.lastRatedTs)
             }
         }
     }
@@ -486,52 +465,5 @@ class SpotifyViewModel(
                 }
             )
         )
-    }
-
-    // Database functions
-    private fun upsertSong(song: Song) {
-        viewModelScope.launch {
-            dao.upsertSong(song)
-        }
-    }
-
-    private fun deleteSong(song: Song) {
-        viewModelScope.launch {
-            dao.deleteSong(song)
-            showSnackbar("Deleted \"${song.name}\"")
-        }
-    }
-
-    private fun deleteSongWithNullRating(exceptName: String, exceptArtists: List<Artist>) {
-        viewModelScope.launch {
-            val deletedCount = dao.deleteSongsWithNullRating(exceptName, exceptArtists)
-            showSnackbar("Deleted $deletedCount songs")
-        }
-    }
-
-    private fun updateLastPlayedTs(name: String, artists: List<Artist>, lastPlayedTs: Long?, timesPlayed: Int) {
-        viewModelScope.launch {
-            val song = dao.getSongByPrimaryKey(name, artists)
-            if (song != null) {
-                dao.upsertSong(song.copy(lastPlayedTs = lastPlayedTs, timesPlayed = timesPlayed))
-            }
-        }
-    }
-
-    private fun updateRating(name: String, artists: List<Artist>, rating: Rating?, lastRatedTs: Long?) {
-        viewModelScope.launch {
-            val song = dao.getSongByPrimaryKey(name, artists)
-            Log.d("SpotifyViewModel", "$song")
-            if (song != null) {
-                dao.upsertSong(song.copy(lastRatedTs = lastRatedTs, rating = rating))
-            }
-        }
-    }
-
-    override fun getSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>> {
-        return when (groupType) {
-            GroupType.ALBUM -> dao.getSongsByAlbum(Album(groupName, uri))
-            GroupType.ARTIST -> dao.getSongsByArtist(Artist(groupName, uri))
-        }
     }
 }

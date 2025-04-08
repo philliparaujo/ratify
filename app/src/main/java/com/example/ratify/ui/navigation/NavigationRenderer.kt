@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.ratify.spotify.ISpotifyViewModel
-import com.example.ratify.spotify.SpotifyViewModel
 import com.example.ratify.ui.components.BottomNavBar
 import com.example.ratify.ui.components.LeftNavDrawer
 import com.example.ratify.ui.components.MySnackBar

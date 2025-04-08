@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.mocks.Preview
 import com.example.ratify.mocks.mockArtist
-import com.spotify.protocol.types.Artist
 import kotlin.math.pow
 import kotlin.math.roundToInt
 

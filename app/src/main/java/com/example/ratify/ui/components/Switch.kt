@@ -43,8 +43,8 @@ fun MySwitch(
 }
 
 // Previews
-val leftText = "Light Theme"
-val rightText = "Dark Theme"
+const val leftText = "Light Theme"
+const val rightText = "Dark Theme"
 
 @Preview(name = "Dark Switch")
 @Composable

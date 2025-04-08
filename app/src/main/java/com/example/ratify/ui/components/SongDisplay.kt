@@ -16,14 +16,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.core.model.Rating
-import com.example.ratify.database.Song
 import com.example.ratify.mocks.Preview
 import com.example.ratify.mocks.longMockSong
 import com.example.ratify.mocks.mockSong
-import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
-import com.spotify.protocol.types.ImageUri
 
 @Composable
 fun SongDisplay(

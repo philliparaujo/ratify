@@ -3,16 +3,13 @@ package com.example.ratify.spotify
 import MusicState
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
-import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.state.LibraryState
-import com.example.ratify.database.Song
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISpotifyViewModel {
@@ -41,5 +38,4 @@ interface ISpotifyViewModel {
     fun onEvent(event: SpotifyEvent)
     fun showSnackbar(message: String, action: SnackbarAction? = null)
     fun syncPlaybackPositionNow()
-    fun getSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>>
 }

@@ -14,6 +14,9 @@ const val NOTIFICATION_PRIORITY = NotificationCompat.PRIORITY_MAX
 
 // SharedPrefs names
 const val BUTTON_SHARED_PREFS = "rating_button_prefs"
+const val PLAYER_STATE_SHARED_PREFS = "player_state"
+const val TRACK_NAME_SHARED_PREFS = "track_name"
+const val TRACK_ARTISTS_SHARED_PREFS = "track_artists"
 
 // GetExtra names
 const val BUTTON_ID_EXTRA = "button_id"
