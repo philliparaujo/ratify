@@ -1,11 +1,8 @@
 package com.example.ratify.mocks
 
-import MusicState
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.ratify.core.state.FavoritesState
-import com.example.ratify.core.state.LibraryState
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
@@ -29,12 +26,6 @@ class FakeSpotifyViewModel: ISpotifyViewModel {
         get() = MutableLiveData()
     override val snackbarHostState: SnackbarHostState
         get() = SnackbarHostState()
-    override val musicState: StateFlow<MusicState>
-        get() = MutableStateFlow(MusicState())
-    override val libraryState: StateFlow<LibraryState>
-        get() = MutableStateFlow(LibraryState())
-    override val favoritesState: StateFlow<FavoritesState>
-        get() = MutableStateFlow(FavoritesState())
     override val settings: ISettingsManager
         get() = FakeSettingsManager()
 

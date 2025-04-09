@@ -1,6 +1,5 @@
 package com.example.ratify.spotify
 
-import MusicState
 import SongRepository
 import android.app.Application
 import android.content.Context
@@ -13,16 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
-import com.example.ratify.core.model.FavoritesSortType
-import com.example.ratify.core.model.GroupType
-import com.example.ratify.core.model.LibrarySortType
-import com.example.ratify.core.model.Rating
-import com.example.ratify.core.model.SearchType
-import com.example.ratify.core.state.FavoritesState
-import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Converters
-import com.example.ratify.database.GroupedSong
-import com.example.ratify.database.Song
 import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
 import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
@@ -37,15 +27,10 @@ import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SpotifyViewModel(
@@ -227,71 +212,6 @@ class SpotifyViewModel(
 
     // Handles management of settings preferences
     override val settings = settingsManager
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val _librarySongs = combine(stateRepository.searchType, stateRepository.searchQuery, stateRepository.librarySortType, stateRepository.librarySortAscending) { searchType, searchQuery, sortType, sortAscending ->
-        songRepository.GetLibrarySongs(searchType, searchQuery, sortType, sortAscending)
-    }.flatMapLatest { it }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val _favoritesSongs = combine(stateRepository.groupType, stateRepository.favoritesSortType, stateRepository.favoritesSortAscending, stateRepository.minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
-        songRepository.GetFavoritesSongs(groupType, sortType, sortAscending, minEntriesThreshold)
-    }.flatMapLatest { it }
-
-    // Individual screen states
-    private val _libraryState = MutableStateFlow(LibraryState())
-    override val libraryState = combine(
-        listOf(_libraryState, stateRepository.searchType, stateRepository.librarySortType, stateRepository.libraryDialog, stateRepository.visualizerShowing, _librarySongs, stateRepository.searchQuery)
-    ) { flows: Array<Any?> ->
-        val state = flows[0] as LibraryState
-        val searchType = flows[1] as SearchType
-        val librarySortType = flows[2] as LibrarySortType
-        val libraryDialog = flows[3] as Song?
-        val visualizerShowing = flows[4] as Boolean
-        val songs = flows[5] as List<Song>
-        val searchQuery = flows[6] as String
-
-        state.copy(
-            songs = songs,
-            searchQuery = searchQuery,
-            searchType = searchType,
-            librarySortType = librarySortType,
-            visualizerShowing = visualizerShowing,
-            libraryDialog = libraryDialog
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LibraryState())
-
-    private val _musicState = MutableStateFlow(MusicState())
-    override val musicState = combine(
-        listOf(_musicState, stateRepository.currentRating)
-    ) { flows: Array<Any?> ->
-        val state = flows[0] as MusicState
-        val currentRating = flows[1] as Rating?
-
-        state.copy(
-            currentRating = currentRating
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MusicState())
-
-    private val _favoritesState = MutableStateFlow(FavoritesState())
-    override val favoritesState = combine(
-        listOf(_favoritesState, _favoritesSongs, stateRepository.groupType, stateRepository.favoritesSortType, stateRepository.favoritesDialog, stateRepository.minEntriesThreshold)
-    ) { flows: Array<Any?> ->
-        val state = flows[0] as FavoritesState
-        val songs = flows[1] as List<GroupedSong>
-        val groupType = flows[2] as GroupType
-        val favoritesSortType = flows[3] as FavoritesSortType
-        val favoritesDialog = flows[4] as GroupedSong?
-        val minEntriesThreshold = flows[5] as Int
-
-        state.copy(
-            groupedSongs = songs,
-            groupType = groupType,
-            favoritesSortType = favoritesSortType,
-            favoritesDialog = favoritesDialog,
-            minEntriesThreshold = minEntriesThreshold
-        )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FavoritesState())
 
     override fun onEvent(event: SpotifyEvent) {
         when (event) {

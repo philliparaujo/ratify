@@ -1,10 +1,7 @@
 package com.example.ratify.spotify
 
-import MusicState
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
-import com.example.ratify.core.state.FavoritesState
-import com.example.ratify.core.state.LibraryState
 import com.example.ratify.settings.ISettingsManager
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.protocol.types.Capabilities
@@ -26,11 +23,6 @@ interface ISpotifyViewModel {
     val currentPlaybackPosition: LiveData<Long>
     // Keeps Snackbars active across any UI changes / screen rotations
     val snackbarHostState: SnackbarHostState
-
-    // Individual screen states
-    val musicState: StateFlow<MusicState>
-    val libraryState: StateFlow<LibraryState>
-    val favoritesState: StateFlow<FavoritesState>
 
     // Handles management of settings preferences
     val settings: ISettingsManager

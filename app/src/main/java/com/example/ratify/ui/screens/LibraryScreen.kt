@@ -63,7 +63,7 @@ fun LibraryScreen(
     val stateRepository: StateRepository = LocalStateRepository.current
 
     // Current states (UI and Spotify Player)
-    val libraryState = spotifyViewModel.libraryState.collectAsState(initial = LibraryState()).value
+    val libraryState = stateRepository.libraryState.collectAsState(initial = LibraryState()).value
     val playerState by spotifyViewModel.playerState.collectAsState()
 
     // Active search/sort options

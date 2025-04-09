@@ -62,7 +62,7 @@ fun FavoritesScreen() {
     val songRepository: SongRepository = LocalSongRepository.current
     val stateRepository: StateRepository = LocalStateRepository.current
 
-    val favoritesState = spotifyViewModel.favoritesState.collectAsState(initial = FavoritesState()).value
+    val favoritesState = stateRepository.favoritesState.collectAsState(initial = FavoritesState()).value
 
     // Player enabled logic
     val userCapabilities = spotifyViewModel.userCapabilities.observeAsState().value

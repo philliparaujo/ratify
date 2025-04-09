@@ -112,7 +112,7 @@ fun PlayerScreen() {
     val playerState by spotifyViewModel.playerState.collectAsState()
     val currentPlaybackPosition = spotifyViewModel.currentPlaybackPosition.observeAsState()
     val playerEnabled = userCapabilities.value != null && userCapabilities.value!!.canPlayOnDemand
-    val musicState = spotifyViewModel.musicState.collectAsState(initial = MusicState()).value
+    val musicState = stateRepository.musicState.collectAsState(initial = MusicState()).value
 
     // Orientation logic
     val configuration = LocalConfiguration.current

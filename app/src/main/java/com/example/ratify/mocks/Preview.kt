@@ -20,10 +20,14 @@ fun Preview(
     RatifyTheme(
         darkTheme = darkTheme
     ) {
+        val fakeSpotifyViewModel = FakeSpotifyViewModel()
+        val fakeSongRepository = SongRepository(FakeDao())
+        val fakeStateRepository = StateRepository(fakeSongRepository)
+
         CompositionLocalProvider(
-            LocalSpotifyViewModel provides FakeSpotifyViewModel(),
-            LocalSongRepository provides SongRepository(FakeDao()),
-            LocalStateRepository provides StateRepository(),
+            LocalSpotifyViewModel provides fakeSpotifyViewModel,
+            LocalSongRepository provides fakeSongRepository,
+            LocalStateRepository provides fakeStateRepository,
         ) {
             content()
         }

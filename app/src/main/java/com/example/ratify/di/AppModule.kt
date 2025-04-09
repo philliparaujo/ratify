@@ -30,7 +30,7 @@ val appModule = module {
     }
 
     single<StateRepository> {
-        StateRepository()
+        StateRepository(get())
     }
 
     viewModel {
