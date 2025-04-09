@@ -40,10 +40,12 @@ import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
+import com.example.ratify.spotify.StateRepository
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
@@ -58,6 +60,7 @@ import kotlin.math.roundToInt
 fun FavoritesScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val songRepository: SongRepository = LocalSongRepository.current
+    val stateRepository: StateRepository = LocalStateRepository.current
 
     val favoritesState = spotifyViewModel.favoritesState.collectAsState(initial = FavoritesState()).value
 
@@ -126,14 +129,14 @@ fun FavoritesScreen() {
                 checked = favoritesState.groupType == GroupType.ALBUM,
                 onCheckedChange = { newState ->
                     val newGroupType = if (newState) GroupType.ALBUM else GroupType.ARTIST
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateGroupType(newGroupType))
+                    stateRepository.updateGroupType(newGroupType)
                 }
             )
 
             DropdownSelect(
                 options = favoritesSortTypes,
                 selectedOption = favoritesState.favoritesSortType,
-                onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesSortType(sortType)) },
+                onSelect = { stateRepository.updateFavoritesSortType(it) },
                 label = "Sort by",
                 large = true
             )
@@ -173,7 +176,7 @@ fun FavoritesScreen() {
                 onValueChangeFinished = { newValue ->
                     val newInt = newValue.toFloat().roundToInt()
                     currentSliderValue = newInt.toLong()
-                    spotifyViewModel.onEvent(SpotifyEvent.UpdateMinEntriesThreshold(newInt))
+                    stateRepository.updateMinEntriesThreshold(newInt)
                 },
             )
 
@@ -205,7 +208,7 @@ fun FavoritesScreen() {
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
                                         imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
+                                        onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
                                     )
                                 }
                                 GroupType.ALBUM -> {
@@ -215,7 +218,7 @@ fun FavoritesScreen() {
                                         songCount = groupedSong.count,
                                         averageRating = groupedSong.averageRating,
                                         imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(groupedSong)) }
+                                        onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
                                     )
                                 }
                             }
@@ -243,7 +246,7 @@ fun FavoritesScreen() {
             groupType = groupType,
             songs = songs,
             onDismissRequest = {
-                spotifyViewModel.onEvent(SpotifyEvent.UpdateFavoritesDialog(null))
+                stateRepository.updateFavoritesDialog(null)
             },
             playEnabled = playerEnabled,
             showImageUri = showImageUri.value,

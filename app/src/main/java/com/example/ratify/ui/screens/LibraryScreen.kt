@@ -120,7 +120,7 @@ fun LibraryScreen(
         ) { }
         SongDialog(
             onDismissRequest = {
-                spotifyViewModel.onEvent(SpotifyEvent.UpdateLibraryDialog(null))
+                stateRepository.updateLibraryDialog(null)
             },
             song = song,
             onRatingSelect = { rating ->
@@ -129,7 +129,6 @@ fun LibraryScreen(
 
                 if (playerState?.track?.uri == song.uri) {
                     stateRepository.updateCurrentRating(ratingValue)
-//                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
                     context.updateRatingService(ratingValue)
                 }
                 // Update rating in database
@@ -167,7 +166,7 @@ fun LibraryScreen(
                 SongItem(
                     song = song,
                     onClick = {
-                        if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.UpdateLibraryDialog(song))
+                        if (isScreenActive) stateRepository.updateLibraryDialog(song)
                     },
                     onLongClick = {
                         if (isScreenActive) {
@@ -200,7 +199,7 @@ fun LibraryScreen(
         ) {
             Search(
                 query = libraryState.searchQuery,
-                onQueryChange = { spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchText(it)) },
+                onQueryChange = { stateRepository.updateSearchQuery(it) },
                 placeholderText = "Search",
                 trailingIcon = Icons.Default.MoreVert,
                 dropdownLabels = listOf(
@@ -208,7 +207,7 @@ fun LibraryScreen(
                     "Delete unrated songs"
                 ),
                 dropdownOptionOnClick = listOf(
-                    { spotifyViewModel.onEvent(SpotifyEvent.UpdateVisualizerShowing(!libraryState.visualizerShowing)) },
+                    { stateRepository.updateVisualizerShowing(!libraryState.visualizerShowing) },
                     { scope.launch {
                         songRepository.DeleteSongsWithNullRating(
                             playerState?.track?.name ?: "",
@@ -223,7 +222,7 @@ fun LibraryScreen(
             DropdownSelect(
                 options = searchTypes,
                 selectedOption = libraryState.searchType,
-                onSelect = { searchType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateSearchType(searchType)) },
+                onSelect = { searchType -> stateRepository.updateSearchType(searchType) },
                 label = "Search by",
                 modifier = Modifier.wrapContentWidth()
             )
@@ -262,7 +261,7 @@ fun LibraryScreen(
             DropdownSelect(
                 options = librarySortTypes,
                 selectedOption = libraryState.librarySortType,
-                onSelect = { sortType -> spotifyViewModel.onEvent(SpotifyEvent.UpdateLibrarySortType(sortType)) },
+                onSelect = { stateRepository.updateLibrarySortType(it) },
                 label = "Sort by",
                 large = true
             )

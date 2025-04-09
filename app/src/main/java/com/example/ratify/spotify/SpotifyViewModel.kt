@@ -141,7 +141,6 @@ class SpotifyViewModel(
                             .apply()
 
                         // Load current rating based on database entry
-//                        _rating.value = existingSong?.rating
                         stateRepository.updateCurrentRating(existingSong?.rating)
                     }
                 }
@@ -229,34 +228,20 @@ class SpotifyViewModel(
     // Handles management of settings preferences
     override val settings = settingsManager
 
-    // Database variables
-    private val _searchType = MutableStateFlow(SearchType.NAME)
-    private val _searchQuery = MutableStateFlow("")
-    private val _librarySortType = MutableStateFlow(LibrarySortType.LAST_PLAYED_TS)
-    private val _favoritesSortType = MutableStateFlow(FavoritesSortType.RATING)
-    private val _librarySortAscending = MutableStateFlow(false)
-    private val _favoritesSortAscending = MutableStateFlow(false)
-//    private val _rating = MutableStateFlow<Rating?>(null)
-    private val _libraryDialog = MutableStateFlow<Song?>(null)
-    private val _favoritesDialog = MutableStateFlow<GroupedSong?>(null)
-    private val _visualizerShowing = MutableStateFlow(false)
-    private val _groupType = MutableStateFlow(GroupType.ARTIST)
-    private val _minEntriesThreshold = MutableStateFlow(5)
-
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _librarySongs = combine(_searchType, _searchQuery, _librarySortType, _librarySortAscending) { searchType, searchQuery, sortType, sortAscending ->
+    private val _librarySongs = combine(stateRepository.searchType, stateRepository.searchQuery, stateRepository.librarySortType, stateRepository.librarySortAscending) { searchType, searchQuery, sortType, sortAscending ->
         songRepository.GetLibrarySongs(searchType, searchQuery, sortType, sortAscending)
     }.flatMapLatest { it }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _favoritesSongs = combine(_groupType, _favoritesSortType, _favoritesSortAscending, _minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
+    private val _favoritesSongs = combine(stateRepository.groupType, stateRepository.favoritesSortType, stateRepository.favoritesSortAscending, stateRepository.minEntriesThreshold) { groupType, sortType, sortAscending, minEntriesThreshold ->
         songRepository.GetFavoritesSongs(groupType, sortType, sortAscending, minEntriesThreshold)
     }.flatMapLatest { it }
 
     // Individual screen states
     private val _libraryState = MutableStateFlow(LibraryState())
     override val libraryState = combine(
-        listOf(_libraryState, _searchType, _librarySortType, _libraryDialog, _visualizerShowing, _librarySongs, _searchQuery)
+        listOf(_libraryState, stateRepository.searchType, stateRepository.librarySortType, stateRepository.libraryDialog, stateRepository.visualizerShowing, _librarySongs, stateRepository.searchQuery)
     ) { flows: Array<Any?> ->
         val state = flows[0] as LibraryState
         val searchType = flows[1] as SearchType
@@ -290,7 +275,7 @@ class SpotifyViewModel(
 
     private val _favoritesState = MutableStateFlow(FavoritesState())
     override val favoritesState = combine(
-        listOf(_favoritesState, _favoritesSongs, _groupType, _favoritesSortType, _favoritesDialog, _minEntriesThreshold)
+        listOf(_favoritesState, _favoritesSongs, stateRepository.groupType, stateRepository.favoritesSortType, stateRepository.favoritesDialog, stateRepository.minEntriesThreshold)
     ) { flows: Array<Any?> ->
         val state = flows[0] as FavoritesState
         val songs = flows[1] as List<GroupedSong>
@@ -323,54 +308,6 @@ class SpotifyViewModel(
             is SpotifyEvent.SkipPrevious -> skipPrevious()
             is SpotifyEvent.SeekTo -> seekTo(event.positionMs)
             is SpotifyEvent.PlayerEventWhenNotConnected -> playerEventWhenNotConnected()
-
-            is SpotifyEvent.UpdateSearchType -> {
-                _searchType.value = event.searchType
-            }
-            is SpotifyEvent.UpdateSearchText -> {
-                _searchQuery.value = event.text
-            }
-            is SpotifyEvent.UpdateLibrarySortType -> {
-                // If reselect same sort type, flip sort ascending
-                if (_librarySortType.value == event.librarySortType) {
-                    onEvent(SpotifyEvent.UpdateLibrarySortAscending(!_librarySortAscending.value))
-                } else {
-                    onEvent(SpotifyEvent.UpdateLibrarySortAscending(event.librarySortType.sortAscendingPreference))
-                }
-
-                _librarySortType.value = event.librarySortType
-            }
-            is SpotifyEvent.UpdateFavoritesSortType -> {
-                // If reselect some same sort type, flip sort ascending
-                if (_favoritesSortType.value == event.favoritesSortType) {
-                    onEvent(SpotifyEvent.UpdateFavoritesSortAscending(!_favoritesSortAscending.value))
-                } else {
-                    onEvent(SpotifyEvent.UpdateFavoritesSortAscending(event.favoritesSortType.sortAscendingPreference))
-                }
-
-                _favoritesSortType.value = event.favoritesSortType
-            }
-            is SpotifyEvent.UpdateGroupType -> {
-                _groupType.value = event.groupType
-            }
-            is SpotifyEvent.UpdateLibrarySortAscending -> {
-                _librarySortAscending.value = event.sortAscending
-            }
-            is SpotifyEvent.UpdateFavoritesSortAscending -> {
-                _favoritesSortAscending.value = event.sortAscending
-            }
-            is SpotifyEvent.UpdateLibraryDialog -> {
-                _libraryDialog.value = event.song
-            }
-            is SpotifyEvent.UpdateFavoritesDialog -> {
-                _favoritesDialog.value = event.groupedSong
-            }
-            is SpotifyEvent.UpdateVisualizerShowing -> {
-                _visualizerShowing.value = event.visualizerShowing
-            }
-            is SpotifyEvent.UpdateMinEntriesThreshold -> {
-                _minEntriesThreshold.value = event.newThreshold
-            }
         }
     }
 
