@@ -1,7 +1,9 @@
-package com.example.ratify.spotify
+package com.example.ratify.repository
 
 import MusicState
-import SongRepository
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import com.example.ratify.core.model.FavoritesSortType
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.model.LibrarySortType
@@ -11,6 +13,7 @@ import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
+import com.example.ratify.ui.navigation.SnackbarAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 // TODO: find a better location for this class
 class StateRepository(
@@ -84,11 +88,10 @@ class StateRepository(
     }
     private val favoritesMeta = combine(
         _favoritesSortType,
-        _favoritesSortAscending,
         _favoritesDialog,
         _groupType,
         _minEntriesThreshold
-    ) { sortType, sortAsc, dialog, groupType, threshold ->
+    ) { sortType, dialog, groupType, threshold ->
         FavoritesState(
             favoritesSortType = sortType,
             favoritesDialog = dialog,
@@ -111,6 +114,7 @@ class StateRepository(
         meta.copy(groupedSongs = songs)
     }.stateIn(scope, SharingStarted.WhileSubscribed(5000), FavoritesState())
 
+    val snackbarHostState = SnackbarHostState()  // Keeps Snackbars active across UI changes/rotations
 
     // Setters
     fun updateCurrentRating(rating: Rating?) {
@@ -155,10 +159,25 @@ class StateRepository(
     fun updateGroupType(type: GroupType) {
         _groupType.value = type
     }
-    fun updateLibrarySortAscending(sortAscending: Boolean) {
+    private fun updateLibrarySortAscending(sortAscending: Boolean) {
         _librarySortAscending.value = sortAscending
     }
-    fun updateFavoritesSortAscending(sortAscending: Boolean) {
+    private fun updateFavoritesSortAscending(sortAscending: Boolean) {
         _favoritesSortAscending.value = sortAscending
+    }
+    fun showSnackbar(message: String, action: SnackbarAction? = null) {
+        snackbarHostState.currentSnackbarData?.dismiss()
+
+        scope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = action?.name,
+                duration = SnackbarDuration.Short
+            ).let { result ->
+                if (result == SnackbarResult.ActionPerformed) {
+                    action?.action?.invoke()
+                }
+            }
+        }
     }
 }

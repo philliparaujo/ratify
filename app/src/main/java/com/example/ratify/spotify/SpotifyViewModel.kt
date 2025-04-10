@@ -1,12 +1,9 @@
 package com.example.ratify.spotify
 
-import SongRepository
+import com.example.ratify.repository.SongRepository
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +14,8 @@ import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
 import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
 import com.example.ratify.services.updateRatingService
-import com.example.ratify.settings.ISettingsManager
+import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -37,7 +35,7 @@ class SpotifyViewModel(
     application: Application,
     private val songRepository: SongRepository,
     private val stateRepository: StateRepository,
-    private val settingsManager: ISettingsManager
+    private val settingsRepository: SettingsRepository
 ): AndroidViewModel(application), ISpotifyViewModel {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
@@ -192,27 +190,6 @@ class SpotifyViewModel(
         }
     }
 
-    // Keeps Snackbars active across any UI changes / screen rotations
-    override val snackbarHostState = SnackbarHostState()
-    override fun showSnackbar(message: String, action: SnackbarAction?) {
-        snackbarHostState.currentSnackbarData?.dismiss()
-
-        viewModelScope.launch {
-            snackbarHostState.showSnackbar(
-                message = message,
-                actionLabel = action?.name,
-                duration = SnackbarDuration.Short
-            ).let { result ->
-                if (result == SnackbarResult.ActionPerformed) {
-                    action?.action?.invoke()
-                }
-            }
-        }
-    }
-
-    // Handles management of settings preferences
-    override val settings = settingsManager
-
     override fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
@@ -253,7 +230,7 @@ class SpotifyViewModel(
             override fun onConnected(appRemote: SpotifyAppRemote) {
                 spotifyAppRemote = appRemote
                 Log.d("SpotifyViewModel", "Connected! Yay!")
-                showSnackbar("Connected to Spotify")
+                stateRepository.showSnackbar("Connected to Spotify")
                 _spotifyConnectionState.value = true
                 subscribeToPlayerState()
                 subscribeToUserCapabilities()
@@ -275,7 +252,7 @@ class SpotifyViewModel(
             isSubscribedToUserCapabilities = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")
-        showSnackbar("Disconnected from Spotify")
+        stateRepository.showSnackbar("Disconnected from Spotify")
     }
 
     private fun playPlaylist(playlistURI: String) {
@@ -284,7 +261,7 @@ class SpotifyViewModel(
 
     private fun playSong(songURI: String, songName: String) {
         spotifyAppRemote?.playerApi?.play(songURI)
-        showSnackbar("\"${songName}\" now playing")
+        stateRepository.showSnackbar("\"${songName}\" now playing")
     }
 
     private fun pause() {
@@ -293,7 +270,7 @@ class SpotifyViewModel(
 
     private fun queueTrack(trackURI: String, trackName: String) {
         spotifyAppRemote?.playerApi?.queue(trackURI)
-        showSnackbar("\"${trackName}\" added to queue")
+        stateRepository.showSnackbar("\"${trackName}\" added to queue")
     }
 
     private fun resume() {
@@ -313,7 +290,7 @@ class SpotifyViewModel(
     }
 
     private fun playerEventWhenNotConnected() {
-        showSnackbar(
+        stateRepository.showSnackbar(
             "Not connected to Spotify",
             SnackbarAction(
                 name = "Connect",

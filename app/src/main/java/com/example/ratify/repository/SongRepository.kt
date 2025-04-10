@@ -1,3 +1,5 @@
+package com.example.ratify.repository
+
 import com.example.ratify.core.model.FavoritesSortType
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.model.LibrarySortType

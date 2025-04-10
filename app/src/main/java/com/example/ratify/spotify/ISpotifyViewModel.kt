@@ -1,9 +1,6 @@
 package com.example.ratify.spotify
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.LiveData
-import com.example.ratify.settings.ISettingsManager
-import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationRequest
@@ -21,13 +18,7 @@ interface ISpotifyViewModel {
     val playerState: StateFlow<PlayerState?>
     // Provides information on live playback position by incrementing a timer on song being played
     val currentPlaybackPosition: LiveData<Long>
-    // Keeps Snackbars active across any UI changes / screen rotations
-    val snackbarHostState: SnackbarHostState
-
-    // Handles management of settings preferences
-    val settings: ISettingsManager
 
     fun onEvent(event: SpotifyEvent)
-    fun showSnackbar(message: String, action: SnackbarAction? = null)
     fun syncPlaybackPositionNow()
 }

@@ -30,11 +30,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.Rating
+import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
+import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
@@ -65,10 +67,10 @@ fun MusicScreen() {
 @Composable
 fun LoginScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+    val settingsRepository: SettingsRepository = LocalSettingsRepository.current
 
-    val settings = spotifyViewModel.settings
     val scope = rememberCoroutineScope()
-    val autoSignIn = settings.autoSignIn.collectAsState(initial = false)
+    val autoSignIn = settingsRepository.autoSignIn.collectAsState(initial = false)
 
     Box(
         modifier = Modifier
@@ -93,7 +95,7 @@ fun LoginScreen() {
                 state = autoSignIn.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings.setAutoSignIn(newState)
+                        settingsRepository.setAutoSignIn(newState)
                     }
                 }
             )
@@ -106,6 +108,7 @@ fun PlayerScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val songRepository = LocalSongRepository.current
     val stateRepository = LocalStateRepository.current
+    val settingsRepository = LocalSettingsRepository.current
 
     // Player state
     val userCapabilities = spotifyViewModel.userCapabilities.observeAsState()
@@ -119,8 +122,7 @@ fun PlayerScreen() {
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
-    val settings = spotifyViewModel.settings
-    val skipOnRate = settings.skipOnRate.collectAsState(initial = false)
+    val skipOnRate = settingsRepository.skipOnRate.collectAsState(initial = false)
 
     @Composable
     fun RenderSongDisplay() {

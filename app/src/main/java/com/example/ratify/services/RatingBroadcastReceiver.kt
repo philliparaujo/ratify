@@ -1,6 +1,6 @@
 package com.example.ratify.services
 
-import SongRepository
+import com.example.ratify.repository.SongRepository
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,7 +8,7 @@ import android.content.Intent
 import android.util.Log
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Converters
-import com.example.ratify.spotify.StateRepository
+import com.example.ratify.repository.StateRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

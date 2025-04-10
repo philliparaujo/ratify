@@ -6,7 +6,6 @@ import com.example.ratify.spotify.ISpotifyViewModel
 
 @Composable
 fun MainScreen(
-    spotifyViewModel: ISpotifyViewModel,
     onExportClick: () -> Unit,
     onImportClick: () -> Unit,
 ) {
@@ -22,7 +21,6 @@ fun MainScreen(
 
     NavigationRenderer(
         navController = navController,
-        spotifyViewModel = spotifyViewModel,
         navigationTargets = targets,
         onExportClick = onExportClick,
         onImportClick = onImportClick,

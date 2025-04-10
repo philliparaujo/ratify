@@ -1,19 +1,17 @@
 package com.example.ratify.di
 
-import SongRepository
 import androidx.room.Room
 import com.example.ratify.database.SongDao
 import com.example.ratify.database.SongDatabase
-import com.example.ratify.settings.ISettingsManager
-import com.example.ratify.settings.SettingsManager
+import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.repository.SongRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotify.StateRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
-    single<ISettingsManager> { SettingsManager(androidApplication()) }
 
     single<SongDatabase> {
         Room.databaseBuilder(
@@ -33,12 +31,16 @@ val appModule = module {
         StateRepository(get())
     }
 
+    single<SettingsRepository> {
+        SettingsRepository(androidApplication())
+    }
+
     viewModel {
         SpotifyViewModel(
             application = androidApplication(),
             songRepository = get(),
             stateRepository = get(),
-            settingsManager = get()
+            settingsRepository = get()
         )
     }
 }

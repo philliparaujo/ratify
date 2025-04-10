@@ -1,6 +1,5 @@
 package com.example.ratify
 
-import SongRepository
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -17,14 +16,16 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.ratify.core.model.PrimaryColor
 import com.example.ratify.database.DatabaseIOHelper
+import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
-import com.example.ratify.settings.ISettingsManager
+import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.repository.SongRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.spotify.SpotifyAuthHelper
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.spotify.SpotifyViewModel
-import com.example.ratify.spotify.StateRepository
 import com.example.ratify.ui.navigation.MainScreen
 import com.example.ratify.ui.theme.RatifyTheme
 import kotlinx.coroutines.flow.first
@@ -36,8 +37,8 @@ class MainActivity : ComponentActivity() {
     private val spotifyViewModel: SpotifyViewModel by viewModel()
     private val songRepository: SongRepository by inject()
     private val stateRepository: StateRepository by inject()
+    private val settingsRepository: SettingsRepository by inject()
 
-    private val settingsManager: ISettingsManager by inject()
     private lateinit var spotifyAuthHelper: SpotifyAuthHelper
     private lateinit var databaseIOHelper: DatabaseIOHelper
 
@@ -49,10 +50,10 @@ class MainActivity : ComponentActivity() {
         databaseIOHelper = DatabaseIOHelper(
             this,
             onExportComplete = { success ->
-                spotifyViewModel.showSnackbar(if (success) "Database exported successfully!" else "Failed to export database")
+                stateRepository.showSnackbar(if (success) "Database exported successfully!" else "Failed to export database")
             },
             onImportComplete = { success ->
-                spotifyViewModel.showSnackbar(if (success) "Database imported successfully!" else "Failed to import database")
+                stateRepository.showSnackbar(if (success) "Database imported successfully!" else "Failed to import database")
             }
         )
 
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
         // This allows us to save the Snackbar and display it on app restart.
         val sharedPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         sharedPrefs.getString("pendingSnackbar", null)?.let {
-            spotifyViewModel.showSnackbar(it)
+            stateRepository.showSnackbar(it)
             sharedPrefs.edit().remove("pendingSnackbar").apply()
         }
 
@@ -89,17 +90,17 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalSpotifyViewModel provides spotifyViewModel,
                 LocalSongRepository provides songRepository,
-                LocalStateRepository provides stateRepository
+                LocalStateRepository provides stateRepository,
+                LocalSettingsRepository provides settingsRepository
             ) {
-                val darkTheme by settingsManager.darkTheme.collectAsState(true)
-                val themeColor by settingsManager.themeColor.collectAsState(PrimaryColor.DEFAULT.ordinal)
+                val darkTheme by settingsRepository.darkTheme.collectAsState(true)
+                val themeColor by settingsRepository.themeColor.collectAsState(PrimaryColor.DEFAULT.ordinal)
 
                 RatifyTheme(
                     darkTheme = darkTheme,
                     themeColor = themeColor
                 ) {
                     MainScreen(
-                        spotifyViewModel = spotifyViewModel,
                         onExportClick = { databaseIOHelper.exportDatabase() },
                         onImportClick = { databaseIOHelper.importDatabase() }
                     )
@@ -128,7 +129,7 @@ class MainActivity : ComponentActivity() {
         if (!connected) {
             lifecycleScope.launch {
                 // .first() prevents auto sign-in on setting toggle
-                val autoSignIn = settingsManager.autoSignIn.first()
+                val autoSignIn = settingsRepository.autoSignIn.first()
                 if (autoSignIn) {
                     spotifyViewModel.onEvent(SpotifyEvent.GenerateAuthorizationRequest)
                 }

@@ -30,7 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.di.LocalStateRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.components.BottomNavBar
 import com.example.ratify.ui.components.LeftNavDrawer
 import com.example.ratify.ui.components.MySnackBar
@@ -41,7 +42,6 @@ fun NavigationRenderer(
     navController: NavHostController,
     startNavigationTarget: NavigationTarget,
     navigationTargets: List<NavigationTarget>,
-    spotifyViewModel: ISpotifyViewModel,
     onExportClick: () -> Unit,
     onImportClick: () -> Unit
 ) {
@@ -72,7 +72,8 @@ fun NavigationRenderer(
     }
 
     // Snackbar rendering
-    val snackbarHostState = spotifyViewModel.snackbarHostState
+    val stateRepository: StateRepository = LocalStateRepository.current
+    val snackbarHostState = stateRepository.snackbarHostState
     val scope = rememberCoroutineScope()
 
     ObserveAsEvents(

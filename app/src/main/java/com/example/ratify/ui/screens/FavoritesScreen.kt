@@ -1,6 +1,6 @@
 package com.example.ratify.ui.screens
 
-import SongRepository
+import com.example.ratify.repository.SongRepository
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -38,14 +38,16 @@ import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
+import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
+import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.spotify.StateRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
@@ -61,6 +63,7 @@ fun FavoritesScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val songRepository: SongRepository = LocalSongRepository.current
     val stateRepository: StateRepository = LocalStateRepository.current
+    val settingsRepository: SettingsRepository = LocalSettingsRepository.current
 
     val favoritesState = stateRepository.favoritesState.collectAsState(initial = FavoritesState()).value
 
@@ -103,9 +106,8 @@ fun FavoritesScreen() {
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
-    val settings = spotifyViewModel.settings
-    val showImageUri = settings.libraryImageUri.collectAsState(true)
-    val queueSkip = settings.queueSkip.collectAsState(false)
+    val showImageUri = settingsRepository.libraryImageUri.collectAsState(true)
+    val queueSkip = settingsRepository.queueSkip.collectAsState(false)
     fun realPlay(song: Song) {
         if (queueSkip.value) {
             spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))

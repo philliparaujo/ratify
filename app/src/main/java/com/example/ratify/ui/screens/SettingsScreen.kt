@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.di.LocalSpotifyViewModel
+import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.Preview
-import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MySwitch
@@ -28,17 +28,16 @@ fun SettingsScreen(
     onExportClick: () -> Unit = {},
     onImportClick: () -> Unit = {}
 ) {
-    val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
+    val settingsRepository: SettingsRepository = LocalSettingsRepository.current
 
-    val settings = spotifyViewModel.settings
     val scope = rememberCoroutineScope()
 
-    val autoSignIn = settings.autoSignIn.collectAsState(false)
-    val skipOnRate = settings.skipOnRate.collectAsState(false)
-    val queueSkip = settings.queueSkip.collectAsState(false)
-    val libraryImageUri = settings.libraryImageUri.collectAsState(true)
-    val darkTheme = settings.darkTheme.collectAsState(true)
-    val themeColor = settings.themeColor.collectAsState(0)
+    val autoSignIn = settingsRepository.autoSignIn.collectAsState(false)
+    val skipOnRate = settingsRepository.skipOnRate.collectAsState(false)
+    val queueSkip = settingsRepository.queueSkip.collectAsState(false)
+    val libraryImageUri = settingsRepository.libraryImageUri.collectAsState(true)
+    val darkTheme = settingsRepository.darkTheme.collectAsState(true)
+    val themeColor = settingsRepository.themeColor.collectAsState(0)
 
     Box(
         modifier = Modifier
@@ -67,7 +66,7 @@ fun SettingsScreen(
                 checked = darkTheme.value,
                 onCheckedChange = { newState ->
                     scope.launch {
-                        settings.setDarkTheme(newState)
+                        settingsRepository.setDarkTheme(newState)
                     }
                 },
                 modifier = Modifier.padding(start = 16.dp)
@@ -77,7 +76,7 @@ fun SettingsScreen(
                 currentTheme = themeColor.value,
                 onThemeSelected = { newTheme ->
                     scope.launch {
-                        settings.setThemeColor(newTheme)
+                        settingsRepository.setThemeColor(newTheme)
                     }
                 },
                 modifier = Modifier.padding(start = 14.dp, top = 12.dp, bottom = 12.dp)
@@ -88,7 +87,7 @@ fun SettingsScreen(
                 state = autoSignIn.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings.setAutoSignIn(newState)
+                        settingsRepository.setAutoSignIn(newState)
                     }
                 }
             )
@@ -97,7 +96,7 @@ fun SettingsScreen(
                 state = skipOnRate.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings.setSkipOnRate(newState)
+                        settingsRepository.setSkipOnRate(newState)
                     }
                 }
             )
@@ -106,7 +105,7 @@ fun SettingsScreen(
                 state = queueSkip.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings.setQueueSkip(newState)
+                        settingsRepository.setQueueSkip(newState)
                     }
                 }
             )
@@ -115,7 +114,7 @@ fun SettingsScreen(
                 state = libraryImageUri.value,
                 toggleState = { newState ->
                     scope.launch {
-                        settings.setLibraryImageUri(newState)
+                        settingsRepository.setLibraryImageUri(newState)
                     }
                 }
             )
