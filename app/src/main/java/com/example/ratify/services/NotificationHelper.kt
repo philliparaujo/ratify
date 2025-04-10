@@ -21,17 +21,6 @@ fun setupNotification(context: Context, remoteViews: RemoteViews, onlyAlertOnce:
         .setOnlyAlertOnce(onlyAlertOnce)
 }
 
-fun Context.startRatingService(currentRating: Rating?) {
-    val currentRatingText = ratingToText(currentRating)
-
-    Intent(this, RatingService::class.java).apply {
-        action = RatingService.Actions.START.toString()
-        putExtra(CURRENT_RATING_EXTRA, currentRatingText)
-    }.also {
-        startService(it)
-    }
-}
-
 fun Context.updateRatingService(currentRating: Rating?) {
     val currentRatingText = ratingToText(currentRating)
 

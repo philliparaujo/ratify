@@ -26,7 +26,7 @@ class DatabaseIOHelper(
     }
 
     fun exportDatabase() {
-        exportLauncher.launch(SongDatabaseProvider.databaseName)
+        exportLauncher.launch(SongDatabaseProvider.DATABASE_NAME)
     }
 
     fun importDatabase() {

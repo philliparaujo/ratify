@@ -34,8 +34,7 @@ import kotlinx.coroutines.launch
 class SpotifyViewModel(
     application: Application,
     private val songRepository: SongRepository,
-    private val stateRepository: StateRepository,
-    private val settingsRepository: SettingsRepository
+    private val stateRepository: StateRepository
 ): AndroidViewModel(application), ISpotifyViewModel {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
@@ -88,7 +87,7 @@ class SpotifyViewModel(
                     Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
 
                     viewModelScope.launch {
-                        val existingSong = songRepository.GetSongByPrimaryKey(currentSong)
+                        val existingSong = songRepository.getSongByPrimaryKey(currentSong)
                         val currentTime = System.currentTimeMillis()
 
                         val context = getApplication<Application>()
@@ -97,7 +96,7 @@ class SpotifyViewModel(
                         // In database, insert current song for first time or update existing song's lastPlayedTs, timesPlayed
                         if (existingSong == null) {
                             if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
-                                songRepository.UpsertSong(
+                                songRepository.upsertSong(
                                     track = currentSong,
                                     lastPlayedTs = currentTime,
                                     timesPlayed = 1,
@@ -107,7 +106,7 @@ class SpotifyViewModel(
                                 context.updateRatingService(null)
                             }
                         } else {
-                            songRepository.UpdateLastPlayedTs(
+                            songRepository.updateLastPlayedTs(
                                 name = existingSong.name,
                                 artists = existingSong.artists,
                                 lastPlayedTs = currentTime,

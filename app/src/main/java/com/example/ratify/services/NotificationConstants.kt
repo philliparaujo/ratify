@@ -27,5 +27,5 @@ val textViewId = R.id.currentRating
 const val nullTextViewValue = "-"
 
 // Button constants
-val buttonIds = listOf(R.id.star1, R.id.star2, R.id.star3, R.id.star4, R.id.star5,)
+val buttonIds = listOf(R.id.star1, R.id.star2, R.id.star3, R.id.star4, R.id.star5)
 val defaultButtonValues = listOf(2, 4, 6, 8, 10)

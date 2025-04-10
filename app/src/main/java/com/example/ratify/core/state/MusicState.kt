@@ -1,3 +1,5 @@
+package com.example.ratify.core.state
+
 import com.example.ratify.core.model.Rating
 
 data class MusicState(

@@ -21,14 +21,16 @@ val appModule = module {
         ).build()
     }
 
-    single<SongDao> { get<SongDatabase>().dao }
+    single<SongDao> {
+        get<SongDatabase>().dao
+    }
 
     single<SongRepository> {
-        SongRepository(get())
+        SongRepository(get<SongDao>())
     }
 
     single<StateRepository> {
-        StateRepository(get())
+        StateRepository(get<SongRepository>())
     }
 
     single<SettingsRepository> {
@@ -39,8 +41,7 @@ val appModule = module {
         SpotifyViewModel(
             application = androidApplication(),
             songRepository = get(),
-            stateRepository = get(),
-            settingsRepository = get()
+            stateRepository = get()
         )
     }
 }

@@ -46,7 +46,7 @@ class RatingBroadcastReceiver : BroadcastReceiver() {
             val converters = Converters()
 
             if (name != null && artists != null) {
-                songRepository.UpdateRating(
+                songRepository.updateRating(
                     name = name,
                     artists = converters.toArtistList(artists)!!,
                     rating = Rating.from(buttonValue),

@@ -14,14 +14,14 @@ import java.io.FileOutputStream
 object SongDatabaseProvider {
     @Volatile
     private var instance: SongDatabase? = null
-    val databaseName = "songs.db"
+    const val DATABASE_NAME = "songs.db"
 
-    fun getDatabase(context: Context): SongDatabase {
+    private fun getDatabase(context: Context): SongDatabase {
         return instance ?: synchronized(this) {
             val newInstance = Room.databaseBuilder(
                 context.applicationContext,
                 SongDatabase::class.java,
-                databaseName
+                DATABASE_NAME
             )
                 .addMigrations(*DatabaseVersionManager.getAllMigrations())
                 .build()
@@ -44,7 +44,7 @@ object SongDatabaseProvider {
             val database = getDatabase(context)
             forceDatabaseSync(database) // Ensure changes are written to disk
 
-            val databasePath = context.getDatabasePath(databaseName).absolutePath
+            val databasePath = context.getDatabasePath(DATABASE_NAME).absolutePath
             val inputFile = File(databasePath)
             val outputStream = contentResolver.openOutputStream(destinationUri) ?: return false
 
@@ -61,7 +61,7 @@ object SongDatabaseProvider {
     }
 
     fun importDatabase(context: Context, sourceUri: Uri): Boolean {
-        val destinationPath = context.getDatabasePath(databaseName).absolutePath
+        val destinationPath = context.getDatabasePath(DATABASE_NAME).absolutePath
         Log.d("SongDatabaseProvider", "Importing database from URI: $sourceUri to $destinationPath")
 
         return try {

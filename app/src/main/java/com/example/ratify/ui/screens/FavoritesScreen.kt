@@ -81,7 +81,7 @@ fun FavoritesScreen() {
             GroupType.ARTIST -> dialog?.artist?.name to dialog?.artist?.uri
         }
 
-        groupName?.let { songRepository.GetSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
+        groupName?.let { songRepository.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
 
     // Sort button options

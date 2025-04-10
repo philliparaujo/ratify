@@ -14,21 +14,30 @@ import com.spotify.protocol.types.Track
 import kotlinx.coroutines.flow.Flow
 
 class SongRepository(
-    val dao: SongDao
+    private val dao: SongDao
 ) {
     // Fetches
-    suspend fun GetSongByPrimaryKey(track: Track): Song? {
+    suspend fun getSongByPrimaryKey(track: Track): Song? {
         return dao.getSongByPrimaryKey(track.name, track.artists)
     }
 
-    fun GetSongsByGroup(groupType: GroupType, groupName: String, uri: String): Flow<List<Song>> {
+    fun getSongsByGroup(
+        groupType: GroupType,
+        groupName: String,
+        uri: String
+    ): Flow<List<Song>> {
         return when (groupType) {
             GroupType.ALBUM -> dao.getSongsByAlbum(Album(groupName, uri))
             GroupType.ARTIST -> dao.getSongsByArtist(Artist(groupName, uri))
         }
     }
 
-    fun GetLibrarySongs(searchType: SearchType?, searchQuery: String?, librarySortType: LibrarySortType?, ascending: Boolean): Flow<List<Song>> {
+    fun getLibrarySongs(
+        searchType: SearchType?,
+        searchQuery: String?,
+        librarySortType: LibrarySortType?,
+        ascending: Boolean
+    ): Flow<List<Song>> {
         return dao.querySongs(
             dao.buildLibraryQuery(
                 searchType,
@@ -39,7 +48,12 @@ class SongRepository(
         )
     }
 
-    fun GetFavoritesSongs(groupType: GroupType, favoritesSortType: FavoritesSortType?, ascending: Boolean, minEntriesThreshold: Int = 1): Flow<List<GroupedSong>> {
+    fun getFavoritesSongs(
+        groupType: GroupType,
+        favoritesSortType: FavoritesSortType?,
+        ascending: Boolean,
+        minEntriesThreshold: Int = 1
+    ): Flow<List<GroupedSong>> {
         return dao.queryGroupedSongs(
             dao.buildFavoritesQuery(
                 groupType,
@@ -51,7 +65,13 @@ class SongRepository(
     }
 
     // Updates
-    suspend fun UpsertSong(track: Track, rating: Rating?, lastRatedTs: Long?, lastPlayedTs: Long?, timesPlayed: Int) {
+    suspend fun upsertSong(
+        track: Track,
+        rating: Rating?,
+        lastRatedTs: Long?,
+        lastPlayedTs: Long?,
+        timesPlayed: Int
+    ) {
         val song = Song(
             album = track.album,
             artist = track.artist,
@@ -69,20 +89,33 @@ class SongRepository(
         dao.upsertSong(song)
     }
 
-    suspend fun DeleteSong(song: Song) {
+    suspend fun deleteSong(song: Song) {
         dao.deleteSong(song)
     }
 
-    suspend fun DeleteSongsWithNullRating(exceptName: String, exceptArtists: List<Artist>): Int {
+    suspend fun deleteSongsWithNullRating(
+        exceptName: String,
+        exceptArtists: List<Artist>
+    ): Int {
         return dao.deleteSongsWithNullRating(exceptName, exceptArtists)
     }
 
-    suspend fun UpdateLastPlayedTs(name: String, artists: List<Artist>, lastPlayedTs: Long?, timesPlayed: Int) {
+    suspend fun updateLastPlayedTs(
+        name: String,
+        artists: List<Artist>,
+        lastPlayedTs: Long?,
+        timesPlayed: Int
+    ) {
         dao.getSongByPrimaryKey(name, artists)?.let {
             dao.upsertSong(it.copy(lastPlayedTs = lastPlayedTs, timesPlayed = timesPlayed))
         }
     }
-    suspend fun UpdateRating(name: String, artists: List<Artist>, rating: Rating?, lastRatedTs: Long?) {
+    suspend fun updateRating(
+        name: String,
+        artists: List<Artist>,
+        rating: Rating?,
+        lastRatedTs: Long?
+    ) {
         dao.getSongByPrimaryKey(name, artists)?.let {
             dao.upsertSong(it.copy(lastRatedTs = lastRatedTs, rating = rating))
         }

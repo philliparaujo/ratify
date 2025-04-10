@@ -135,7 +135,7 @@ fun LibraryScreen(
                 }
                 // Update rating in database
                 scope.launch {
-                    songRepository.UpdateRating(
+                    songRepository.updateRating(
                         name = song.name,
                         artists = song.artists,
                         rating = ratingValue,
@@ -149,7 +149,7 @@ fun LibraryScreen(
             },
             onDelete = {
                 scope.launch {
-                    songRepository.DeleteSong(song)
+                    songRepository.deleteSong(song)
                 }
             },
             playEnabled = playerEnabled,
@@ -211,7 +211,7 @@ fun LibraryScreen(
                 dropdownOptionOnClick = listOf(
                     { stateRepository.updateVisualizerShowing(!libraryState.visualizerShowing) },
                     { scope.launch {
-                        songRepository.DeleteSongsWithNullRating(
+                        songRepository.deleteSongsWithNullRating(
                             playerState?.track?.name ?: "",
                             playerState?.track?.artists ?: listOf()
                         )

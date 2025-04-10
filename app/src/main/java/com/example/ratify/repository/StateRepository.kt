@@ -1,6 +1,5 @@
 package com.example.ratify.repository
 
-import MusicState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -11,6 +10,7 @@ import com.example.ratify.core.model.Rating
 import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.core.state.LibraryState
+import com.example.ratify.core.state.MusicState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.example.ratify.ui.navigation.SnackbarAction
@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-// TODO: find a better location for this class
 class StateRepository(
     private val songRepository: SongRepository
 ) {
@@ -48,7 +47,6 @@ class StateRepository(
     private val _groupType = MutableStateFlow(GroupType.ARTIST)
     private val _minEntriesThreshold = MutableStateFlow(5)
 
-
     // Complex states
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _librarySongs = combine(
@@ -57,7 +55,7 @@ class StateRepository(
         _librarySortType,
         _librarySortAscending
     ) { searchType, searchQuery, sortType, sortAscending ->
-        songRepository.GetLibrarySongs(searchType, searchQuery, sortType, sortAscending)
+        songRepository.getLibrarySongs(searchType, searchQuery, sortType, sortAscending)
     }.flatMapLatest { it }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -67,7 +65,7 @@ class StateRepository(
         _favoritesSortAscending,
         _minEntriesThreshold
     ) { groupType, sortType, sortAscending, minEntriesThreshold ->
-        songRepository.GetFavoritesSongs(groupType, sortType, sortAscending, minEntriesThreshold)
+        songRepository.getFavoritesSongs(groupType, sortType, sortAscending, minEntriesThreshold)
     }.flatMapLatest { it }
 
     private val musicMeta = flowOf(MusicState())
@@ -100,7 +98,6 @@ class StateRepository(
         )
     }
 
-
     // Getters
     val musicState = combine(_currentRating, musicMeta) { rating, meta ->
         meta.copy(currentRating = rating)
@@ -114,7 +111,7 @@ class StateRepository(
         meta.copy(groupedSongs = songs)
     }.stateIn(scope, SharingStarted.WhileSubscribed(5000), FavoritesState())
 
-    val snackbarHostState = SnackbarHostState()  // Keeps Snackbars active across UI changes/rotations
+    val snackbarHostState = SnackbarHostState()  // Keeps Snackbars active
 
     // Setters
     fun updateCurrentRating(rating: Rating?) {

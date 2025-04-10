@@ -11,7 +11,7 @@ val LocalSpotifyViewModel = staticCompositionLocalOf<ISpotifyViewModel> {
 }
 
 val LocalSongRepository = staticCompositionLocalOf<SongRepository> {
-    error("com.example.ratify.repository.SongRepository not provided")
+    error("SongRepository not provided")
 }
 
 val LocalStateRepository = staticCompositionLocalOf<StateRepository> {

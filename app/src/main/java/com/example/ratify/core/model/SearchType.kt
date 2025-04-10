@@ -1,7 +1,7 @@
 package com.example.ratify.core.model
 
 enum class SearchType(
-    val displayName: String
+    private val displayName: String
 ) {
     NAME("Name"),
     ARTISTS("Artists"),

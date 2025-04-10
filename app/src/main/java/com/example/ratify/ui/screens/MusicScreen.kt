@@ -1,6 +1,5 @@
 package com.example.ratify.ui.screens
 
-import MusicState
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.Rating
+import com.example.ratify.core.state.MusicState
 import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
@@ -223,7 +223,7 @@ fun PlayerScreen() {
 
                     // Update rating in database
                     scope.launch {
-                        songRepository.UpdateRating(
+                        songRepository.updateRating(
                             name = playerState!!.track.name,
                             artists = playerState!!.track.artists,
                             rating = ratingValue,

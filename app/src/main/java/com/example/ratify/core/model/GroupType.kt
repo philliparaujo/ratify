@@ -1,7 +1,7 @@
 package com.example.ratify.core.model
 
 enum class GroupType(
-    val displayName: String
+    private val displayName: String
 ) {
     ARTIST("Artist"),
     ALBUM("Album");
