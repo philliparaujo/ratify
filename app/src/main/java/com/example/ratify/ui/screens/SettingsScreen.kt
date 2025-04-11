@@ -32,12 +32,13 @@ fun SettingsScreen(
 
     val scope = rememberCoroutineScope()
 
+    // Toggleable settings rendered on screen
+    val darkTheme = settingsRepository.darkTheme.collectAsState(true)
+    val themeColor = settingsRepository.themeColor.collectAsState(0)
     val autoSignIn = settingsRepository.autoSignIn.collectAsState(false)
     val skipOnRate = settingsRepository.skipOnRate.collectAsState(false)
     val queueSkip = settingsRepository.queueSkip.collectAsState(false)
     val libraryImageUri = settingsRepository.libraryImageUri.collectAsState(true)
-    val darkTheme = settingsRepository.darkTheme.collectAsState(true)
-    val themeColor = settingsRepository.themeColor.collectAsState(0)
 
     Box(
         modifier = Modifier

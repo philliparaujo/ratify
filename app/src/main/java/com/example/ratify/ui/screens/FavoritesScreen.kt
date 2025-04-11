@@ -1,8 +1,6 @@
 package com.example.ratify.ui.screens
 
-import com.example.ratify.repository.SongRepository
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.core.model.FavoritesSortType
+import com.example.ratify.core.helper.FAVORITES_MAX_SLIDER_VALUE
+import com.example.ratify.core.helper.FAVORITES_SORT_TYPES
+import com.example.ratify.core.helper.GroupsPerRow
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
@@ -45,9 +45,10 @@ import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.repository.SongRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.components.AlbumItem
 import com.example.ratify.ui.components.ArtistItem
 import com.example.ratify.ui.components.DropdownSelect
@@ -84,18 +85,7 @@ fun FavoritesScreen() {
         groupName?.let { songRepository.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
 
-    // Sort button options
-    val favoritesSortTypes = listOf(
-        FavoritesSortType.RATING,
-        FavoritesSortType.NAME,
-        FavoritesSortType.NUM_ENTRIES,
-        FavoritesSortType.TIMES_PLAYED,
-        FavoritesSortType.LAST_RATED_TS,
-        FavoritesSortType.LAST_PLAYED_TS
-    )
-
     // Slider values
-    val maxSliderValue: Long = 30
     var currentSliderValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
     LaunchedEffect(favoritesState.minEntriesThreshold) {
         currentSliderValue = favoritesState.minEntriesThreshold.toLong()
@@ -136,7 +126,7 @@ fun FavoritesScreen() {
             )
 
             DropdownSelect(
-                options = favoritesSortTypes,
+                options = FAVORITES_SORT_TYPES,
                 selectedOption = favoritesState.favoritesSortType,
                 onSelect = { stateRepository.updateFavoritesSortType(it) },
                 label = "Sort by",
@@ -171,7 +161,7 @@ fun FavoritesScreen() {
 
             MySlider(
                 currentValue = currentSliderValue,
-                maxValue = maxSliderValue,
+                maxValue = FAVORITES_MAX_SLIDER_VALUE,
                 onValueChanging = { newValue ->
                     currentSliderValue = newValue.toFloat().roundToInt().toLong()
                 },
@@ -188,8 +178,9 @@ fun FavoritesScreen() {
     @Composable
     fun RenderItemList() {
         val groupedSongs = favoritesState.groupedSongs
-        val numRows = if (isLandscape) 4 else 2
-        val rows = groupedSongs.chunked(numRows)
+        val groupsPerRow =
+            if (isLandscape) GroupsPerRow.LANDSCAPE.columns else GroupsPerRow.PORTRAIT.columns
+        val rows = groupedSongs.chunked(groupsPerRow)
 
         LazyColumn(
             modifier = Modifier
@@ -228,8 +219,8 @@ fun FavoritesScreen() {
                     }
 
                     // Ensure last row has same size
-                    if (rowItems.size < numRows) {
-                        repeat(numRows - rowItems.size) {
+                    if (rowItems.size < groupsPerRow) {
+                        repeat(groupsPerRow - rowItems.size) {
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
@@ -240,9 +231,6 @@ fun FavoritesScreen() {
 
     @Composable
     fun RenderDialog(groupedSong: GroupedSong, groupType: GroupType, songs: List<Song>) {
-        AnimatedVisibility(
-            visible = true,
-        ) { }
         GroupedSongDialog(
             groupedSong = groupedSong,
             groupType = groupType,

@@ -1,7 +1,6 @@
 package com.example.ratify.ui.screens
 
-import com.example.ratify.repository.SongRepository
-import androidx.compose.animation.AnimatedVisibility
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,9 +30,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.ratify.core.model.LibrarySortType
+import com.example.ratify.core.helper.LIBRARY_SEARCH_TYPES
+import com.example.ratify.core.helper.LIBRARY_SORT_TYPES
+import com.example.ratify.core.helper.dropdownOptions
 import com.example.ratify.core.model.Rating
-import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Song
 import com.example.ratify.di.LocalSettingsRepository
@@ -43,10 +43,11 @@ import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.repository.SongRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
-import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.SongDialog
@@ -69,17 +70,13 @@ fun LibraryScreen(
     val libraryState = stateRepository.libraryState.collectAsState(initial = LibraryState()).value
     val playerState by spotifyViewModel.playerState.collectAsState()
 
-    // Active search/sort options
-    val searchTypes = listOf(SearchType.NAME, SearchType.ARTISTS, SearchType.ALBUM, SearchType.RATING)
-    val librarySortTypes = listOf(LibrarySortType.RATING, LibrarySortType.LAST_PLAYED_TS, LibrarySortType.LAST_RATED_TS, LibrarySortType.TIMES_PLAYED, LibrarySortType.NAME)
-
     // Player enabled logic
     val userCapabilities = spotifyViewModel.userCapabilities.observeAsState().value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
     // Orientation logic
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Figure out which Target is currently selected
     // Relies on composable<Target> route being a substring of Target.toString()
@@ -117,9 +114,6 @@ fun LibraryScreen(
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
 
-        AnimatedVisibility(
-                visible = true,
-        ) { }
         SongDialog(
             onDismissRequest = {
                 stateRepository.updateLibraryDialog(null)
@@ -193,6 +187,9 @@ fun LibraryScreen(
     @Composable
     fun RenderSearch() {
         val scope = rememberCoroutineScope()
+        val (dropdownLabels, dropdownOptionOnClick) = dropdownOptions(
+            songRepository, stateRepository, libraryState, playerState, scope
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -204,25 +201,14 @@ fun LibraryScreen(
                 onQueryChange = { stateRepository.updateSearchQuery(it) },
                 placeholderText = "Search",
                 trailingIcon = Icons.Default.MoreVert,
-                dropdownLabels = listOf(
-                    if (libraryState.visualizerShowing) "Hide visualizer" else "Show visualizer",
-                    "Delete unrated songs"
-                ),
-                dropdownOptionOnClick = listOf(
-                    { stateRepository.updateVisualizerShowing(!libraryState.visualizerShowing) },
-                    { scope.launch {
-                        songRepository.deleteSongsWithNullRating(
-                            playerState?.track?.name ?: "",
-                            playerState?.track?.artists ?: listOf()
-                        )
-                    } }
-                ),
+                dropdownLabels = dropdownLabels,
+                dropdownOptionOnClick = dropdownOptionOnClick,
                 modifier = Modifier.weight(1f)
             )
 
             // Searching dropdown
             DropdownSelect(
-                options = searchTypes,
+                options = LIBRARY_SEARCH_TYPES,
                 selectedOption = libraryState.searchType,
                 onSelect = { searchType -> stateRepository.updateSearchType(searchType) },
                 label = "Search by",
@@ -261,7 +247,7 @@ fun LibraryScreen(
 
             // Sorting dropdown
             DropdownSelect(
-                options = librarySortTypes,
+                options = LIBRARY_SORT_TYPES,
                 selectedOption = libraryState.librarySortType,
                 onSelect = { stateRepository.updateLibrarySortType(it) },
                 label = "Sort by",

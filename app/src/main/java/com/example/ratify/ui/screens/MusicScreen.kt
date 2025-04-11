@@ -142,9 +142,9 @@ fun PlayerScreen() {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
 
+        // Controls playback position dragging
         var userDragging by remember { mutableStateOf(false) }
         var dragPositionMs by remember { mutableLongStateOf(0L) }
-
         LaunchedEffect(userDragging, dragPositionMs, currentPlaybackPosition.value) {
             if (userDragging) {
                 val actualPosition = currentPlaybackPosition.value ?: 0L

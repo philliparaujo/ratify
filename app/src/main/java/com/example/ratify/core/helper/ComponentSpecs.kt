@@ -79,7 +79,7 @@ object LeftNavBarSpecs {
 
 object SliderSpecs {
     val circleSize = 12  // (dp)
-    val barHeight = 8
+    val barHeight = 8  // (dp)
 }
 
 

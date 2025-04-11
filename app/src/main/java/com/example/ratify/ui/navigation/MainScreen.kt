@@ -2,6 +2,8 @@ package com.example.ratify.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ratify.core.helper.NAVIGATION_TARGETS
+import com.example.ratify.core.helper.START_NAVIGATION_TARGET
 
 @Composable
 fun MainScreen(
@@ -10,19 +12,11 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
 
-    // Controls pages that show up on bottom nav bar (portrait) and nav drawer (landscape)
-    val targets = listOf(
-        MusicNavigationTarget,
-        LibraryNavigationTarget,
-        FavoritesNavigationTarget,
-        SettingsNavigationTarget)
-    val startTarget = MusicNavigationTarget
-
     NavigationRenderer(
         navController = navController,
-        navigationTargets = targets,
+        navigationTargets = NAVIGATION_TARGETS,
         onExportClick = onExportClick,
         onImportClick = onImportClick,
-        startNavigationTarget = startTarget
+        startNavigationTarget = START_NAVIGATION_TARGET
     )
 }
