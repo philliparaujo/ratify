@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
@@ -125,7 +125,7 @@ fun SettingsScreen(
 @Preview(name = "Dark Settings Screen")
 @Composable
 fun DarkSettingsScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         SettingsScreen()
     }
 }
@@ -133,7 +133,7 @@ fun DarkSettingsScreenPreview() {
 @Preview(name = "Light Settings Screen")
 @Composable
 fun LightSettingsScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         SettingsScreen()
     }
 }
@@ -144,7 +144,7 @@ fun LightSettingsScreenPreview() {
 )
 @Composable
 fun DarkLandscapeSettingsScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         SettingsScreen()
     }
 }
@@ -155,7 +155,7 @@ fun DarkLandscapeSettingsScreenPreview() {
 )
 @Composable
 fun LightLandscapeSettingsScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         SettingsScreen()
     }
 }

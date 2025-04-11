@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.Rating
 import com.example.ratify.database.Song
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.mockSong
 import com.example.ratify.services.nullTextViewValue
 
@@ -69,7 +69,7 @@ fun getRatingColor(rating: Rating?): Color {
 @Preview(name = "Dark Song Items")
 @Composable
 fun DarkSongItemsPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -103,7 +103,7 @@ fun DarkSongItemsPreview() {
 @Preview(name = "Light Song Items")
 @Composable
 fun LightSongItemsPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

@@ -1,7 +1,6 @@
 package com.example.ratify.ui.components
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -18,8 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.ButtonSpecs
+import com.example.ratify.core.helper.textStyle
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun MyButton(
@@ -30,9 +30,7 @@ fun MyButton(
     large: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val buttonHeight = if (large) 54.dp else 40.dp
-    val minWidth = if (large) 140.dp else 100.dp
-    val typography = if (large) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.bodyMedium
+    val specs = if (large) ButtonSpecs.LARGE else ButtonSpecs.SMALL
 
     Box(
         modifier = modifier
@@ -48,12 +46,12 @@ fun MyButton(
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             modifier = Modifier
-                .height(buttonHeight)
-                .defaultMinSize(minWidth)
+                .height(specs.height)
+                .defaultMinSize(specs.width)
         ) {
             Text(
                 text = text,
-                style = typography,
+                style = specs.textStyle(),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -83,10 +81,8 @@ const val bigButtonText = "Connect to Spotify"
 @Preview(name = "Dark Enabled Button")
 @Composable
 fun DarkEnabledButtonPreview() {
-    Preview(darkTheme = true) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
+    MyPreview(darkTheme = true) {
+        Column {
             MyButton(text = smallButtonText, onClick = {}, enabled = true)
             MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
             MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
@@ -98,10 +94,8 @@ fun DarkEnabledButtonPreview() {
 @Preview(name = "Light Enabled Button")
 @Composable
 fun LightEnabledButtonPreview() {
-    Preview(darkTheme = false) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
+    MyPreview(darkTheme = false) {
+        Column {
             MyButton(text = smallButtonText, onClick = {}, enabled = true)
             MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
             MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)

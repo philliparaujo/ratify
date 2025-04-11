@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.database.Song
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.mockSong
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -227,7 +227,7 @@ fun timestampToDate(timestamp: Long?): String? {
 @Preview(name = "Dark Test Dialog")
 @Composable
 fun DarkTestDialogPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -247,7 +247,7 @@ fun DarkTestDialogPreview() {
 @Preview(name = "Light Test Dialog")
 @Composable
 fun TestDialogPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -267,7 +267,7 @@ fun TestDialogPreview() {
 @Preview(name = "Dark Landscape Test Dialog", device = LANDSCAPE_DEVICE)
 @Composable
 fun DarkLandscapeTestDialogPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -287,7 +287,7 @@ fun DarkLandscapeTestDialogPreview() {
 @Preview(name = "Light Landscape Test Dialog", device = LANDSCAPE_DEVICE)
 @Composable
 fun LightLandscapeTestDialogPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

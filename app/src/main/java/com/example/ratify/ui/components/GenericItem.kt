@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +23,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.SubcomposeAsyncImage
+import com.example.ratify.R
+import com.example.ratify.core.helper.ItemSpecs
+import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.mockSong
 import com.spotify.protocol.types.ImageUri
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -43,23 +49,14 @@ fun GenericItem(
     onLongClick: (() -> Unit)?,
     imageUri: ImageUri?
 ) {
-    val itemHeight = 55.dp
-    val innerContentPadding = 3.dp
-    val roundedCorner = RoundedCornerShape(12.dp)
-
-    val ratingToContentSpacing = 10.dp
-    val contentToButtonSpacing = 12.dp
-
-    val ratingTextSize = 22.sp
-    val titleSize = 16.sp
-    val subtitleSize = 12.sp
+    val specs = ItemSpecs
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(itemHeight)
-            .clip(roundedCorner)
-            .border(0.5.dp, MaterialTheme.colorScheme.secondary, roundedCorner)
+            .height(specs.itemHeight)
+            .clip(specs.roundedCorner)
+            .border(0.5.dp, MaterialTheme.colorScheme.secondary, specs.roundedCorner)
             .background(MaterialTheme.colorScheme.background)
             .combinedClickable(
                 onClick = onClick,
@@ -74,7 +71,7 @@ fun GenericItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(roundedCorner)
+                    .clip(specs.roundedCorner)
             )
 
             // Translucent overlay
@@ -89,7 +86,7 @@ fun GenericItem(
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerContentPadding),
+                .padding(specs.innerContentPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Rating Box
@@ -97,19 +94,19 @@ fun GenericItem(
                 modifier = Modifier
                     .aspectRatio(1f)
                     .fillMaxHeight()
-                    .clip(roundedCorner)
+                    .clip(specs.roundedCorner)
                     .background(ratingColor),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = ratingText,
-                    fontSize = ratingTextSize,
+                    fontSize = specs.ratingTextSize,
                     color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.width(ratingToContentSpacing))
+            Spacer(modifier = Modifier.width(specs.ratingToContentSpacing))
 
             // Title and subtitle
             Column(
@@ -117,7 +114,7 @@ fun GenericItem(
             ) {
                 Text(
                     text = title,
-                    fontSize = titleSize,
+                    fontSize = specs.titleSize,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -125,18 +122,49 @@ fun GenericItem(
                 )
                 Text(
                     text = subtitle,
-                    fontSize = subtitleSize,
+                    fontSize = specs.subtitleSize,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
 
-            Spacer(modifier = Modifier.width(contentToButtonSpacing))
+            Spacer(modifier = Modifier.width(specs.contentToButtonSpacing))
 
             if (displayButton != null) {
                 displayButton()
             }
+        }
+    }
+}
+
+// Previews
+@Preview(name = "Generic Item")
+@Composable
+fun GenericItemPreview() {
+    MyPreview(darkTheme = true) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            GenericItem(
+                title = "Title",
+                subtitle = "Subtitle",
+                ratingColor = MaterialTheme.colorScheme.primary,
+                ratingText = "10",
+                displayButton = {
+                    MyIconButton(
+                        icon = ImageVector.vectorResource(id = R.drawable.baseline_file_download_24),
+                        onClick = { },
+                        onDisabledClick = { },
+                        enabled = false,
+                    )
+                },
+                onClick = { },
+                onLongClick = { },
+                imageUri = mockSong.imageUri
+            )
         }
     }
 }

@@ -14,7 +14,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.LeftNavBarSpecs
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
 import com.example.ratify.ui.navigation.NavigationTarget
@@ -28,10 +29,12 @@ fun LeftNavDrawer(
     onClick: (NavigationTarget, Boolean) -> Unit
 ) {
     val outlineColor = MaterialTheme.colorScheme.secondary
+    val specs = LeftNavBarSpecs
+
     ModalDrawerSheet(
         drawerContainerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
-            .width(100.dp)
+            .width(specs.width)
             .drawBehind {
                 // Right gray outline of nav bar
                 drawLine(
@@ -72,7 +75,7 @@ fun LeftNavDrawer(
 @Preview(name = "Dark Landscape Nav Drawer", widthDp = 640, heightDp = 360)
 @Composable
 fun DarkLandscapeNavDrawerPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         LeftNavDrawer(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
@@ -84,7 +87,7 @@ fun DarkLandscapeNavDrawerPreview() {
 @Preview(name = "Light Landscape Nav Drawer", widthDp = 640, heightDp = 360)
 @Composable
 fun LightLandscapeNavDrawerPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         LeftNavDrawer(
             onClick = { _, _ -> run {} },
             navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),

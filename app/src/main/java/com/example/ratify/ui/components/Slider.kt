@@ -27,7 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.SliderSpecs
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun MySlider(
@@ -45,9 +46,9 @@ fun MySlider(
         draggedValue = currentValue
         realMaxValue = maxValue
     }
-
     val progress = draggedValue.toFloat() / realMaxValue.toFloat().coerceAtLeast(1f)
-    val progressCircleSize = 12
+
+    val specs = SliderSpecs
 
     Box(
         modifier = modifier
@@ -73,14 +74,14 @@ fun MySlider(
                 )
             }
             .fillMaxWidth()
-            .height(16.dp)
+            .height(specs.circleSize.dp)
             .onSizeChanged { containerWidthPx = it.width }
     ) {
         // Secondary progress bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp)
+                .height(specs.barHeight.dp)
                 .background(
                     color = MaterialTheme.colorScheme.secondary,
                     shape = RoundedCornerShape(4.dp)
@@ -92,7 +93,7 @@ fun MySlider(
         Box(
             modifier = Modifier
                 .fillMaxWidth(progress)
-                .height(8.dp)
+                .height(specs.barHeight.dp)
                 .background(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(4.dp)
@@ -103,9 +104,9 @@ fun MySlider(
         // Progress circle
         Box(
             modifier = Modifier
-                .size(progressCircleSize.dp)
+                .size(specs.circleSize.dp)
                 .offset {
-                    val offsetX = (progress * (containerWidthPx.toFloat() - progressCircleSize) - progressCircleSize).toInt() // Center the circle
+                    val offsetX = (progress * (containerWidthPx.toFloat() - specs.circleSize) - specs.circleSize).toInt() // Center the circle
                     IntOffset(x = offsetX, y = 0)
                 }
                 .background(
@@ -122,7 +123,7 @@ fun MySlider(
 @Preview(name = "Dark Slider")
 @Composable
 fun DarkSliderPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -137,7 +138,7 @@ fun DarkSliderPreview() {
 @Preview(name = "Light Slider")
 @Composable
 fun LightSliderPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

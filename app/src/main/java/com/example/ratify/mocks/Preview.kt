@@ -16,7 +16,7 @@ import com.example.ratify.ui.theme.RatifyTheme
 const val LANDSCAPE_DEVICE = "spec:width=411dp,height=891dp,dpi=420,isRound=false,chinSize=0dp,orientation=landscape"
 
 @Composable
-fun Preview(
+fun MyPreview(
     darkTheme: Boolean,
     content: @Composable () -> Unit
 ) {

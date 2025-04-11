@@ -43,7 +43,7 @@ import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
@@ -301,7 +301,7 @@ fun FavoritesScreen() {
 @Preview(name = "Dark Favorites Screen")
 @Composable
 fun DarkFavoritesScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         FavoritesScreen()
     }
 }
@@ -309,7 +309,7 @@ fun DarkFavoritesScreenPreview() {
 @Preview(name = "Light Favorites Screen")
 @Composable
 fun LightFavoritesScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         FavoritesScreen()
     }
 }
@@ -320,7 +320,7 @@ fun LightFavoritesScreenPreview() {
 )
 @Composable
 fun DarkLandscapeFavoritesScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         FavoritesScreen()
     }
 }
@@ -331,7 +331,7 @@ fun DarkLandscapeFavoritesScreenPreview() {
 )
 @Composable
 fun LightLandscapeFavoritesScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         FavoritesScreen()
     }
 }

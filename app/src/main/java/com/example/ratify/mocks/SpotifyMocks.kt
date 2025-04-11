@@ -1,6 +1,7 @@
 package com.example.ratify.mocks
 
 import com.example.ratify.core.model.Rating
+import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
@@ -19,6 +20,10 @@ private const val mockLongSongName = "Symphony No. 40 in G Minor, K. 550: I.Alle
 private const val mockTimestamp = 1737132383109
 private const val mockTimesPlayed = 1
 private val mockRating = Rating.from(10)
+
+private val mockCount = 12
+private val mockTotalTimesPlayed = 55
+private val mockAverageRating = 6.4f
 
 private const val unspecifiedString = "foo"
 
@@ -57,4 +62,14 @@ val longMockSong = Song(
     timesPlayed = mockTimesPlayed,
     lastRatedTs = mockTimestamp,
     rating = mockRating
+)
+val mockGroupedSong = GroupedSong(
+    artist = mockArtist,
+    album = null,
+    count = mockCount,
+    totalTimesPlayed = mockTotalTimesPlayed,
+    averageRating = mockAverageRating,
+    lastPlayedTs = mockTimestamp,
+    lastRatedTs = mockTimestamp,
+    imageUri = ImageUri(mockImageUri)
 )

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.mockAlbum
 import com.example.ratify.mocks.mockArtist
 
@@ -94,11 +94,10 @@ fun AlbumItem(
 }
 
 // Previews
-
 @Preview(name = "Dark Album Items")
 @Composable
 fun DarkAlbumItemsPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -135,7 +134,7 @@ fun DarkAlbumItemsPreview() {
 @Preview(name = "Light Album Items")
 @Composable
 fun LightAlbumItemsPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

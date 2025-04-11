@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.SwitchSpecs
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun MySwitch(
@@ -22,9 +22,11 @@ fun MySwitch(
     onCheckedChange: ((Boolean) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val specs = SwitchSpecs
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(specs.spacing),
         modifier = modifier
     ) {
         Text(
@@ -49,7 +51,7 @@ const val rightText = "Dark Theme"
 @Preview(name = "Dark Switch")
 @Composable
 fun DarkSwitchPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -65,7 +67,7 @@ fun DarkSwitchPreview() {
 @Preview(name = "Light Switch")
 @Composable
 fun LightSwitchPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

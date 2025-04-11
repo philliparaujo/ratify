@@ -4,12 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarData
@@ -24,22 +22,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.SnackBarSpecs
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun MySnackBar(
     snackbarData: SnackbarData,
     modifier: Modifier = Modifier
 ) {
+    val specs = SnackBarSpecs
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 6.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .padding(
+                horizontal = specs.outerHorizontalPadding,
+                vertical = specs.outerVerticalPadding
+            )
+            .clip(RoundedCornerShape(specs.roundedCorner))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(
+                horizontal = specs.innerHorizontalPadding,
+                vertical = specs.innerVerticalPadding
+            )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -48,13 +53,13 @@ fun MySnackBar(
             Text(
                 text = snackbarData.visuals.message,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontSize = 14.sp,
+                fontSize = specs.messageSize,
                 modifier = Modifier.weight(1f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Box(modifier = Modifier.height(36.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.height(specs.height), contentAlignment = Alignment.Center) {
                 snackbarData.visuals.actionLabel?.let { actionLabel ->
                     TextButton(
                         onClick = { snackbarData.performAction() }
@@ -65,7 +70,7 @@ fun MySnackBar(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                } ?: Spacer(modifier = Modifier.width(64.dp))
+                }
             }
         }
     }
@@ -77,7 +82,7 @@ fun MySnackBar(
 @Preview(name = "Dark SnackBar")
 @Composable
 fun DarkSnackBarPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -117,7 +122,7 @@ fun DarkSnackBarPreview() {
 @Preview(name = "Light SnackBar")
 @Composable
 fun LightSnackBarPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

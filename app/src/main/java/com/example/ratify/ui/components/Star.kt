@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.toPath
 import com.example.ratify.core.model.Rating
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -229,7 +229,7 @@ fun Float.toRadians() = this * (PI.toFloat() / 180f)
 @Preview(name = "Dark Star Preview")
 @Composable
 fun DarkStarPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column {
             Star(
                 scale = 1f,
@@ -265,7 +265,7 @@ fun DarkStarPreview() {
 @Preview(name = "Light Star Preview")
 @Composable
 fun LightStarPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column {
             Star(
                 scale = 1f,
@@ -303,7 +303,7 @@ fun LightStarPreview() {
 fun DarkStarRowPreview() {
     var rating by remember { mutableIntStateOf(0) }
 
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column {
             StarRow(
                 scale = 1f,
@@ -341,7 +341,7 @@ fun DarkStarRowPreview() {
 fun LightStarRowPreview() {
     var rating by remember { mutableIntStateOf(0) }
 
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column {
             StarRow(
                 scale = 1f,

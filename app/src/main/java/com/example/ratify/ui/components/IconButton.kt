@@ -17,9 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.ratify.R
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.IconButtonSpecs
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun MyIconButton(
@@ -30,8 +30,7 @@ fun MyIconButton(
     large: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val buttonSize = if (large) 80.dp else 50.dp
-    val iconSize = if (large) 50.dp else 30.dp
+    val specs = if (large) IconButtonSpecs.LARGE else IconButtonSpecs.SMALL
 
     Box {
         IconButton(
@@ -44,12 +43,12 @@ fun MyIconButton(
                 disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             modifier = modifier
-                .size(buttonSize)
+                .size(specs.buttonSize)
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = "foo",
-                modifier = Modifier.size(iconSize)
+                modifier = Modifier.size(specs.iconSize)
             )
         }
 
@@ -74,7 +73,7 @@ fun MyIconButton(
 @Preview(name = "Dark Enabled Icon Button")
 @Composable
 fun DarkEnabledIconButtonPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
@@ -111,7 +110,7 @@ fun DarkEnabledIconButtonPreview() {
 @Preview(name = "Light Enabled Icon Button")
 @Composable
 fun LightEnabledIconButtonPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {

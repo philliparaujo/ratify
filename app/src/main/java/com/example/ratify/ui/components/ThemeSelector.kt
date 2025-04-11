@@ -20,8 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ratify.core.helper.ThemeSelectorSpecs
 import com.example.ratify.core.model.PrimaryColor
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun ThemeSelector(
@@ -51,18 +52,17 @@ fun ThemeDropdown(
     var expanded by remember { mutableStateOf(false) }
     val setExpanded = { newValue: Boolean -> expanded = newValue }
 
-    val circleSize = 20.dp
-    val selectionWidth = 160.dp
+    val specs = ThemeSelectorSpecs
 
     Box(modifier = modifier) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(specs.colorTextSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Clickable color circle to trigger dropdown
             Box(
                 modifier = Modifier
-                    .size(circleSize)
+                    .size(specs.circleSize)
                     .background(selectedOption.base, CircleShape)
                     .clickable { setExpanded(true) }
             )
@@ -91,11 +91,11 @@ fun ThemeDropdown(
             renderText = {
                 option -> Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(specs.colorTextSpacing)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(circleSize)
+                            .size(specs.circleSize)
                             .background(option.base, CircleShape)
                     )
                     Text(
@@ -106,7 +106,7 @@ fun ThemeDropdown(
             },
             expanded = expanded,
             setExpanded = setExpanded,
-            modifier = Modifier.width(selectionWidth)
+            modifier = Modifier.width(specs.selectionWidth)
         )
     }
 }
@@ -115,7 +115,7 @@ fun ThemeDropdown(
 @Preview(name = "Dark Theme Selector")
 @Composable
 fun DarkThemeSelectorPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         ThemeSelector(
             currentTheme = PrimaryColor.DEFAULT.ordinal,
             onThemeSelected = { }
@@ -126,7 +126,7 @@ fun DarkThemeSelectorPreview() {
 @Preview(name = "Light Theme Selector")
 @Composable
 fun LightThemeSelectorPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         ThemeSelector(
             currentTheme = PrimaryColor.DEFAULT.ordinal,
             onThemeSelected = { }

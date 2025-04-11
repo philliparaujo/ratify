@@ -1,5 +1,6 @@
 package com.example.ratify.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -15,9 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.ratify.core.helper.DialogSpecs
+import com.example.ratify.mocks.LANDSCAPE_DEVICE
+import com.example.ratify.mocks.MyPreview
 
 @Composable
 fun GenericDialog(
@@ -26,7 +31,9 @@ fun GenericDialog(
     onDismissRequest: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    val specs = if (isLandscape) DialogSpecs.LANDSCAPE else DialogSpecs.PORTRAIT
 
     Dialog(
         onDismissRequest = { onDismissRequest() },
@@ -37,38 +44,68 @@ fun GenericDialog(
         if (isLandscape) {
             Box(
                 modifier = Modifier
-                    .padding(32.dp)
+                    .padding(
+                        horizontal = specs.outerHorizontalPadding,
+                        vertical = specs.outerVerticalPadding
+                    )
                     .fillMaxHeight()
-                    .padding(horizontal = 64.dp)
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(8.dp)
+                    .padding(specs.innerPadding)
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(16.dp)
                         .align(Alignment.Center),
-                    horizontalArrangement = Arrangement.spacedBy(32.dp),
+                    horizontalArrangement = Arrangement.spacedBy(specs.innerScopeSpacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     renderLandscapeContent()
                 }
             }
-        }
-        else {
+        } else {
             Box(
                 modifier = Modifier
-                    .padding(32.dp)
+                    .padding(
+                        horizontal = specs.outerHorizontalPadding,
+                        vertical = specs.outerVerticalPadding
+                    )
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp)
+                    .padding(specs.innerPadding)
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(specs.innerScopeSpacing),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     renderPortraitContent()
                 }
             }
+        }
+    }
+}
+
+// Previews
+@Preview(name = "Generic Dialog")
+@Composable
+fun GenericDialogPreview() {
+    MyPreview(darkTheme = true) {
+        Column {
+            GenericDialog(
+                renderLandscapeContent = { Box(modifier = Modifier.background(MaterialTheme.colorScheme.secondary).fillMaxSize()) },
+                renderPortraitContent = { Box(modifier = Modifier.background(MaterialTheme.colorScheme.secondary).fillMaxSize())}
+            ) { }
+        }
+    }
+}
+
+@Preview(name = "Landscape Generic Dialog", device = LANDSCAPE_DEVICE)
+@Composable
+fun LandscapeGenericDialogPreview() {
+    MyPreview(darkTheme = true) {
+        Column {
+            GenericDialog(
+                renderLandscapeContent = { Box(modifier = Modifier.background(MaterialTheme.colorScheme.secondary).fillMaxSize()) },
+                renderPortraitContent = { Box(modifier = Modifier.background(MaterialTheme.colorScheme.secondary).fillMaxSize())}
+            ) { }
         }
     }
 }

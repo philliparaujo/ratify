@@ -14,9 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.SongDisplaySpecs
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.longMockSong
 import com.example.ratify.mocks.mockSong
 import com.spotify.protocol.types.Artist
@@ -28,6 +27,8 @@ fun SongDisplay(
     imageUri: String,
     modifier: Modifier = Modifier,
 ) {
+    val specs = SongDisplaySpecs
+
     ImageOverlay(
         imageUri = imageUri,
         renderContent = {
@@ -38,25 +39,32 @@ fun SongDisplay(
                 Text(
                     text = title,
                     color = MaterialTheme.colorScheme.onSecondary,
-                    fontSize = 16.sp,
+                    fontSize = specs.titleSize,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp)
+                        .padding(
+                            start = specs.textPadding,
+                            end = specs.textPadding
+                        )
                 )
                 Text(
                     text = artists,
                     color = MaterialTheme.colorScheme.onSecondary,
-                    fontSize = 14.sp,
+                    fontSize = specs.artistSize,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                        .padding(
+                            start = specs.textPadding,
+                            end = specs.textPadding,
+                            bottom = specs.textPadding
+                        )
                 )
             }
         },
@@ -80,7 +88,7 @@ fun getArtistsString(artists: List<Artist>): String {
 @Preview(name = "Dark Song Display")
 @Composable
 fun DarkSongDisplayPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,7 +105,7 @@ fun DarkSongDisplayPreview() {
 @Preview(name = "Light Song Display")
 @Composable
 fun LightSongDisplayPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -114,7 +122,7 @@ fun LightSongDisplayPreview() {
 @Preview(name = "Dark Long Name Song Display")
 @Composable
 fun DarkLongNameSongDisplayPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +139,7 @@ fun DarkLongNameSongDisplayPreview() {
 @Preview(name = "Light Long Name Song Display")
 @Composable
 fun LightLongNameSongDisplayPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

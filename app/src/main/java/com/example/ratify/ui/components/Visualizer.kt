@@ -17,11 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.VisualizerSpecs
 import com.example.ratify.core.model.Rating
+import com.example.ratify.mocks.MyPreview
 import kotlin.math.max
 
 @Composable
@@ -31,24 +31,18 @@ fun Visualizer(
     // Normalization value
     val maxHeight = max(heights.max(), 1f)
 
-    val totalHeight = 50.dp
-    val horizontalInnerPadding = 16.dp
-    val verticalInnerPadding = 8.dp
-    val outerPadding = 0.dp
-    val spacing = 15.dp
-    val columnSpacing = 8.dp
-    val borderWeight = 0.5.dp
+    val specs = VisualizerSpecs
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = outerPadding)
-            .border(width = borderWeight, color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(20.dp))
+            .padding(horizontal = specs.outerPadding)
+            .border(width = specs.borderWeight, color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(specs.rounderCorner))
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing),
+            horizontalArrangement = Arrangement.spacedBy(specs.horizontalBarSpacing),
             verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.padding(horizontal = horizontalInnerPadding, vertical = verticalInnerPadding)
+            modifier = Modifier.padding(horizontal = specs.innerHorizontalPadding, vertical = specs.innerVerticalPadding)
         ) {
             heights.forEachIndexed { i, h ->
                 val ratingValue = i + 1
@@ -56,11 +50,11 @@ fun Visualizer(
                 Column(
                     modifier = Modifier
                         .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(columnSpacing)
+                    verticalArrangement = Arrangement.spacedBy(specs.verticalBarSpacing)
                 ) {
                     Box(
                         modifier = Modifier
-                            .height(h / maxHeight * totalHeight)
+                            .height(h / maxHeight * specs.height)
                             .fillMaxWidth()
                             .background(
                                 getRatingColor(Rating.from(ratingValue))
@@ -82,7 +76,7 @@ fun Visualizer(
 @Preview(name = "Dark Visualizer")
 @Composable
 fun DarkVisualizerPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -96,7 +90,7 @@ fun DarkVisualizerPreview() {
 @Preview(name = "Light Visualizer")
 @Composable
 fun LightVisualizerPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {

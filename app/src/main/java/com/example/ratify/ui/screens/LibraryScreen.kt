@@ -41,7 +41,7 @@ import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -314,7 +314,7 @@ fun LibraryScreen(
 @Preview(name = "Dark Library Screen")
 @Composable
 fun DarkLibraryScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         LibraryScreen(
             navController = rememberNavController()
         )
@@ -324,7 +324,7 @@ fun DarkLibraryScreenPreview() {
 @Preview(name = "Light Library Screen")
 @Composable
 fun LightLibraryScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         LibraryScreen(
             navController = rememberNavController()
         )
@@ -337,7 +337,7 @@ fun LightLibraryScreenPreview() {
 )
 @Composable
 fun DarkLandscapeLibraryScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         LibraryScreen(
             navController = rememberNavController()
         )
@@ -350,7 +350,7 @@ fun DarkLandscapeLibraryScreenPreview() {
 )
 @Composable
 fun LightLandscapeLibraryScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         LibraryScreen(
             navController = rememberNavController()
         )

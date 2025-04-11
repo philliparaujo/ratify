@@ -28,10 +28,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.core.helper.DropdownSpecs
+import com.example.ratify.mocks.MyPreview
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -47,23 +46,21 @@ fun <T> DropdownSelect(
     var expanded by remember { mutableStateOf(startExpanded) }
     val setExpanded = { newValue: Boolean -> expanded = newValue }
 
-    val fontSize = 16f
-    val height = if (large) 56.dp else 56.dp
-    val width = if (large) 150.dp else 100.dp
+    val specs = if (large) DropdownSpecs.LARGE else DropdownSpecs.SMALL
 
     ExposedDropdownMenuBox(
         expanded = expanded,
         onExpandedChange = { setExpanded(it) },
         modifier = Modifier
-            .height(height)
-            .width(width)
+            .height(specs.height)
+            .width(specs.width)
             .padding(0.dp)
     ) {
         Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
-                .height(height)
-                .width(width)
+                .height(specs.height)
+                .width(specs.width)
         ) {
             TextField(
                 value = selectedOption.toString(),
@@ -73,10 +70,7 @@ fun <T> DropdownSelect(
                 label = { Text(text = label, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
                 textStyle = TextStyle(
                     textAlign = TextAlign.Center,
-                    fontSize = TextUnit(
-                        fontSize,
-                        TextUnitType.Sp
-                    ),
+                    fontSize = specs.fontSize,
                     fontWeight = FontWeight.Bold,
                     baselineShift = BaselineShift(-1f)
                 ),
@@ -111,7 +105,7 @@ fun <T> DropdownSelect(
             },
             expanded = expanded,
             setExpanded = setExpanded,
-            modifier = Modifier.width(width)
+            modifier = Modifier.width(specs.width)
         )
     }
 }
@@ -120,7 +114,7 @@ fun <T> DropdownSelect(
 @Preview(name = "Dark Dropdown Select")
 @Composable
 fun DarkDropdownSelectPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -172,7 +166,7 @@ fun DarkDropdownSelectPreview() {
 @Preview(name = "Light Dropdown Select")
 @Composable
 fun LightDropdownSelectPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),

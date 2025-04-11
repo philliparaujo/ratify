@@ -35,7 +35,7 @@ import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -216,7 +216,6 @@ fun PlayerScreen() {
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
                     stateRepository.updateCurrentRating(ratingValue)
-//                    spotifyViewModel.onEvent(SpotifyEvent.UpdateCurrentRating(ratingValue))
 
                     // Update current rating notification service
                     context.updateRatingService(ratingValue)
@@ -292,7 +291,7 @@ fun PlayerScreen() {
 @Preview(name = "Dark Login Screen")
 @Composable
 fun DarkLoginScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         LoginScreen()
     }
 }
@@ -300,7 +299,7 @@ fun DarkLoginScreenPreview() {
 @Preview(name = "Light Login Screen")
 @Composable
 fun LightLoginScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         LoginScreen()
     }
 }
@@ -308,7 +307,7 @@ fun LightLoginScreenPreview() {
 @Preview(name = "Dark Player Screen")
 @Composable
 fun DarkPlayerScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         PlayerScreen()
     }
 }
@@ -316,7 +315,7 @@ fun DarkPlayerScreenPreview() {
 @Preview(name = "Light Player Screen")
 @Composable
 fun LightPlayerScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         PlayerScreen()
     }
 }
@@ -327,7 +326,7 @@ fun LightPlayerScreenPreview() {
 )
 @Composable
 fun DarkLandscapeLoginScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         LoginScreen()
     }
 }
@@ -338,7 +337,7 @@ fun DarkLandscapeLoginScreenPreview() {
 )
 @Composable
 fun LightLandscapeLoginScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         LoginScreen()
     }
 }
@@ -349,7 +348,7 @@ fun LightLandscapeLoginScreenPreview() {
 )
 @Composable
 fun DarkLandscapePlayerScreenPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         PlayerScreen()
     }
 }
@@ -360,7 +359,7 @@ fun DarkLandscapePlayerScreenPreview() {
 )
 @Composable
 fun LightLandscapePlayerScreenPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         PlayerScreen()
     }
 }

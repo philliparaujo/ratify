@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratify.mocks.Preview
+import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.mockArtist
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -91,7 +91,7 @@ fun Float.roundTo(n: Int): Float {
 @Preview(name = "Dark Artist Items")
 @Composable
 fun DarkArtistItemsPreview() {
-    Preview(darkTheme = true) {
+    MyPreview(darkTheme = true) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -125,7 +125,7 @@ fun DarkArtistItemsPreview() {
 @Preview(name = "Light Artist Items")
 @Composable
 fun LightArtistItemsPreview() {
-    Preview(darkTheme = false) {
+    MyPreview(darkTheme = false) {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
