@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Sizes
 enum class ButtonSpecs(
     val width: Dp,
     val height: Dp

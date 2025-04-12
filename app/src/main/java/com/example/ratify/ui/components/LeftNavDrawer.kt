@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.core.helper.LeftNavBarSpecs
+import com.example.ratify.core.helper.NoRippleInteractionSource
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
@@ -65,6 +66,7 @@ fun LeftNavDrawer(
                         unselectedIconColor = MaterialTheme.colorScheme.onBackground,
                         unselectedTextColor = MaterialTheme.colorScheme.onBackground,
                     ),
+                    interactionSource = NoRippleInteractionSource
                 )
             }
         }
