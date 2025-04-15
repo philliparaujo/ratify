@@ -182,6 +182,8 @@ class SpotifyViewModel(
 
     override fun syncPlaybackPositionNow() {
         viewModelScope.launch(Dispatchers.IO) {
+            subscribeToPlayerState()
+
             val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
             syncedPosition?.let {
                 startUpdatingPlaybackPosition(it)
