@@ -1,6 +1,7 @@
 package com.example.ratify.ui.screens
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +43,7 @@ import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.BinarySetting
+import com.example.ratify.ui.components.Logo
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
 import com.example.ratify.ui.components.PlaybackPosition
@@ -71,6 +74,11 @@ fun LoginScreen() {
 
     val scope = rememberCoroutineScope()
     val autoSignIn = settingsRepository.autoSignIn.collectAsState(initial = false)
+    val darkTheme = settingsRepository.darkTheme.collectAsState(initial = true)
+
+    // Orientation logic
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Box(
         modifier = Modifier
@@ -78,10 +86,20 @@ fun LoginScreen() {
     ) {
         Column(
             modifier = Modifier
-                .align(Alignment.Center),
+                .align(Alignment.TopCenter),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            Logo(
+                darkTheme = darkTheme.value,
+                primaryColor = MaterialTheme.colorScheme.primary,
+                modifier =
+                    if (isLandscape) {
+                        Modifier.padding(0.dp, 32.dp)
+                    } else {
+                        Modifier.padding(top = 160.dp, bottom = 128.dp)
+                    }
+            )
             MyButton(
                 enabled = true,
                 onClick = {
