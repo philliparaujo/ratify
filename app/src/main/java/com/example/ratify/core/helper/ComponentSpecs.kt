@@ -53,12 +53,13 @@ object ItemSpecs {
 
 enum class DialogSpecs(
     val outerHorizontalPadding: Dp,
-    val outerVerticalPadding: Dp,
+    val outerTopPadding: Dp,
+    val outerBottomPadding: Dp,
     val innerPadding: Dp,
     val innerScopeSpacing: Dp
 ) {
-    LANDSCAPE(96.dp, 32.dp, 16.dp, 32.dp),
-    PORTRAIT(32.dp, 160.dp, 16.dp, 16.dp)
+    LANDSCAPE(96.dp, 32.dp, 32.dp, 16.dp, 32.dp),
+    PORTRAIT(32.dp, 80.dp, 160.dp, 16.dp, 16.dp)
 }
 
 

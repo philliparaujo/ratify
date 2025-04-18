@@ -45,8 +45,10 @@ fun GenericDialog(
             Box(
                 modifier = Modifier
                     .padding(
-                        horizontal = specs.outerHorizontalPadding,
-                        vertical = specs.outerVerticalPadding
+                        start = specs.outerHorizontalPadding,
+                        end = specs.outerHorizontalPadding,
+                        top = specs.outerTopPadding,
+                        bottom = specs.outerBottomPadding
                     )
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.surface)
@@ -65,8 +67,10 @@ fun GenericDialog(
             Box(
                 modifier = Modifier
                     .padding(
-                        horizontal = specs.outerHorizontalPadding,
-                        vertical = specs.outerVerticalPadding
+                        start = specs.outerHorizontalPadding,
+                        end = specs.outerHorizontalPadding,
+                        top = specs.outerTopPadding,
+                        bottom = specs.outerBottomPadding
                     )
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
