@@ -72,8 +72,9 @@ fun <T> DropdownSelect(
                     textAlign = TextAlign.Center,
                     fontSize = specs.fontSize,
                     fontWeight = FontWeight.Bold,
-                    baselineShift = BaselineShift(-1f)
+                    baselineShift = BaselineShift(0f)
                 ),
+                singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = MaterialTheme.colorScheme.onPrimary,
                     unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
