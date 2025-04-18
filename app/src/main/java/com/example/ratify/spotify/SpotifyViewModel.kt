@@ -75,9 +75,8 @@ class SpotifyViewModel(
     // Provides information on current track, playing/paused, playback position, etc.
     private val _playerState = MutableStateFlow<PlayerState?>(null)
     override val playerState: StateFlow<PlayerState?> get() = _playerState
-    private var isSubscribedToPlayerState = false
     private fun subscribeToPlayerState() {
-        if (spotifyAppRemote != null && !isSubscribedToPlayerState) {
+        if (spotifyAppRemote != null) {
             spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { state ->
                 val previousSong = playerState.value?.track
                 val currentSong = state.track
@@ -137,7 +136,6 @@ class SpotifyViewModel(
                     stopUpdatingPlaybackPosition()
                 }
             }
-            isSubscribedToPlayerState = true
         }
     }
 
@@ -249,7 +247,6 @@ class SpotifyViewModel(
             SpotifyAppRemote.disconnect(it)
             spotifyAppRemote = null
             _spotifyConnectionState.value = false
-            isSubscribedToPlayerState = false
             isSubscribedToUserCapabilities = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")
