@@ -9,6 +9,7 @@ data class LibraryState(
     val searchQuery: String = "",
     val searchType: SearchType = SearchType.NAME,
     val librarySortType: LibrarySortType = LibrarySortType.LAST_PLAYED_TS,
+    val librarySortAscending: Boolean = false,
     val visualizerShowing: Boolean = false,
     val libraryDialog: Song? = null,  // Represents currently shown dialog for a song
 )

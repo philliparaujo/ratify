@@ -8,6 +8,7 @@ data class FavoritesState(
     val groupedSongs: List<GroupedSong> = emptyList(),
     val groupType: GroupType = GroupType.ARTIST,
     val favoritesSortType: FavoritesSortType = FavoritesSortType.RATING,
+    val favoritesSortAscending: Boolean = false,
     val favoritesDialog: GroupedSong? = null,  // Represents currently shown dialog for a GroupedSong
     val minEntriesThreshold: Int = 5,
 )
