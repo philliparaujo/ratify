@@ -216,7 +216,7 @@ class SpotifyViewModel(
         )
             .setScopes(scopes)
             .build()
-        _authRequest.value = request
+        _authRequest.postValue(request)
     }
 
     private fun connectSpotifyAppRemote() {
