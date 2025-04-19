@@ -6,11 +6,15 @@ import com.example.ratify.database.Song
 
 data class LibraryState(
     val songs: List<Song> = emptyList(),
+
     val searchQuery: String = "",
     val searchType: SearchType = SearchType.NAME,
-    val librarySortType: LibrarySortType = LibrarySortType.LAST_PLAYED_TS,
-    val librarySortAscending: Boolean = false,
+
+    val sortType: LibrarySortType = LibrarySortType.LAST_PLAYED_TS,
+    val sortAscending: Boolean = false,
+
     val visualizerShowing: Boolean = false,
-    val libraryDialog: Song? = null,  // Represents currently shown dialog for a song
+
+    val dialog: Song? = null,  // Represents currently shown dialog for a song
 )
 

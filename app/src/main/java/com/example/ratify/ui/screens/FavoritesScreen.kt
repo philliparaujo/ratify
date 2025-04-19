@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,20 +24,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.core.helper.FAVORITES_MAX_SLIDER_VALUE
+import com.example.ratify.core.helper.FAVORITES_SEARCH_TYPES
 import com.example.ratify.core.helper.FAVORITES_SORT_TYPES
 import com.example.ratify.core.helper.GroupsPerRow
+import com.example.ratify.core.helper.LIBRARY_SEARCH_TYPES
 import com.example.ratify.core.model.GroupType
+import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
@@ -55,6 +64,7 @@ import com.example.ratify.ui.components.DropdownSelect
 import com.example.ratify.ui.components.GroupedSongDialog
 import com.example.ratify.ui.components.MySlider
 import com.example.ratify.ui.components.MySwitch
+import com.example.ratify.ui.components.Search
 import com.example.ratify.ui.components.spotifyUriToImageUrl
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
@@ -73,9 +83,9 @@ fun FavoritesScreen() {
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
     // Fetching songs for dialog based on selected group and group type
-    val songs by remember(favoritesState.groupType, favoritesState.favoritesDialog) {
+    val songs by remember(favoritesState.groupType, favoritesState.dialog) {
         val groupType = favoritesState.groupType
-        val dialog = favoritesState.favoritesDialog
+        val dialog = favoritesState.dialog
 
         val (groupName, groupUri) = when (favoritesState.groupType) {
             GroupType.ALBUM -> dialog?.album?.name to dialog?.album?.uri
@@ -108,6 +118,40 @@ fun FavoritesScreen() {
         }
     }
 
+    // Handles up-to-date search query
+    var localTextFieldValue by remember { mutableStateOf(TextFieldValue(favoritesState.searchQuery)) }
+
+    @Composable
+    fun RenderSearch(modifier: Modifier = Modifier) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Search(
+                query = localTextFieldValue.text,
+                onQueryChange = {
+                    localTextFieldValue = localTextFieldValue.copy(text = it, selection = TextRange(it.length))
+                    stateRepository.updateFavoritesSearchQuery(it)
+                },
+                placeholderText = "Search",
+                trailingIcon = Icons.Default.MoreVert,
+                dropdownLabels = emptyList(),
+                dropdownOptionOnClick = emptyList(),
+                modifier = Modifier.weight(1f)
+            )
+
+            // Searching dropdown
+            DropdownSelect(
+                options = FAVORITES_SEARCH_TYPES,
+                selectedOption = favoritesState.searchType,
+                onSelect = { searchType -> stateRepository.updateFavoritesSearchType(searchType) },
+                label = "Search by",
+                modifier = Modifier.wrapContentWidth()
+            )
+        }
+    }
+
     @Composable
     fun RenderSettings(modifier: Modifier = Modifier) {
         Row(
@@ -127,7 +171,7 @@ fun FavoritesScreen() {
 
             DropdownSelect(
                 options = FAVORITES_SORT_TYPES,
-                selectedOption = favoritesState.favoritesSortType,
+                selectedOption = favoritesState.sortType,
                 onSelect = { stateRepository.updateFavoritesSortType(it) },
                 label = "Sort by",
                 large = true
@@ -264,20 +308,28 @@ fun FavoritesScreen() {
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                RenderSettings(modifier = Modifier.weight(5f))
-                RenderSlider(modifier = Modifier.weight(4f))
+                RenderSearch(modifier = Modifier.weight(4f))
+                RenderSlider(modifier = Modifier.weight(3f))
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(48.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                RenderSettings(modifier = Modifier.weight(4f))
+                Spacer(modifier = Modifier.weight(3f))
             }
         } else {
-            RenderSettings(modifier = Modifier.fillMaxWidth())
+            RenderSearch(modifier = Modifier.fillMaxWidth())
             RenderSlider()
+            RenderSettings(modifier = Modifier.fillMaxWidth())
         }
 
         HorizontalDivider()
 
         RenderItemList()
-        if (favoritesState.favoritesDialog != null) {
+        if (favoritesState.dialog != null) {
             RenderDialog(
-                favoritesState.favoritesDialog,
+                favoritesState.dialog,
                 favoritesState.groupType,
                 songs
             )

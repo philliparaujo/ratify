@@ -11,6 +11,7 @@ import com.example.ratify.core.model.FavoritesSortType
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.model.LibrarySortType
 import com.example.ratify.core.model.SearchType
+import com.example.ratify.ui.components.Search
 import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import kotlinx.coroutines.flow.Flow
@@ -92,15 +93,19 @@ interface SongDao {
     }
 
     fun buildFavoritesQuery(
+        searchType: SearchType?,
+        searchQuery: String?,
         groupType: GroupType,
-        favoritesSortType: FavoritesSortType?,
-        ascending: Boolean,
         minEntriesThreshold: Int = 1,
+        favoritesSortType: FavoritesSortType?,
+        ascending: Boolean
     ): SimpleSQLiteQuery {
         val groupColumn = when (groupType) {
             GroupType.ARTIST -> "artist"
             GroupType.ALBUM -> "album"
         }
+
+        val args = mutableListOf<Any>()
 
         val baseQuery = StringBuilder(
             """
@@ -140,6 +145,16 @@ interface SongDao {
         """.trimIndent()
         )
 
+        // Optional search filtering
+        if (!searchQuery.isNullOrBlank() && searchType == SearchType.ARTISTS) {
+            baseQuery.append(" AND songs.artist LIKE ?")
+            args.add("%$searchQuery%")
+        }
+        if (!searchQuery.isNullOrBlank() && searchType == SearchType.ALBUM && groupType == GroupType.ALBUM) {
+            baseQuery.append(" AND songs.album LIKE ?")
+            args.add("%$searchQuery%")
+        }
+
         // Sorting
         if (favoritesSortType != null) {
             baseQuery.append(" ORDER BY ")
@@ -156,6 +171,6 @@ interface SongDao {
             baseQuery.append(if (ascending) " ASC" else " DESC")
         }
 
-        return SimpleSQLiteQuery(baseQuery.toString())
+        return SimpleSQLiteQuery(baseQuery.toString(), args.toTypedArray())
     }
 }

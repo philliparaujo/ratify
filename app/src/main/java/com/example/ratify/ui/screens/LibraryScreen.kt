@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ratify.core.helper.LIBRARY_SEARCH_TYPES
 import com.example.ratify.core.helper.LIBRARY_SORT_TYPES
-import com.example.ratify.core.helper.dropdownOptions
+import com.example.ratify.core.helper.libraryDropdownOptions
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.state.LibraryState
 import com.example.ratify.database.Song
@@ -105,13 +106,7 @@ fun LibraryScreen(
     }
 
     // Handles up-to-date search query
-    val query = libraryState.searchQuery
-    var localTextFieldValue by remember { mutableStateOf(TextFieldValue(query)) }
-    LaunchedEffect(query) {
-        if (query != localTextFieldValue.text) {
-            localTextFieldValue = TextFieldValue(query)
-        }
-    }
+    var localTextFieldValue by remember { mutableStateOf(TextFieldValue(libraryState.searchQuery)) }
 
     @Composable
     fun RenderVisualizer() {
@@ -201,7 +196,7 @@ fun LibraryScreen(
     @Composable
     fun RenderSearch() {
         val scope = rememberCoroutineScope()
-        val (dropdownLabels, dropdownOptionOnClick) = dropdownOptions(
+        val (dropdownLabels, dropdownOptionOnClick) = libraryDropdownOptions(
             songRepository, stateRepository, libraryState, playerState, scope
         )
 
@@ -213,8 +208,8 @@ fun LibraryScreen(
             Search(
                 query = localTextFieldValue.text,
                 onQueryChange = {
-                    localTextFieldValue = TextFieldValue(it)
-                    stateRepository.updateSearchQuery(it)
+                    localTextFieldValue = localTextFieldValue.copy(text = it, selection = TextRange(it.length))
+                    stateRepository.updateLibrarySearchQuery(it)
                 },
                 placeholderText = "Search",
                 trailingIcon = Icons.Default.MoreVert,
@@ -227,7 +222,7 @@ fun LibraryScreen(
             DropdownSelect(
                 options = LIBRARY_SEARCH_TYPES,
                 selectedOption = libraryState.searchType,
-                onSelect = { searchType -> stateRepository.updateSearchType(searchType) },
+                onSelect = { searchType -> stateRepository.updateLibrarySearchType(searchType) },
                 label = "Search by",
                 modifier = Modifier.wrapContentWidth()
             )
@@ -265,7 +260,7 @@ fun LibraryScreen(
             // Sorting dropdown
             DropdownSelect(
                 options = LIBRARY_SORT_TYPES,
-                selectedOption = libraryState.librarySortType,
+                selectedOption = libraryState.sortType,
                 onSelect = { stateRepository.updateLibrarySortType(it) },
                 label = "Sort by",
                 large = true
@@ -307,8 +302,8 @@ fun LibraryScreen(
         HorizontalDivider()
 
         RenderSongList()
-        if (libraryState.libraryDialog != null) {
-            RenderCurrentSongDialog(libraryState.libraryDialog)
+        if (libraryState.dialog != null) {
+            RenderCurrentSongDialog(libraryState.dialog)
         }
     }
 }

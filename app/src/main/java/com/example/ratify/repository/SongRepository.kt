@@ -49,17 +49,21 @@ class SongRepository(
     }
 
     fun getFavoritesSongs(
+        searchType: SearchType?,
+        searchQuery: String?,
         groupType: GroupType,
+        minEntriesThreshold: Int = 1,
         favoritesSortType: FavoritesSortType?,
         ascending: Boolean,
-        minEntriesThreshold: Int = 1
     ): Flow<List<GroupedSong>> {
         return dao.queryGroupedSongs(
             dao.buildFavoritesQuery(
+                searchType,
+                searchQuery,
                 groupType,
+                minEntriesThreshold,
                 favoritesSortType,
                 ascending,
-                minEntriesThreshold
             )
         )
     }

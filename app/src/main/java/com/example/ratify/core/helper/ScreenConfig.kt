@@ -42,7 +42,7 @@ val LIBRARY_SORT_TYPES = listOf(
     LibrarySortType.NAME
 )
 // Search bar dropdown options (located under three dots)
-fun dropdownOptions(
+fun libraryDropdownOptions(
     songRepository: SongRepository,
     stateRepository: StateRepository,
     libraryState: LibraryState,
@@ -67,6 +67,11 @@ fun dropdownOptions(
 }
 
 /* Favorites Screen */
+// Search options for grouped song list
+val FAVORITES_SEARCH_TYPES = listOf(
+    SearchType.ARTISTS,
+    SearchType.ALBUM
+)
 // Sort options for grouped songs
 val FAVORITES_SORT_TYPES = listOf(
     FavoritesSortType.RATING,

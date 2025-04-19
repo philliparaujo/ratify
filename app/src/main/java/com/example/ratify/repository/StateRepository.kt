@@ -40,7 +40,7 @@ class StateRepository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _librarySongs = _libraryState
-        .map { Triple(it.searchType, it.searchQuery, it.librarySortType to it.librarySortAscending) }
+        .map { Triple(it.searchType, it.searchQuery, it.sortType to it.sortAscending) }
         .distinctUntilChanged()
         .flatMapLatest { (searchType, query, sort) ->
             songRepository.getLibrarySongs(searchType, query, sort.first, sort.second)
@@ -48,10 +48,14 @@ class StateRepository(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _favoritesSongs = _favoritesState
-        .map { Triple(it.groupType, it.favoritesSortType to it.favoritesSortAscending, it.minEntriesThreshold) }
+        .map { Triple(
+            it.searchType to it.searchQuery,
+            it.groupType to it.minEntriesThreshold,
+            it.sortType to it.sortAscending
+        ) }
         .distinctUntilChanged()
-        .flatMapLatest { (groupType, sort, minEntriesThreshold) ->
-            songRepository.getFavoritesSongs(groupType, sort.first, sort.second, minEntriesThreshold)
+        .flatMapLatest { (search, group, sort) ->
+            songRepository.getFavoritesSongs(search.first, search.second, group.first, group.second, sort.first, sort.second, )
         }
 
     // Public states
@@ -72,50 +76,56 @@ class StateRepository(
     }
 
     fun updateLibraryDialog(dialog: Song?) {
-        _libraryState.update { it.copy(libraryDialog = dialog) }
+        _libraryState.update { it.copy(dialog = dialog) }
     }
     fun updateVisualizerShowing(showing: Boolean) {
         _libraryState.update { it.copy(visualizerShowing = showing) }
     }
-    fun updateSearchType(type: SearchType) {
+    fun updateLibrarySearchType(type: SearchType) {
         _libraryState.update { it.copy(searchType = type) }
     }
-    fun updateSearchQuery(query: String) {
+    fun updateLibrarySearchQuery(query: String) {
         _libraryState.update { it.copy(searchQuery = query) }
     }
     fun updateLibrarySortType(type: LibrarySortType) {
-        if (_libraryState.value.librarySortType == type) {
-            updateLibrarySortAscending(!_libraryState.value.librarySortAscending)
+        if (_libraryState.value.sortType == type) {
+            updateLibrarySortAscending(!_libraryState.value.sortAscending)
         } else {
             updateLibrarySortAscending(type.sortAscendingPreference)
         }
 
-        _libraryState.update { it.copy(librarySortType = type) }
+        _libraryState.update { it.copy(sortType = type) }
     }
     private fun updateLibrarySortAscending(sortAscending: Boolean) {
-        _libraryState.update { it.copy(librarySortAscending = sortAscending) }
+        _libraryState.update { it.copy(sortAscending = sortAscending) }
     }
 
     fun updateFavoritesDialog(dialog: GroupedSong?) {
-        _favoritesState.update { it.copy(favoritesDialog = dialog) }
+        _favoritesState.update { it.copy(dialog = dialog) }
     }
     fun updateMinEntriesThreshold(threshold: Int) {
         _favoritesState.update { it.copy(minEntriesThreshold = threshold) }
     }
+    fun updateFavoritesSearchType(type: SearchType) {
+        _favoritesState.update { it.copy(searchType = type) }
+    }
+    fun updateFavoritesSearchQuery(query: String) {
+        _favoritesState.update { it.copy(searchQuery = query) }
+    }
     fun updateFavoritesSortType(type: FavoritesSortType) {
-        if (_favoritesState.value.favoritesSortType == type) {
-            updateFavoritesSortAscending(!_favoritesState.value.favoritesSortAscending)
+        if (_favoritesState.value.sortType == type) {
+            updateFavoritesSortAscending(!_favoritesState.value.sortAscending)
         } else {
             updateFavoritesSortAscending(type.sortAscendingPreference)
         }
 
-        _favoritesState.update { it.copy(favoritesSortType = type) }
+        _favoritesState.update { it.copy(sortType = type) }
     }
     fun updateGroupType(type: GroupType) {
         _favoritesState.update { it.copy(groupType = type) }
     }
     private fun updateFavoritesSortAscending(sortAscending: Boolean) {
-        _favoritesState.update { it.copy(favoritesSortAscending = sortAscending) }
+        _favoritesState.update { it.copy(sortAscending = sortAscending) }
     }
 
     fun showSnackbar(message: String, action: SnackbarAction? = null) {
