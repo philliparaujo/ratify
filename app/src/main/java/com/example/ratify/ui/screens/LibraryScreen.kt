@@ -107,6 +107,14 @@ fun LibraryScreen(
 
     // Handles up-to-date search query
     var localTextFieldValue by remember { mutableStateOf(TextFieldValue(libraryState.searchQuery)) }
+    LaunchedEffect(libraryState.searchQuery) {
+        if (libraryState.searchQuery != localTextFieldValue.text) {
+            localTextFieldValue = TextFieldValue(
+                text = libraryState.searchQuery,
+                selection = TextRange(libraryState.searchQuery.length)
+            )
+        }
+    }
 
     @Composable
     fun RenderVisualizer() {

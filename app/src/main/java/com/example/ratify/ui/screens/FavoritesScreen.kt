@@ -120,6 +120,14 @@ fun FavoritesScreen() {
 
     // Handles up-to-date search query
     var localTextFieldValue by remember { mutableStateOf(TextFieldValue(favoritesState.searchQuery)) }
+    LaunchedEffect(favoritesState.searchQuery) {
+        if (favoritesState.searchQuery != localTextFieldValue.text) {
+            localTextFieldValue = TextFieldValue(
+                text = favoritesState.searchQuery,
+                selection = TextRange(favoritesState.searchQuery.length)
+            )
+        }
+    }
 
     @Composable
     fun RenderSearch(modifier: Modifier = Modifier) {
