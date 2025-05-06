@@ -1,8 +1,8 @@
 package com.example.ratify.di
 
-import androidx.room.Room
 import com.example.ratify.database.SongDao
 import com.example.ratify.database.SongDatabase
+import com.example.ratify.database.SongDatabaseProvider
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.repository.SongRepository
 import com.example.ratify.repository.StateRepository
@@ -14,11 +14,7 @@ import org.koin.dsl.module
 val appModule = module {
 
     single<SongDatabase> {
-        Room.databaseBuilder(
-            androidApplication(),
-            SongDatabase::class.java,
-            "songs.db"
-        ).build()
+        SongDatabaseProvider.getDatabase(androidApplication())
     }
 
     single<SongDao> {

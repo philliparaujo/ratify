@@ -46,6 +46,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // On successful DatabaseIO import, the app restarts to display the up-to-date database
+        // on the Library page. But the Snackbar we wish to show does not persist on app restarts.
+        // This allows us to save the Snackbar and display it on app restart.
+        val pendingSnackbar = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            .getString("pendingSnackbar", null)
+
         // Initialize database IO helper
         databaseIOHelper = DatabaseIOHelper(
             this,
@@ -56,15 +62,6 @@ class MainActivity : ComponentActivity() {
                 stateRepository.showSnackbar(if (success) "Database imported successfully!" else "Failed to import database")
             }
         )
-
-        // On successful DatabaseIO import, the app restarts to display the up-to-date database
-        // on the Library page. But the Snackbar we wish to show does not persist on app restarts.
-        // This allows us to save the Snackbar and display it on app restart.
-        val sharedPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        sharedPrefs.getString("pendingSnackbar", null)?.let {
-            stateRepository.showSnackbar(it)
-            sharedPrefs.edit().remove("pendingSnackbar").apply()
-        }
 
         // Initialize auth helper, launch authentication if not already connected
         if (spotifyViewModel.spotifyConnectionState.value != true) {
@@ -95,6 +92,17 @@ class MainActivity : ComponentActivity() {
             ) {
                 val darkTheme by settingsRepository.darkTheme.collectAsState(true)
                 val themeColor by settingsRepository.themeColor.collectAsState(PrimaryColor.DEFAULT.ordinal)
+
+                // Display the Snackbar we previously fetched
+                LaunchedEffect(pendingSnackbar) {
+                    if (pendingSnackbar != null) {
+                        stateRepository.showSnackbar(pendingSnackbar)
+
+                        // Remove the string so that on future launch, Snackbar not displayed
+                        getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                            .edit().remove("pendingSnackbar").apply()
+                    }
+                }
 
                 RatifyTheme(
                     darkTheme = darkTheme,
@@ -138,9 +146,9 @@ class MainActivity : ComponentActivity() {
     }
 
     fun restartApp() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
-        finish()
+        Runtime.getRuntime().exit(0) // Fully restart app
     }
 }

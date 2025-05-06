@@ -1,5 +1,6 @@
 package com.example.ratify.database
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
@@ -16,7 +17,7 @@ object SongDatabaseProvider {
     private var instance: SongDatabase? = null
     const val DATABASE_NAME = "songs.db"
 
-    private fun getDatabase(context: Context): SongDatabase {
+    fun getDatabase(context: Context): SongDatabase {
         return instance ?: synchronized(this) {
             val newInstance = Room.databaseBuilder(
                 context.applicationContext,
@@ -60,6 +61,7 @@ object SongDatabaseProvider {
         }
     }
 
+    @SuppressLint("ApplySharedPref")
     fun importDatabase(context: Context, sourceUri: Uri): Boolean {
         val destinationPath = context.getDatabasePath(DATABASE_NAME).absolutePath
         Log.d("SongDatabaseProvider", "Importing database from URI: $sourceUri to $destinationPath")
@@ -77,10 +79,12 @@ object SongDatabaseProvider {
             Log.d("SongDatabaseProvider", "Database import completed successfully.")
 
             // Save Snackbar message to display after app restart
+            // Need to use commit to ensure that string is written before app restart
             val sharedPrefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            sharedPrefs.edit().putString("pendingSnackbar", "Database imported successfully!").apply()
+            sharedPrefs.edit().putString("pendingSnackbar", "Database imported successfully!").commit()
 
             // Restart the app to reflect new database state
+            Log.d("SongDatabaseProvider", "Restarting app after saving snackbar...")
             (context as? Activity)?.runOnUiThread {
                 (context as MainActivity).restartApp()
             }
