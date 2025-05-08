@@ -14,7 +14,6 @@ import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
 import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
 import com.example.ratify.services.updateRatingService
-import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
@@ -31,7 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SpotifyViewModel(
+class  SpotifyViewModel(
     application: Application,
     private val songRepository: SongRepository,
     private val stateRepository: StateRepository
@@ -52,9 +51,13 @@ class SpotifyViewModel(
     private val _authRequest = MutableLiveData<AuthorizationRequest>()
     override val authRequest = _authRequest
 
-    // Answers "is the user connected?"
-    private val _spotifyConnectionState = MutableLiveData<Boolean>()
-    override val spotifyConnectionState: LiveData<Boolean> get() = _spotifyConnectionState
+    // Answers if the user has successfully authenticated
+    private val _isAuthenticated = MutableLiveData<Boolean>()
+    override val isAuthenticated: LiveData<Boolean> get() = _isAuthenticated
+
+    // Answers if the user is connected to Spotify App Remote, used to control song playback
+    private val _remoteConnected = MutableLiveData<Boolean>()
+    override val remoteConnected: LiveData<Boolean> get() = _remoteConnected
 
     // Provides information on whether the user can play on demand
     private val _userCapabilities = MutableLiveData<Capabilities>()
@@ -192,8 +195,9 @@ class SpotifyViewModel(
     override fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
-            is SpotifyEvent.ConnectSpotify -> connectSpotifyAppRemote()
-            is SpotifyEvent.DisconnectSpotify -> disconnectSpotifyAppRemote()
+            is SpotifyEvent.SetAuthenticationStatus -> setAuthenticationStatus(event.isAuthenticated)
+            is SpotifyEvent.ConnectAppRemote -> connectSpotifyAppRemote()
+            is SpotifyEvent.DisconnectAppRemote -> disconnectSpotifyAppRemote()
 
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
             is SpotifyEvent.PlaySong -> playSong(event.songUri, event.songName)
@@ -219,7 +223,19 @@ class SpotifyViewModel(
         _authRequest.postValue(request)
     }
 
+    private fun setAuthenticationStatus(isAuthenticated: Boolean) {
+        _isAuthenticated.value = isAuthenticated
+    }
+
     private fun connectSpotifyAppRemote() {
+        // If Spotify not installed on phone, cannot connect to App Remote
+        val context = getApplication<Application>()
+        val isSpotifyInstalled = context.packageManager.getLaunchIntentForPackage("com.spotify.music") != null
+        if (!isSpotifyInstalled) {
+            Log.d("SpotifyViewModel", "Spotify app not installed, skipping App Remote connection")
+            return
+        }
+
         val connectionParams = ConnectionParams.Builder(clientId)
             .setRedirectUri(redirectUri)
             .showAuthView(true)
@@ -230,14 +246,14 @@ class SpotifyViewModel(
                 spotifyAppRemote = appRemote
                 Log.d("SpotifyViewModel", "Connected! Yay!")
                 stateRepository.showSnackbar("Connected to Spotify")
-                _spotifyConnectionState.value = true
+                _remoteConnected.value = true
                 subscribeToPlayerState()
                 subscribeToUserCapabilities()
             }
 
             override fun onFailure(throwable: Throwable) {
                 Log.e("SpotifyViewModel", throwable.message, throwable)
-                _spotifyConnectionState.value = false
+                _remoteConnected.value = false
             }
         })
     }
@@ -246,7 +262,7 @@ class SpotifyViewModel(
         spotifyAppRemote?.let {
             SpotifyAppRemote.disconnect(it)
             spotifyAppRemote = null
-            _spotifyConnectionState.value = false
+            _remoteConnected.value = false
             isSubscribedToUserCapabilities = false
         }
         Log.d("SpotifyViewModel", "Disconnected! Yay!")

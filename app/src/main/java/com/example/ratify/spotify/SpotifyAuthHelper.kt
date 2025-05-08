@@ -19,13 +19,16 @@ class SpotifyAuthHelper(
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
                     Log.d("SpotifyAuthHelper", "Authorization successful!")
-                    spotifyViewModel.onEvent(SpotifyEvent.ConnectSpotify)
+                    spotifyViewModel.onEvent(SpotifyEvent.SetAuthenticationStatus(true))
+                    spotifyViewModel.onEvent(SpotifyEvent.ConnectAppRemote)
                 }
                 AuthorizationResponse.Type.ERROR -> {
                     Log.e("SpotifyAuthHelper", "Auth error: ${response.error}")
+                    spotifyViewModel.onEvent(SpotifyEvent.SetAuthenticationStatus(false))
                 }
                 else -> {
                     Log.e("SpotifyAuthHelper", "Auth flow cancelled")
+                    spotifyViewModel.onEvent(SpotifyEvent.SetAuthenticationStatus(false))
                 }
             }
         }

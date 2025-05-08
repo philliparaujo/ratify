@@ -37,7 +37,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
                     android:scheme="${redirectSchemeName}"
-                    android:host="${redirectHostName}" />
+                    android:host="${redirectHostName}"
+                    android:pathPrefix="${redirectPathPrefix}" />
             </intent-filter>
         </activity>
         <service

@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 class FakeSpotifyViewModel: ISpotifyViewModel {
     override val authRequest: LiveData<AuthorizationRequest>
         get() = MutableLiveData()
-    override val spotifyConnectionState: LiveData<Boolean>
+    override val isAuthenticated: LiveData<Boolean>
+        get() = MutableLiveData(true)
+    override val remoteConnected: LiveData<Boolean>
         get() = MutableLiveData(true)
     override val userCapabilities: LiveData<Capabilities>
         get() =  MutableLiveData()

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,11 +57,18 @@ import kotlin.math.abs
 @Composable
 fun MusicScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
-    val spotifyConnectionState by spotifyViewModel.spotifyConnectionState.observeAsState()
-    val connected = spotifyConnectionState == true
+    val spotifyConnectionState by spotifyViewModel.remoteConnected.observeAsState()
+    val authenticationState by spotifyViewModel.isAuthenticated.observeAsState()
 
-    if (!connected) {
+    val connected = spotifyConnectionState == true
+    val authenticated = authenticationState == true
+
+    if (!connected && !authenticated) {
         LoginScreen()
+    } else if (!connected) {
+        Column {
+            Text("Authenticated but not connected")
+        }
     } else {
         PlayerScreen()
     }

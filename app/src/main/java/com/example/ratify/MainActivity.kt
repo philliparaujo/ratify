@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
         )
 
         // Initialize auth helper, launch authentication if not already connected
-        if (spotifyViewModel.spotifyConnectionState.value != true) {
+        if (spotifyViewModel.remoteConnected.value != true) {
             spotifyAuthHelper = SpotifyAuthHelper(this, spotifyViewModel)
             spotifyViewModel.authRequest.observe(this) { request ->
                 spotifyAuthHelper.launchAuth(request)
@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
 
         // If the app launch has autoSignIn set to true, automatically connect to Spotify
-        val connected = spotifyViewModel.spotifyConnectionState.value == true
+        val connected = spotifyViewModel.remoteConnected.value == true
         if (!connected) {
             lifecycleScope.launch {
                 // .first() prevents auto sign-in on setting toggle

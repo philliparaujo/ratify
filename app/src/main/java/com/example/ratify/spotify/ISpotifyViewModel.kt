@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.StateFlow
 interface ISpotifyViewModel {
     // Saves request to launch authentication, done in MainActivity
     val authRequest: LiveData<AuthorizationRequest>
-    // Answers "is the user connected?"
-    val spotifyConnectionState: LiveData<Boolean>
+    // Answers if the user has successfully authenticated
+    val isAuthenticated: LiveData<Boolean>
+    // Answers if the user is connected to Spotify App Remote, used to control song playback
+    val remoteConnected: LiveData<Boolean>
     // Provides information on whether the user can play on demand
     val userCapabilities: LiveData<Capabilities>
 

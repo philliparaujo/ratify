@@ -19,8 +19,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["redirectHostName"] = "https://com.example.ratify/callback"
-        manifestPlaceholders["redirectSchemeName"] = "ratify"
+        manifestPlaceholders["redirectSchemeName"] = "https"
+        manifestPlaceholders["redirectHostName"] = "philliparaujo.github.io"
+        manifestPlaceholders["redirectPathPrefix"] = "/callback"
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${project.findProperty("spotifyClientId")}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"${project.findProperty("spotifyRedirectUri")}\"")
