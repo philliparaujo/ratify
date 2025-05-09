@@ -1,6 +1,9 @@
 package com.example.ratify.ui.screens
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,9 +33,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
+import com.example.ratify.core.helper.IconButtonSpecs
+import com.example.ratify.core.helper.alternativePlayStoreUri
+import com.example.ratify.core.helper.playStorePackageName
+import com.example.ratify.core.helper.playStoreUri
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.state.MusicState
 import com.example.ratify.di.LocalSettingsRepository
@@ -58,19 +69,98 @@ import kotlin.math.abs
 fun MusicScreen() {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val spotifyConnectionState by spotifyViewModel.remoteConnected.observeAsState()
-    val authenticationState by spotifyViewModel.isAuthenticated.observeAsState()
+    val appInstalledState by spotifyViewModel.isSpotifyAppInstalled.observeAsState()
 
     val connected = spotifyConnectionState == true
-    val authenticated = authenticationState == true
+    val appInstalled = appInstalledState == true
 
-    if (!connected && !authenticated) {
-        LoginScreen()
+    if (!appInstalled) {
+        AppNotInstalledScreen()
     } else if (!connected) {
-        Column {
-            Text("Authenticated but not connected")
-        }
+        LoginScreen()
     } else {
         PlayerScreen()
+    }
+}
+
+@Composable
+fun AppNotInstalledScreen() {
+    val context = LocalContext.current
+
+    val settingsRepository: SettingsRepository = LocalSettingsRepository.current
+    val darkTheme = settingsRepository.darkTheme.collectAsState(initial = true)
+
+    // Orientation logic
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(42.dp)
+        ) {
+            Logo(
+                darkTheme = darkTheme.value,
+                primaryColor = MaterialTheme.colorScheme.primary,
+                modifier =
+                if (isLandscape) {
+                    Modifier.padding(0.dp, 0.dp)
+                } else {
+                    Modifier.padding(top = 128.dp, bottom = 96.dp)
+                }
+            )
+            MyButton(
+                enabled = true,
+                onClick = {
+                    val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse(playStoreUri)
+                        setPackage(playStorePackageName)
+                    }
+                    val fallbackIntent = Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse(alternativePlayStoreUri)
+                    }
+
+                    try {
+                        context.startActivity(playStoreIntent)
+                    } catch (e: ActivityNotFoundException) {
+                        context.startActivity(fallbackIntent)
+                    }
+                },
+                text = "Go to Play Store",
+                large = true,
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_warning_24),
+                    contentDescription = "Warning",
+                    modifier = Modifier.size(IconButtonSpecs.LARGE.iconSize),
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+                Column(
+                    modifier = Modifier.widthIn(max = 400.dp),
+                ) {
+                    Text(
+                        "Spotify is not installed on your device.",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Please install the Spotify app to enable music playback.",
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -313,6 +403,22 @@ fun PlayerScreen() {
 }
 
 // Previews
+@Preview(name = "Dark Not Installed Screen")
+@Composable
+fun DarkNotInstalledScreenPreview() {
+    MyPreview(darkTheme = true) {
+        AppNotInstalledScreen()
+    }
+}
+
+@Preview(name = "Light Not Installed Screen")
+@Composable
+fun LightNotInstalledScreenPreview() {
+    MyPreview(darkTheme = false) {
+        AppNotInstalledScreen()
+    }
+}
+
 @Preview(name = "Dark Login Screen")
 @Composable
 fun DarkLoginScreenPreview() {
@@ -342,6 +448,28 @@ fun DarkPlayerScreenPreview() {
 fun LightPlayerScreenPreview() {
     MyPreview(darkTheme = false) {
         PlayerScreen()
+    }
+}
+
+@Preview(
+    name = "Dark Landscape Not Installed Screen",
+    device = LANDSCAPE_DEVICE
+)
+@Composable
+fun DarkLandscapeNotInstalledScreenPreview() {
+    MyPreview(darkTheme = true) {
+        AppNotInstalledScreen()
+    }
+}
+
+@Preview(
+    name = "Light Landscape Not Installed Screen",
+    device = LANDSCAPE_DEVICE
+)
+@Composable
+fun LightLandscapeNotInstalledScreenPreview() {
+    MyPreview(darkTheme = false) {
+        AppNotInstalledScreen()
     }
 }
 

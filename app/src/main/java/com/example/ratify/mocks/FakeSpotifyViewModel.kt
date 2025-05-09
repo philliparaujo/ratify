@@ -1,5 +1,6 @@
 package com.example.ratify.mocks
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 class FakeSpotifyViewModel: ISpotifyViewModel {
     override val authRequest: LiveData<AuthorizationRequest>
         get() = MutableLiveData()
-    override val isAuthenticated: LiveData<Boolean>
+    override val isSpotifyAppInstalled: LiveData<Boolean>
         get() = MutableLiveData(true)
     override val remoteConnected: LiveData<Boolean>
         get() = MutableLiveData(true)
@@ -23,6 +24,13 @@ class FakeSpotifyViewModel: ISpotifyViewModel {
         get() = MutableStateFlow(null)
     override val currentPlaybackPosition: LiveData<Long>
         get() = MutableLiveData()
+
+    override fun isSpotifyAppInstalled(context: Context): Boolean {
+        return false
+    }
+    override fun setSpotifyAppInstalled(installed: Boolean) {
+
+    }
 
     override fun onEvent(event: SpotifyEvent) {
 

@@ -3,8 +3,6 @@ package com.example.ratify.spotify
 sealed interface SpotifyEvent {
     // Authentication and connection
     data object GenerateAuthorizationRequest: SpotifyEvent
-    data class SetAuthenticationStatus(val isAuthenticated: Boolean): SpotifyEvent
-
     data object ConnectAppRemote: SpotifyEvent
     data object DisconnectAppRemote: SpotifyEvent
 

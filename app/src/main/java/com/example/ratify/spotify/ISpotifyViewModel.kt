@@ -1,5 +1,6 @@
 package com.example.ratify.spotify
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
@@ -10,7 +11,7 @@ interface ISpotifyViewModel {
     // Saves request to launch authentication, done in MainActivity
     val authRequest: LiveData<AuthorizationRequest>
     // Answers if the user has successfully authenticated
-    val isAuthenticated: LiveData<Boolean>
+    val isSpotifyAppInstalled: LiveData<Boolean>
     // Answers if the user is connected to Spotify App Remote, used to control song playback
     val remoteConnected: LiveData<Boolean>
     // Provides information on whether the user can play on demand
@@ -23,4 +24,7 @@ interface ISpotifyViewModel {
 
     fun onEvent(event: SpotifyEvent)
     fun syncPlaybackPositionNow()
+
+    fun isSpotifyAppInstalled(context: Context): Boolean
+    fun setSpotifyAppInstalled(installed: Boolean)
 }

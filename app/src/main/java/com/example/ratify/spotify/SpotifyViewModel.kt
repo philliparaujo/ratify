@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
+import com.example.ratify.core.helper.spotifyPackageName
 import com.example.ratify.database.Converters
 import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
@@ -51,9 +52,12 @@ class  SpotifyViewModel(
     private val _authRequest = MutableLiveData<AuthorizationRequest>()
     override val authRequest = _authRequest
 
-    // Answers if the user has successfully authenticated
-    private val _isAuthenticated = MutableLiveData<Boolean>()
-    override val isAuthenticated: LiveData<Boolean> get() = _isAuthenticated
+    // Answers if the user has Spotify installed on device
+    private val _isSpotifyAppInstalled = MutableLiveData<Boolean>()
+    override val isSpotifyAppInstalled: LiveData<Boolean> get() = _isSpotifyAppInstalled
+    override fun setSpotifyAppInstalled(installed: Boolean) {
+        _isSpotifyAppInstalled.value = installed
+    }
 
     // Answers if the user is connected to Spotify App Remote, used to control song playback
     private val _remoteConnected = MutableLiveData<Boolean>()
@@ -181,6 +185,10 @@ class  SpotifyViewModel(
         playbackJob = null
     }
 
+    override fun isSpotifyAppInstalled(context: Context): Boolean {
+        return context.packageManager.getLaunchIntentForPackage(spotifyPackageName) != null
+    }
+
     override fun syncPlaybackPositionNow() {
         viewModelScope.launch(Dispatchers.IO) {
             subscribeToPlayerState()
@@ -195,7 +203,6 @@ class  SpotifyViewModel(
     override fun onEvent(event: SpotifyEvent) {
         when (event) {
             is SpotifyEvent.GenerateAuthorizationRequest -> generateAuthorizationRequest()
-            is SpotifyEvent.SetAuthenticationStatus -> setAuthenticationStatus(event.isAuthenticated)
             is SpotifyEvent.ConnectAppRemote -> connectSpotifyAppRemote()
             is SpotifyEvent.DisconnectAppRemote -> disconnectSpotifyAppRemote()
 
@@ -221,10 +228,6 @@ class  SpotifyViewModel(
             .setScopes(scopes)
             .build()
         _authRequest.postValue(request)
-    }
-
-    private fun setAuthenticationStatus(isAuthenticated: Boolean) {
-        _isAuthenticated.value = isAuthenticated
     }
 
     private fun connectSpotifyAppRemote() {

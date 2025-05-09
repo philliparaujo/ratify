@@ -46,6 +46,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        checkSpotifyInstalled()
+
         // On successful DatabaseIO import, the app restarts to display the up-to-date database
         // on the Library page. But the Snackbar we wish to show does not persist on app restarts.
         // This allows us to save the Snackbar and display it on app restart.
@@ -125,6 +127,8 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+        checkSpotifyInstalled()
+
         // Sync playback position by asking Spotify, prevents de-sync when app in background
         spotifyViewModel.syncPlaybackPositionNow()
     }
@@ -143,6 +147,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun checkSpotifyInstalled() {
+        val installed = spotifyViewModel.isSpotifyAppInstalled(this)
+        spotifyViewModel.setSpotifyAppInstalled(installed)
     }
 
     fun restartApp() {
