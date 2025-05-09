@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
 import com.example.ratify.core.helper.alternativePlayStoreUri
+import com.example.ratify.core.helper.navigateToSpotifyInstall
 import com.example.ratify.core.helper.playStorePackageName
 import com.example.ratify.core.helper.playStoreUri
 import com.example.ratify.core.model.Rating
@@ -117,21 +118,7 @@ fun AppNotInstalledScreen() {
             )
             MyButton(
                 enabled = true,
-                onClick = {
-                    val playStoreIntent = Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse(playStoreUri)
-                        setPackage(playStorePackageName)
-                    }
-                    val fallbackIntent = Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse(alternativePlayStoreUri)
-                    }
-
-                    try {
-                        context.startActivity(playStoreIntent)
-                    } catch (e: ActivityNotFoundException) {
-                        context.startActivity(fallbackIntent)
-                    }
-                },
+                onClick = { navigateToSpotifyInstall(context) },
                 text = "Go to Play Store",
                 large = true,
             )

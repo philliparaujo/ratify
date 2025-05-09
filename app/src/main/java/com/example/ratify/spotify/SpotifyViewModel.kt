@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.ratify.BuildConfig
+import com.example.ratify.core.helper.navigateToSpotifyInstall
 import com.example.ratify.core.helper.spotifyPackageName
 import com.example.ratify.database.Converters
 import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
@@ -307,14 +308,29 @@ class  SpotifyViewModel(
     }
 
     private fun playerEventWhenNotConnected() {
-        stateRepository.showSnackbar(
-            "Not connected to Spotify",
-            SnackbarAction(
-                name = "Connect",
-                action = {
-                    onEvent(SpotifyEvent.GenerateAuthorizationRequest)
-                }
+        val context = getApplication<Application>()
+        val isInstalled = _isSpotifyAppInstalled.value == true
+
+        if (isInstalled) {
+            stateRepository.showSnackbar(
+                "Not connected to Spotify",
+                SnackbarAction(
+                    name = "Connect",
+                    action = {
+                        onEvent(SpotifyEvent.GenerateAuthorizationRequest)
+                    }
+                )
             )
-        )
+        } else {
+            stateRepository.showSnackbar(
+                "Spotify is not installed",
+                SnackbarAction(
+                    name = "Install",
+                    action = {
+                        navigateToSpotifyInstall(context)
+                    }
+                )
+            )
+        }
     }
 }
