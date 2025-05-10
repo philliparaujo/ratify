@@ -1,6 +1,5 @@
 package com.example.ratify.spotify
 
-import com.example.ratify.repository.SongRepository
 import android.app.Application
 import android.content.Context
 import android.util.Log
@@ -12,11 +11,12 @@ import com.example.ratify.BuildConfig
 import com.example.ratify.core.helper.navigateToSpotifyInstall
 import com.example.ratify.core.helper.spotifyPackageName
 import com.example.ratify.database.Converters
+import com.example.ratify.repository.SongRepository
+import com.example.ratify.repository.StateRepository
 import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
 import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
 import com.example.ratify.services.updateRatingService
-import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.navigation.SnackbarAction
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -216,7 +216,7 @@ class SpotifyViewModel(
             is SpotifyEvent.DisconnectAppRemote -> disconnectSpotifyAppRemote()
 
             is SpotifyEvent.PlayPlaylist -> playPlaylist(event.playlistUri)
-            is SpotifyEvent.PlaySong -> playSong(event.songUri, event.songName)
+            is SpotifyEvent.PlaySong -> playSong(event.songUri, event.songName, event.queueSkip)
             is SpotifyEvent.Pause -> pause()
             is SpotifyEvent.QueueTrack -> queueTrack(event.trackUri, event.trackName)
             is SpotifyEvent.Resume -> resume()
@@ -284,9 +284,17 @@ class SpotifyViewModel(
         spotifyAppRemote?.playerApi?.play(playlistURI)
     }
 
-    private fun playSong(songURI: String, songName: String) {
-        spotifyAppRemote?.playerApi?.play(songURI)
-        stateRepository.showSnackbar("\"${songName}\" now playing")
+    private fun playSong(songURI: String, songName: String, queueSkip: Boolean) {
+        viewModelScope.launch {
+            if (queueSkip) {
+                queueTrack(songURI, songName)
+                Thread.sleep(1000)
+                skipNext()
+            } else {
+                spotifyAppRemote?.playerApi?.play(songURI)
+                stateRepository.showSnackbar("\"$songName\" now playing")
+            }
+        }
     }
 
     private fun pause() {

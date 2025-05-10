@@ -9,7 +9,7 @@ sealed interface SpotifyEvent {
 
     // Player
     data class PlayPlaylist(val playlistUri: String): SpotifyEvent
-    data class PlaySong(val songUri: String, val songName: String): SpotifyEvent
+    data class PlaySong(val songUri: String, val songName: String, val queueSkip: Boolean = false): SpotifyEvent
     data object Pause: SpotifyEvent
     data object Resume: SpotifyEvent
     data object SkipNext: SpotifyEvent

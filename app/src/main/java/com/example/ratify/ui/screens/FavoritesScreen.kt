@@ -101,15 +101,6 @@ fun FavoritesScreen() {
     // Settings variables
     val showImageUri = settingsRepository.libraryImageUri.collectAsState(true)
     val queueSkip = settingsRepository.queueSkip.collectAsState(false)
-    fun realPlay(song: Song) {
-        if (queueSkip.value) {
-            spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
-            Thread.sleep(1000)
-            spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
-        } else {
-            spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
-        }
-    }
 
     // Handles up-to-date search query
     var localTextFieldValue by remember { mutableStateOf(TextFieldValue(favoritesState.searchQuery)) }
@@ -313,7 +304,9 @@ fun FavoritesScreen() {
                     spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                 }
             },
-            onPlay = { song -> realPlay(song) },
+            onPlay = { song ->
+                spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name, queueSkip.value))
+            },
             onDisabledPlay = { spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)}
         )
     }

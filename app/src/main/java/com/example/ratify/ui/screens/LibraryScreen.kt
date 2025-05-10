@@ -85,15 +85,6 @@ fun LibraryScreen(
     // Settings variables
     val showImageUri = settingsRepository.libraryImageUri.collectAsState(true)
     val queueSkip = settingsRepository.queueSkip.collectAsState(false)
-    fun realPlay(song: Song) {
-        if (queueSkip.value) {
-            spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
-            Thread.sleep(1000)
-            spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
-        } else {
-            spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name))
-        }
-    }
 
     // Handles up-to-date search query
     var localTextFieldValue by remember { mutableStateOf(TextFieldValue(libraryState.searchQuery)) }
@@ -144,7 +135,9 @@ fun LibraryScreen(
                     )
                 }
             },
-            onPlay = { realPlay(song) },
+            onPlay = {
+                spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name, queueSkip.value))
+            },
             onDisabledPlay = {
                 spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
             },
@@ -204,7 +197,9 @@ fun LibraryScreen(
                                 }
                             }
                         },
-                        onPlay = { if (isScreenActive) realPlay(song) },
+                        onPlay = { if (isScreenActive)
+                            spotifyViewModel.onEvent(SpotifyEvent.PlaySong(song.uri, song.name, queueSkip.value))
+                        },
                         onDisabledPlay = {
                             if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
                         },
