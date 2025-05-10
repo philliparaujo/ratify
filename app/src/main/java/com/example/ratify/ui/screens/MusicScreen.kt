@@ -1,9 +1,6 @@
 package com.example.ratify.ui.screens
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,14 +31,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
-import com.example.ratify.core.helper.alternativePlayStoreUri
 import com.example.ratify.core.helper.navigateToSpotifyInstall
-import com.example.ratify.core.helper.playStorePackageName
-import com.example.ratify.core.helper.playStoreUri
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.state.MusicState
 import com.example.ratify.di.LocalSettingsRepository
@@ -55,6 +50,7 @@ import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
 import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.BinarySetting
+import com.example.ratify.ui.components.ImageOverlay
 import com.example.ratify.ui.components.Logo
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MyIconButton
@@ -235,7 +231,22 @@ fun PlayerScreen() {
                 imageUri = spotifyUriToImageUrl(playerState!!.track.imageUri.raw) ?: "",
             )
         } else {
-            SongDisplay("Placeholder", "Placeholder", "placeholder")
+            ImageOverlay(
+                imageUri = "",
+                renderContent = {
+                    Column(
+                        modifier = Modifier.widthIn(max = 300.dp).align(Alignment.BottomCenter)
+                    ) {
+                        Text(
+                            text = "Play a song on Spotify to get started!",
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -243,6 +254,7 @@ fun PlayerScreen() {
     fun RenderSongControls() {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
+        val controlsEnabled = playerEnabled && playerState != null
 
         // Controls playback position dragging
         var userDragging by remember { mutableStateOf(false) }
@@ -256,7 +268,7 @@ fun PlayerScreen() {
             }
         }
 
-        if (playerState != null) {
+        if (controlsEnabled) {
             PlaybackPosition(
                 currentPositionMs = if (userDragging) dragPositionMs else {
                     if (playerState!!.isPaused) playerState!!.playbackPosition
@@ -273,21 +285,21 @@ fun PlayerScreen() {
             )
         } else {
             // Placeholder playbackPosition
-            PlaybackPosition(0, 1000)
+            PlaybackPosition(0, 1000, enabled = false)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             MyIconButton(
-                enabled = playerEnabled,
+                enabled = controlsEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipPrevious)
                 },
                 icon = ImageVector.vectorResource(id = R.drawable.baseline_skip_previous_24)
             )
             MyIconButton(
-                enabled = playerEnabled,
+                enabled = controlsEnabled,
                 onClick = {
                     if (playerState != null) {
                         if (playerState!!.isPaused) {
@@ -303,7 +315,7 @@ fun PlayerScreen() {
                 large = true
             )
             MyIconButton(
-                enabled = playerEnabled,
+                enabled = controlsEnabled,
                 onClick = {
                     spotifyViewModel.onEvent(SpotifyEvent.SkipNext)
                 },
@@ -314,7 +326,7 @@ fun PlayerScreen() {
             scale = 1f,
             starCount = 5,
             onRatingSelect = { rating ->
-                if (playerEnabled) {
+                if (controlsEnabled) {
                     // Update current rating (UI indicator)
                     val ratingValue = Rating.from(rating)
                     stateRepository.updateCurrentRating(ratingValue)
@@ -337,7 +349,8 @@ fun PlayerScreen() {
                     }
                 }
             },
-            currentRating = musicState.currentRating
+            currentRating = musicState.currentRating,
+            enabled = controlsEnabled
         )
     }
 

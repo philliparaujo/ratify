@@ -22,7 +22,8 @@ fun PlaybackPosition(
     totalDurationMs: Long,
     onValueChanging: ((Long) -> Unit)? = null,
     onValueChangeFinished: ((Long) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         MySlider(
@@ -30,6 +31,7 @@ fun PlaybackPosition(
             maxValue = totalDurationMs,
             onValueChanging = onValueChanging,
             onValueChangeFinished = onValueChangeFinished,
+            enabled = enabled,
         )
 
         // Time indicators

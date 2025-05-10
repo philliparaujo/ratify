@@ -41,9 +41,7 @@ import com.example.ratify.core.helper.FAVORITES_MAX_SLIDER_VALUE
 import com.example.ratify.core.helper.FAVORITES_SEARCH_TYPES
 import com.example.ratify.core.helper.FAVORITES_SORT_TYPES
 import com.example.ratify.core.helper.GroupsPerRow
-import com.example.ratify.core.helper.LIBRARY_SEARCH_TYPES
 import com.example.ratify.core.model.GroupType
-import com.example.ratify.core.model.SearchType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
@@ -234,46 +232,67 @@ fun FavoritesScreen() {
             if (isLandscape) GroupsPerRow.LANDSCAPE.columns else GroupsPerRow.PORTRAIT.columns
         val rows = groupedSongs.chunked(groupsPerRow)
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            items(rows) { rowItems ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowItems.forEach { groupedSong ->
-                        Box(modifier = Modifier.weight(1f)) {
-                            when (favoritesState.groupType) {
-                                GroupType.ARTIST -> {
-                                    ArtistItem(
-                                        name = groupedSong.artist?.name ?: "N/A",
-                                        songCount = groupedSong.count,
-                                        averageRating = groupedSong.averageRating,
-                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
-                                    )
-                                }
-                                GroupType.ALBUM -> {
-                                    AlbumItem(
-                                        name = groupedSong.album?.name ?: "N/A",
-                                        artistName = groupedSong.artist?.name ?: "N/A",
-                                        songCount = groupedSong.count,
-                                        averageRating = groupedSong.averageRating,
-                                        imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
-                                        onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
-                                    )
+        if (rows.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "No favorites found",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Listen to more songs or adjust the filter criteria",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items(rows) { rowItems ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowItems.forEach { groupedSong ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                when (favoritesState.groupType) {
+                                    GroupType.ARTIST -> {
+                                        ArtistItem(
+                                            name = groupedSong.artist?.name ?: "N/A",
+                                            songCount = groupedSong.count,
+                                            averageRating = groupedSong.averageRating,
+                                            imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
+                                            onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
+                                        )
+                                    }
+                                    GroupType.ALBUM -> {
+                                        AlbumItem(
+                                            name = groupedSong.album?.name ?: "N/A",
+                                            artistName = groupedSong.artist?.name ?: "N/A",
+                                            songCount = groupedSong.count,
+                                            averageRating = groupedSong.averageRating,
+                                            imageUri = spotifyUriToImageUrl(groupedSong.imageUri?.raw) ?: "",
+                                            onClick = { stateRepository.updateFavoritesDialog(groupedSong) }
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    // Ensure last row has same size
-                    if (rowItems.size < groupsPerRow) {
-                        repeat(groupsPerRow - rowItems.size) {
-                            Spacer(modifier = Modifier.weight(1f))
+                        // Ensure last row has same size
+                        if (rowItems.size < groupsPerRow) {
+                            repeat(groupsPerRow - rowItems.size) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
                         }
                     }
                 }

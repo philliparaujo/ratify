@@ -156,11 +156,16 @@ fun StarRow(
     starCount: Int = 5,
     onRatingSelect: (Int) -> Unit,
     currentRating: Rating? = null,
+    enabled: Boolean = true,
 ) {
     var ratingValue by remember { mutableIntStateOf(currentRating?.value ?: 0) }
     val starStates = remember { mutableStateListOf(*Array(starCount * 2) { false }) }
 
     fun updateStarSelections(selectedIndex: Int) {
+        if (!enabled) {
+            return
+        }
+
         ratingValue = selectedIndex + 1
         for (j in starStates.indices) {
             starStates[j] = j <= selectedIndex
@@ -188,7 +193,9 @@ fun StarRow(
                         }
                     },
                     onDragEnd = {
-                        onRatingSelect(ratingValue)
+                        if (enabled) {
+                            onRatingSelect(ratingValue)
+                        }
                     }
                 )
             }
@@ -205,11 +212,15 @@ fun StarRow(
                 isRightSelected = starStates[rightStarIndex],
                 onLeftClick = {
                     updateStarSelections(leftStarIndex)
-                    onRatingSelect(ratingValue)
+                    if (enabled) {
+                        onRatingSelect(ratingValue)
+                    }
                 },
                 onRightClick = {
                     updateStarSelections(rightStarIndex)
-                    onRatingSelect(ratingValue)
+                    if (enabled) {
+                        onRatingSelect(ratingValue)
+                    }
                 }
             )
         }

@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -170,33 +171,58 @@ fun LibraryScreen(
 
     @Composable
     fun RenderSongList() {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            items(libraryState.songs) { song ->
-                SongItem(
-                    song = song,
-                    onClick = {
-                        if (isScreenActive) stateRepository.updateLibraryDialog(song)
-                    },
-                    onLongClick = {
-                        if (isScreenActive) {
-                            if (playerEnabled) {
-                                spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
-                            } else {
-                                spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
-                            }
-                        }
-                    },
-                    onPlay = { if (isScreenActive) realPlay(song) },
-                    onDisabledPlay = {
-                        if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
-                    },
-                    playEnabled = playerEnabled,
-                    showImageUri = showImageUri.value
+        if (libraryState.songs.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "No songs in your library",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
+                Text(
+                    text = if (libraryState.searchQuery == "") {
+                        "When you play a song it will be added here"
+                    } else {
+                        "Listen to more songs or adjust the search criteria"
+                    },
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items(libraryState.songs) { song ->
+                    SongItem(
+                        song = song,
+                        onClick = {
+                            if (isScreenActive) stateRepository.updateLibraryDialog(song)
+                        },
+                        onLongClick = {
+                            if (isScreenActive) {
+                                if (playerEnabled) {
+                                    spotifyViewModel.onEvent(SpotifyEvent.QueueTrack(song.uri, song.name))
+                                } else {
+                                    spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                                }
+                            }
+                        },
+                        onPlay = { if (isScreenActive) realPlay(song) },
+                        onDisabledPlay = {
+                            if (isScreenActive) spotifyViewModel.onEvent(SpotifyEvent.PlayerEventWhenNotConnected)
+                        },
+                        playEnabled = playerEnabled,
+                        showImageUri = showImageUri.value
+                    )
+                }
             }
         }
     }

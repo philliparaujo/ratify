@@ -36,7 +36,8 @@ fun MySlider(
     maxValue: Long,
     onValueChanging: ((Long) -> Unit)? = null,
     onValueChangeFinished: ((Long) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     var containerWidthPx by remember { mutableIntStateOf(0) }
 
@@ -52,27 +53,34 @@ fun MySlider(
 
     Box(
         modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    val tappedProgress = offset.x / containerWidthPx
-                    val newValue = (tappedProgress * realMaxValue).toLong().coerceIn(0, realMaxValue)
-                    onValueChanging?.invoke(newValue)
-                    onValueChangeFinished?.invoke(newValue)
+            .then(
+                if (enabled) {
+                    Modifier
+                        .pointerInput(Unit) {
+                            detectTapGestures { offset ->
+                                val tappedProgress = offset.x / containerWidthPx
+                                val newValue = (tappedProgress * realMaxValue).toLong().coerceIn(0, realMaxValue)
+                                onValueChanging?.invoke(newValue)
+                                onValueChangeFinished?.invoke(newValue)
+                            }
+                        }
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragEnd = {
+                                    onValueChangeFinished?.invoke(draggedValue)
+                                },
+                                onDrag = { change, _ ->
+                                    val draggedProgress = change.position.x / containerWidthPx
+                                    val newValue = (draggedProgress * realMaxValue).toLong().coerceIn(0, realMaxValue)
+                                    draggedValue = newValue
+                                    onValueChanging?.invoke(newValue)
+                                }
+                            )
+                        }
+                } else {
+                    Modifier
                 }
-            }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragEnd = {
-                        onValueChangeFinished?.invoke(draggedValue)
-                    },
-                    onDrag = { change, _ ->
-                        val draggedProgress = change.position.x / containerWidthPx
-                        val newValue = (draggedProgress * realMaxValue).toLong().coerceIn(0, realMaxValue)
-                        draggedValue = newValue
-                        onValueChanging?.invoke(newValue)
-                    }
-                )
-            }
+            )
             .fillMaxWidth()
             .height(specs.circleSize.dp)
             .onSizeChanged { containerWidthPx = it.width }
