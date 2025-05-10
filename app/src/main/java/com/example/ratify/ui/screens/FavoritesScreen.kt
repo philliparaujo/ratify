@@ -1,6 +1,5 @@
 package com.example.ratify.ui.screens
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,6 +39,7 @@ import com.example.ratify.core.helper.FAVORITES_MAX_SLIDER_VALUE
 import com.example.ratify.core.helper.FAVORITES_SEARCH_TYPES
 import com.example.ratify.core.helper.FAVORITES_SORT_TYPES
 import com.example.ratify.core.helper.GroupsPerRow
+import com.example.ratify.core.helper.isLandscapeOrientation
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.core.state.FavoritesState
 import com.example.ratify.database.GroupedSong
@@ -98,10 +97,6 @@ fun FavoritesScreen() {
     LaunchedEffect(favoritesState.minEntriesThreshold) {
         currentSliderValue = favoritesState.minEntriesThreshold.toLong()
     }
-
-    // Orientation logic
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
     val showImageUri = settingsRepository.libraryImageUri.collectAsState(true)
@@ -229,7 +224,7 @@ fun FavoritesScreen() {
     fun RenderItemList() {
         val groupedSongs = favoritesState.groupedSongs
         val groupsPerRow =
-            if (isLandscape) GroupsPerRow.LANDSCAPE.columns else GroupsPerRow.PORTRAIT.columns
+            if (isLandscapeOrientation()) GroupsPerRow.LANDSCAPE.columns else GroupsPerRow.PORTRAIT.columns
         val rows = groupedSongs.chunked(groupsPerRow)
 
         if (rows.isEmpty()) {
@@ -329,7 +324,7 @@ fun FavoritesScreen() {
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (isLandscape) {
+        if (isLandscapeOrientation()) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(48.dp),
                 verticalAlignment = Alignment.Bottom,

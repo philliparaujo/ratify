@@ -1,6 +1,5 @@
 package com.example.ratify.ui.screens
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
+import com.example.ratify.core.helper.isLandscapeOrientation
 import com.example.ratify.core.helper.navigateToSpotifyInstall
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.state.MusicState
@@ -87,10 +86,6 @@ fun AppNotInstalledScreen() {
     val settingsRepository: SettingsRepository = LocalSettingsRepository.current
     val darkTheme = settingsRepository.darkTheme.collectAsState(initial = true)
 
-    // Orientation logic
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -106,7 +101,7 @@ fun AppNotInstalledScreen() {
                 darkTheme = darkTheme.value,
                 primaryColor = MaterialTheme.colorScheme.primary,
                 modifier =
-                if (isLandscape) {
+                if (isLandscapeOrientation()) {
                     Modifier.padding(0.dp, 0.dp)
                 } else {
                     Modifier.padding(top = 128.dp, bottom = 96.dp)
@@ -156,10 +151,6 @@ fun LoginScreen() {
     val autoSignIn = settingsRepository.autoSignIn.collectAsState(initial = false)
     val darkTheme = settingsRepository.darkTheme.collectAsState(initial = true)
 
-    // Orientation logic
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -174,7 +165,7 @@ fun LoginScreen() {
                 darkTheme = darkTheme.value,
                 primaryColor = MaterialTheme.colorScheme.primary,
                 modifier =
-                    if (isLandscape) {
+                    if (isLandscapeOrientation()) {
                         Modifier.padding(0.dp, 32.dp)
                     } else {
                         Modifier.padding(top = 160.dp, bottom = 128.dp)
@@ -214,10 +205,6 @@ fun PlayerScreen() {
     val currentPlaybackPosition = spotifyViewModel.currentPlaybackPosition.observeAsState()
     val playerEnabled = userCapabilities.value != null && userCapabilities.value!!.canPlayOnDemand
     val musicState = stateRepository.musicState.collectAsState(initial = MusicState()).value
-
-    // Orientation logic
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     // Settings variables
     val skipOnRate = settingsRepository.skipOnRate.collectAsState(initial = false)
@@ -287,6 +274,7 @@ fun PlayerScreen() {
             // Placeholder playbackPosition
             PlaybackPosition(0, 1000, enabled = false)
         }
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -357,7 +345,7 @@ fun PlayerScreen() {
     Box(
         modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
-        if (isLandscape) {
+        if (isLandscapeOrientation()) {
             // Landscape layout (two columns)
             Row(
                 modifier = Modifier

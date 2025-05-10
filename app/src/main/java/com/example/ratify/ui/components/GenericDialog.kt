@@ -1,6 +1,5 @@
 package com.example.ratify.ui.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,11 +15,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.ratify.core.helper.DialogSpecs
+import com.example.ratify.core.helper.isLandscapeOrientation
 import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
 
@@ -30,10 +29,7 @@ fun GenericDialog(
     renderPortraitContent: @Composable ColumnScope.() -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    val specs = if (isLandscape) DialogSpecs.LANDSCAPE else DialogSpecs.PORTRAIT
+    val specs = if (isLandscapeOrientation()) DialogSpecs.LANDSCAPE else DialogSpecs.PORTRAIT
 
     Dialog(
         onDismissRequest = { onDismissRequest() },
@@ -41,7 +37,7 @@ fun GenericDialog(
             usePlatformDefaultWidth = false
         )
     ) {
-        if (isLandscape) {
+        if (isLandscapeOrientation()) {
             Box(
                 modifier = Modifier
                     .padding(

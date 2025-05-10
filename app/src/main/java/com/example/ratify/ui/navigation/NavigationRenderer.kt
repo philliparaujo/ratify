@@ -25,11 +25,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ratify.core.helper.isLandscapeOrientation
 import com.example.ratify.di.LocalStateRepository
 import com.example.ratify.repository.StateRepository
 import com.example.ratify.ui.components.BottomNavBar
@@ -47,15 +48,9 @@ fun NavigationRenderer(
 ) {
     // Figure out which Target is currently selected
     // Relies on composable<Target> route being a substring of Target.toString()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
     val currentTarget = navigationTargets.find {
-        isRouteOnTarget(currentRoute, it)
+        isRouteOnTarget(navController, it)
     } ?: startNavigationTarget
-
-    // Figure out current orientation
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
     // Shared attributes between both orientations
     val onClick = { target: NavigationTarget, isSelected: Boolean ->
@@ -104,7 +99,7 @@ fun NavigationRenderer(
                 )
             }
         },
-        bottomBar = { if (!isLandscape) {
+        bottomBar = { if (!isLandscapeOrientation()) {
             BottomNavBar(
                 navigationTargets = navigationTargets,
                 currentNavigationTarget = currentTarget,
@@ -116,7 +111,7 @@ fun NavigationRenderer(
             .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.displayCutout)
     ) { innerPadding ->
-        if (isLandscape) {
+        if (isLandscapeOrientation()) {
             PermanentNavigationDrawer (
                 drawerContent = {
                     LeftNavDrawer(
@@ -176,10 +171,16 @@ fun targetOnClick(
     }
 }
 
-fun isRouteOnTarget(route: String?, target: NavigationTarget): Boolean {
-    if (route == null) {
-        return false
+// Checks if the currently selected route matches some target
+@Composable
+fun isRouteOnTarget(navController: NavHostController, target: NavigationTarget): Boolean {
+    @Composable
+    fun currentRoute(navController: NavHostController): String? {
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        return backStackEntry?.destination?.route
     }
+
+    val route = currentRoute(navController) ?: return false
 
     return target.toString().contains(route)
 }

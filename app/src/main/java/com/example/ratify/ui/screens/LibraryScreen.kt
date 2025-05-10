@@ -1,6 +1,5 @@
 package com.example.ratify.ui.screens
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -34,11 +32,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ratify.core.helper.LIBRARY_SEARCH_TYPES
 import com.example.ratify.core.helper.LIBRARY_SORT_TYPES
+import com.example.ratify.core.helper.isLandscapeOrientation
 import com.example.ratify.core.helper.libraryDropdownOptions
 import com.example.ratify.core.model.Rating
 import com.example.ratify.core.state.LibraryState
@@ -66,7 +64,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LibraryScreen(
-    navController: NavController
+    navController: NavHostController
 ) {
     val spotifyViewModel: ISpotifyViewModel = LocalSpotifyViewModel.current
     val songRepository: SongRepository = LocalSongRepository.current
@@ -81,17 +79,8 @@ fun LibraryScreen(
     val userCapabilities = spotifyViewModel.userCapabilities.observeAsState().value
     val playerEnabled = userCapabilities?.canPlayOnDemand ?: false
 
-    // Orientation logic
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    // Figure out which Target is currently selected
-    // Relies on composable<Target> route being a substring of Target.toString()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStackEntry?.destination?.route
-
     // Prevents song items from being interactable when navigating away from screen
-    val isScreenActive = isRouteOnTarget(currentRoute, LibraryNavigationTarget)
+    val isScreenActive = isRouteOnTarget(navController, LibraryNavigationTarget)
 
     // Settings variables
     val showImageUri = settingsRepository.libraryImageUri.collectAsState(true)
@@ -308,7 +297,7 @@ fun LibraryScreen(
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (isLandscape) {
+        if (isLandscapeOrientation()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(48.dp),

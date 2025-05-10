@@ -1,7 +1,10 @@
 package com.example.ratify.core.helper
 
+import android.content.res.Configuration
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -15,4 +18,10 @@ object NoRippleInteractionSource : MutableInteractionSource {
     override fun tryEmit(interaction: Interaction): Boolean {
         return true
     }
+}
+
+@Composable
+fun isLandscapeOrientation(): Boolean {
+    val configuration = LocalConfiguration.current
+    return configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }
