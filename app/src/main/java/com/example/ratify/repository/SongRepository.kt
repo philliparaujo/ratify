@@ -13,6 +13,7 @@ import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.Track
 import kotlinx.coroutines.flow.Flow
 
+// Abstracts over the DAO, handles all data operations relating to songs
 class SongRepository(
     private val dao: SongDao
 ) {

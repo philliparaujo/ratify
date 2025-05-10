@@ -5,7 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
-
+// Prevents navigation elements from having a "ripple" when tapping on a navigation target
 object NoRippleInteractionSource : MutableInteractionSource {
     override val interactions: Flow<Interaction>
         get() = emptyFlow()

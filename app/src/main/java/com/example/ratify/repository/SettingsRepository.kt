@@ -9,6 +9,7 @@ import com.example.ratify.core.model.PrimaryColor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+// Stores user app preferences using Jetpack DataStore for persistent settings
 class SettingsRepository(
     private val context: Context
 ) {

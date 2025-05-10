@@ -27,7 +27,7 @@ private val mockAverageRating = 6.4f
 
 private const val unspecifiedString = "foo"
 
-// Exported Spotify types
+// Exported Spotify types used in Previews
 val mockArtist = Artist(mockArtistName, unspecifiedString)
 val mockAlbum = Album(mockAlbumName, unspecifiedString)
 val mockSong = Song(

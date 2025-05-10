@@ -6,6 +6,8 @@ import com.example.ratify.repository.SongRepository
 import com.example.ratify.repository.StateRepository
 import com.example.ratify.spotify.ISpotifyViewModel
 
+// Gives access to these dependencies anywhere within the Composable scope,
+// reducing repetitive parameter definitions
 val LocalSpotifyViewModel = staticCompositionLocalOf<ISpotifyViewModel> {
     error("SpotifyViewModel not provided")
 }

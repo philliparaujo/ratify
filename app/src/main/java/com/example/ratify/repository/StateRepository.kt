@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// Manages (non-persistent) application states for each individual screen
 class StateRepository(
     private val songRepository: SongRepository
 ) {
@@ -55,7 +56,14 @@ class StateRepository(
         ) }
         .distinctUntilChanged()
         .flatMapLatest { (search, group, sort) ->
-            songRepository.getFavoritesSongs(search.first, search.second, group.first, group.second, sort.first, sort.second, )
+            songRepository.getFavoritesSongs(
+                search.first,
+                search.second,
+                group.first,
+                group.second,
+                sort.first,
+                sort.second
+            )
         }
 
     // Public states
@@ -71,10 +79,12 @@ class StateRepository(
     val snackbarHostState = SnackbarHostState()  // Keeps Snackbars active
 
     // State setters
+    /* Music */
     fun updateCurrentRating(rating: Rating?) {
         _musicState.update { it.copy(currentRating = rating) }
     }
 
+    /* Library */
     fun updateLibraryDialog(dialog: Song?) {
         _libraryState.update { it.copy(dialog = dialog) }
     }
@@ -88,6 +98,10 @@ class StateRepository(
         _libraryState.update { it.copy(searchQuery = query) }
     }
     fun updateLibrarySortType(type: LibrarySortType) {
+        fun updateLibrarySortAscending(sortAscending: Boolean) {
+            _libraryState.update { it.copy(sortAscending = sortAscending) }
+        }
+
         if (_libraryState.value.sortType == type) {
             updateLibrarySortAscending(!_libraryState.value.sortAscending)
         } else {
@@ -96,10 +110,8 @@ class StateRepository(
 
         _libraryState.update { it.copy(sortType = type) }
     }
-    private fun updateLibrarySortAscending(sortAscending: Boolean) {
-        _libraryState.update { it.copy(sortAscending = sortAscending) }
-    }
 
+    /* Favorites */
     fun updateFavoritesDialog(dialog: GroupedSong?) {
         _favoritesState.update { it.copy(dialog = dialog) }
     }
@@ -113,6 +125,10 @@ class StateRepository(
         _favoritesState.update { it.copy(searchQuery = query) }
     }
     fun updateFavoritesSortType(type: FavoritesSortType) {
+        fun updateFavoritesSortAscending(sortAscending: Boolean) {
+            _favoritesState.update { it.copy(sortAscending = sortAscending) }
+        }
+
         if (_favoritesState.value.sortType == type) {
             updateFavoritesSortAscending(!_favoritesState.value.sortAscending)
         } else {
@@ -124,10 +140,8 @@ class StateRepository(
     fun updateGroupType(type: GroupType) {
         _favoritesState.update { it.copy(groupType = type) }
     }
-    private fun updateFavoritesSortAscending(sortAscending: Boolean) {
-        _favoritesState.update { it.copy(sortAscending = sortAscending) }
-    }
 
+    /* Snackbar */
     fun showSnackbar(message: String, action: SnackbarAction? = null) {
         snackbarHostState.currentSnackbarData?.dismiss()
 

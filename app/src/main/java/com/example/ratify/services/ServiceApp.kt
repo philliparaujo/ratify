@@ -10,8 +10,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
+// Initializes app by setting up the notification channel and starting dependency injection
 class ServiceApp: Application() {
-
     override fun onCreate() {
         super.onCreate()
 

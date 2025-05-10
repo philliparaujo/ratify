@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.gson.annotations.SerializedName
 
+// Defines the Rating type used in Song
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Rating(
     @JsonProperty("value")

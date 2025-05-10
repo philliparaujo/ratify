@@ -16,6 +16,7 @@ import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import kotlinx.coroutines.flow.Flow
 
+// Defines all Room DAO operations for querying, inserting, deleting, and filtering songs
 @Dao
 interface SongDao {
     @Upsert

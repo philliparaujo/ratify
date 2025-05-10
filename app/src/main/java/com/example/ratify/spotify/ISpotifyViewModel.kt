@@ -22,9 +22,9 @@ interface ISpotifyViewModel {
     // Provides information on live playback position by incrementing a timer on song being played
     val currentPlaybackPosition: LiveData<Long>
 
+    fun setSpotifyAppInstalled(installed: Boolean)
+    fun isSpotifyAppInstalled(context: Context): Boolean
+
     fun onEvent(event: SpotifyEvent)
     fun syncPlaybackPositionNow()
-
-    fun isSpotifyAppInstalled(context: Context): Boolean
-    fun setSpotifyAppInstalled(installed: Boolean)
 }

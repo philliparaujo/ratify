@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import com.example.ratify.R
 
+// Runs a foreground service displaying the current rating notification
 class RatingService: Service() {
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -34,6 +35,7 @@ class RatingService: Service() {
     }
 
     companion object {
+        // Display the actual UI of the notification
         fun createCustomRemoteView(context: Context, currentRating: String): RemoteViews {
             val packageName = context.packageName
             val remoteViews = RemoteViews(packageName, R.layout.rating_notification)

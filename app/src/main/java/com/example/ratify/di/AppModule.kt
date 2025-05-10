@@ -11,8 +11,9 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
+// Defines where all component injections occur, providing global access to these singletons
+// Dependency injection prevents passing in parameters like SpotifyViewModel into every file
 val appModule = module {
-
     single<SongDatabase> {
         SongDatabaseProvider.getDatabase(androidApplication())
     }

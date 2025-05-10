@@ -1,5 +1,6 @@
 package com.example.ratify.spotify
 
+// Defines all Spotify-related actions for the ViewModel
 sealed interface SpotifyEvent {
     // Authentication and connection
     data object GenerateAuthorizationRequest: SpotifyEvent

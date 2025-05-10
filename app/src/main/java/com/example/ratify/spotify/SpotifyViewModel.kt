@@ -23,6 +23,7 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
+import com.spotify.protocol.types.Track
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.Dispatchers
@@ -32,7 +33,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class  SpotifyViewModel(
+// Manages Spotify permissions, authorization/connection state, playback state, and actions
+class SpotifyViewModel(
     application: Application,
     private val songRepository: SongRepository,
     private val stateRepository: StateRepository
@@ -42,7 +44,11 @@ class  SpotifyViewModel(
     private val redirectUri: String by lazy { BuildConfig.SPOTIFY_REDIRECT_URI }
 
     // Permissions given to users of app, ideally minimized as much as possible
-    private val scopes = arrayOf(Scopes.STREAMING, Scopes.APP_REMOTE_CONTROL, Scopes.USER_READ_PLAYBACK_STATE)
+    private val scopes = arrayOf(
+        Scopes.STREAMING,
+        Scopes.APP_REMOTE_CONTROL,
+        Scopes.USER_READ_PLAYBACK_STATE
+    )
         .map { scope -> scope.value }
         .toTypedArray()
 
@@ -58,6 +64,9 @@ class  SpotifyViewModel(
     override val isSpotifyAppInstalled: LiveData<Boolean> get() = _isSpotifyAppInstalled
     override fun setSpotifyAppInstalled(installed: Boolean) {
         _isSpotifyAppInstalled.value = installed
+    }
+    override fun isSpotifyAppInstalled(context: Context): Boolean {
+        return context.packageManager.getLaunchIntentForPackage(spotifyPackageName) != null
     }
 
     // Answers if the user is connected to Spotify App Remote, used to control song playback
@@ -84,67 +93,70 @@ class  SpotifyViewModel(
     private val _playerState = MutableStateFlow<PlayerState?>(null)
     override val playerState: StateFlow<PlayerState?> get() = _playerState
     private fun subscribeToPlayerState() {
-        if (spotifyAppRemote != null) {
-            spotifyAppRemote?.playerApi?.subscribeToPlayerState()?.setEventCallback { state ->
-                val previousSong = playerState.value?.track
-                val currentSong = state.track
+        val remote = spotifyAppRemote ?: return
 
-                // Handle song change
-                if (previousSong?.uri != currentSong.uri) {
-                    Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
+        remote.playerApi.subscribeToPlayerState().setEventCallback { newPlayerState ->
+            val previousSong = playerState.value?.track
+            val currentSong = newPlayerState.track
 
-                    viewModelScope.launch {
-                        val existingSong = songRepository.getSongByPrimaryKey(currentSong)
-                        val currentTime = System.currentTimeMillis()
+            // On song change, update current rating, RatingService, and database updates
+            if (previousSong?.uri != currentSong.uri) {
+                Log.d("SpotifyViewModel", "Now playing: ${currentSong.name} by ${currentSong.artist.name}")
 
-                        val context = getApplication<Application>()
-                        val prefs = context.getSharedPreferences(PLAYER_STATE_SHARED_PREFS, Context.MODE_PRIVATE)
-
-                        // In database, insert current song for first time or update existing song's lastPlayedTs, timesPlayed
-                        if (existingSong == null) {
-                            if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
-                                songRepository.upsertSong(
-                                    track = currentSong,
-                                    lastPlayedTs = currentTime,
-                                    timesPlayed = 1,
-                                    rating = null,
-                                    lastRatedTs = null
-                                )
-                                context.updateRatingService(null)
-                            }
-                        } else {
-                            songRepository.updateLastPlayedTs(
-                                name = existingSong.name,
-                                artists = existingSong.artists,
-                                lastPlayedTs = currentTime,
-                                timesPlayed = existingSong.timesPlayed + 1
-                            )
-                            context.updateRatingService(existingSong.rating)
-                        }
-
-                        // Update player state for RatingService
-                        val converters = Converters()
-                        prefs.edit()
-                            .putString(TRACK_NAME_SHARED_PREFS, currentSong.name)
-                            .putString(TRACK_ARTISTS_SHARED_PREFS, converters.fromArtistList(currentSong.artists))
-                            .apply()
-
-                        // Load current rating based on database entry
-                        stateRepository.updateCurrentRating(existingSong?.rating)
-                    }
-                }
-
-                // Update playerState on state change
-                _playerState.value = state
-
-                // Update playback position on play
-                if (!state.isPaused) {
-                    startUpdatingPlaybackPosition(state.playbackPosition)
-                } else {
-                    stopUpdatingPlaybackPosition()
+                viewModelScope.launch {
+                    handleSongChange(currentSong)
                 }
             }
+
+            // Update playback position on play
+            if (!newPlayerState.isPaused) {
+                startUpdatingPlaybackPosition(newPlayerState.playbackPosition)
+            } else {
+                stopUpdatingPlaybackPosition()
+            }
+
+            // Update playerState
+            _playerState.value = newPlayerState
         }
+    }
+    private suspend fun handleSongChange(currentSong: Track) {
+        val context = getApplication<Application>()
+        val prefs = context.getSharedPreferences(PLAYER_STATE_SHARED_PREFS, Context.MODE_PRIVATE)
+
+        val currentSongInDb = songRepository.getSongByPrimaryKey(currentSong)
+        val currentTime = System.currentTimeMillis()
+
+        // In database, insert current song for first time or update existing song's lastPlayedTs, timesPlayed
+        if (currentSongInDb == null) {
+            if (currentSong.name != null && currentSong.artists.isNotEmpty() && currentSong.duration > 0) {
+                songRepository.upsertSong(
+                    track = currentSong,
+                    lastPlayedTs = currentTime,
+                    timesPlayed = 1,
+                    rating = null,
+                    lastRatedTs = null
+                )
+                context.updateRatingService(null)
+            }
+        } else {
+            songRepository.updateLastPlayedTs(
+                name = currentSongInDb.name,
+                artists = currentSongInDb.artists,
+                lastPlayedTs = currentTime,
+                timesPlayed = currentSongInDb.timesPlayed + 1
+            )
+            context.updateRatingService(currentSongInDb.rating)
+        }
+
+        // Update player state for RatingService
+        val converters = Converters()
+        prefs.edit()
+            .putString(TRACK_NAME_SHARED_PREFS, currentSong.name)
+            .putString(TRACK_ARTISTS_SHARED_PREFS, converters.fromArtistList(currentSong.artists))
+            .apply()
+
+        // Load current rating based on database entry
+        stateRepository.updateCurrentRating(currentSongInDb?.rating)
     }
 
     // Provides information on live playback position by incrementing a timer on song being played
@@ -154,25 +166,25 @@ class  SpotifyViewModel(
     private fun startUpdatingPlaybackPosition(initialPosition: Long) {
         stopUpdatingPlaybackPosition() // Stop any existing jobs
 
+        val syncIntervalMs = 10000L
+        val updateIntervalMs = 250L
+        val syncRate = (syncIntervalMs/updateIntervalMs).toInt()
+
         Log.d("SpotifyViewModel", "updating playback position")
         playbackJob = viewModelScope.launch {
             var currentPosition = initialPosition
-            val updateIntervalMs = 250L
-            val syncIntervalMs = 10000L
             var syncCounter = 0
+
             while (true) {
                 // Frequently update local counter to estimate true playback position
                 _currentPlaybackPosition.postValue(currentPosition)
                 delay(updateIntervalMs)
                 currentPosition += updateIntervalMs
 
-                // Occasionally Sync playback position using Spotify API in a separate coroutine
-                if (syncCounter % (syncIntervalMs/updateIntervalMs).toInt() == 0) {
+                // Occasionally sync playback position using Spotify API in a separate coroutine
+                if (syncCounter % syncRate == 0) {
                     launch(Dispatchers.IO) {
-                        val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
-                        if (syncedPosition != null) {
-                            currentPosition = syncedPosition
-                        }
+                        fetchPlaybackPosition()?.let { currentPosition = it }
                     }
                 }
                 syncCounter++
@@ -186,18 +198,14 @@ class  SpotifyViewModel(
         playbackJob = null
     }
 
-    override fun isSpotifyAppInstalled(context: Context): Boolean {
-        return context.packageManager.getLaunchIntentForPackage(spotifyPackageName) != null
+    private fun fetchPlaybackPosition(): Long? {
+        return spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
     }
 
     override fun syncPlaybackPositionNow() {
         viewModelScope.launch(Dispatchers.IO) {
             subscribeToPlayerState()
-
-            val syncedPosition = spotifyAppRemote?.playerApi?.playerState?.await()?.data?.playbackPosition
-            syncedPosition?.let {
-                startUpdatingPlaybackPosition(it)
-            }
+            fetchPlaybackPosition()?.let { startUpdatingPlaybackPosition(it) }
         }
     }
 
@@ -233,9 +241,8 @@ class  SpotifyViewModel(
 
     private fun connectSpotifyAppRemote() {
         // If Spotify not installed on phone, cannot connect to App Remote
-        val context = getApplication<Application>()
-        val isSpotifyInstalled = context.packageManager.getLaunchIntentForPackage("com.spotify.music") != null
-        if (!isSpotifyInstalled) {
+        val isInstalled = _isSpotifyAppInstalled.value == true
+        if (!isInstalled) {
             Log.d("SpotifyViewModel", "Spotify app not installed, skipping App Remote connection")
             return
         }

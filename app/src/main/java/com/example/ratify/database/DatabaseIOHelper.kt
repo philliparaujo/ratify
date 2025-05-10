@@ -3,6 +3,7 @@ package com.example.ratify.database
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 
+// Abstracts launching Android activities to import/export Room database using system file pickers
 class DatabaseIOHelper(
     private val activity: ComponentActivity,
     private val onExportComplete: (Boolean) -> Unit,

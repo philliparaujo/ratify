@@ -8,6 +8,7 @@ import com.spotify.protocol.types.Album
 import com.spotify.protocol.types.Artist
 import com.spotify.protocol.types.ImageUri
 
+// Turns Spotify, custom types into strings to encode in database
 class Converters {
     private val gson = Gson()
 

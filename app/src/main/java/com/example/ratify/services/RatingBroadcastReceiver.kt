@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 
+// Handles button interactions from the notification, updating song ratings and refreshing the UI
 class RatingBroadcastReceiver : BroadcastReceiver() {
     // Triggers on button click within notification
     override fun onReceive(context: Context, intent: Intent?) {
@@ -57,7 +58,6 @@ class RatingBroadcastReceiver : BroadcastReceiver() {
             }
         }
 
-
         // Calculate new button value, update shared preferences of button and text view
         val newValue = flipButtonValue(buttonValue)
         Log.d("MyBroadcastReceiver", "Button ID: $buttonId, Toggled Value: $buttonValue -> $newValue")
@@ -76,5 +76,3 @@ class RatingBroadcastReceiver : BroadcastReceiver() {
         notificationManager.notify(NOTIFICATION_ID, existingNotification)
     }
 }
-
-

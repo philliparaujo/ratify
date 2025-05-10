@@ -8,6 +8,7 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
+// Handles launching Spotify's authentication UI
 class SpotifyAuthHelper(
     private val activity: ComponentActivity,
     private val spotifyViewModel: ISpotifyViewModel

@@ -12,6 +12,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
+// Handles importing/exporting the singleton Room database
 object SongDatabaseProvider {
     @Volatile
     private var instance: SongDatabase? = null

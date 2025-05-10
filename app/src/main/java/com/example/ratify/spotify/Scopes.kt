@@ -43,9 +43,4 @@ enum class Scopes(val value: String) {
     SOA_MANAGE_ENTITLEMENTS("soa-manage-entitlements"),
     SOA_MANAGE_PARTNER("soa-manage-partner"),
     SOA_CREATE_PARTNER("soa-create-partner");
-
-    companion object {
-        // Returns a list of all scope strings
-        fun allScopes(): List<String> = entries.map { it.value }
-    }
 }
