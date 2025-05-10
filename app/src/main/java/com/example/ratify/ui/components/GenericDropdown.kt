@@ -43,3 +43,5 @@ fun <T> GenericDropdown(
         }
     }
 }
+
+// Previews don't work well with generic dropdowns

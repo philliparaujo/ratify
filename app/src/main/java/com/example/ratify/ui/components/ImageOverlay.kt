@@ -17,6 +17,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import coil3.compose.SubcomposeAsyncImage
 import com.example.ratify.R
+import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -41,13 +43,15 @@ fun ImageOverlay(
             model = imageUri,
             contentDescription = "Song image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f),
             error = {
-                // Checks if in Preview mode
+                // If in Preview mode, render a play arrow over the image
                 if (LocalInspectionMode.current) {
                     Image(
                         painter = painterResource(R.drawable.baseline_play_arrow_24),
-                        contentDescription = "foo"
+                        contentDescription = "Preview image"
                     )
                 }
             }
@@ -62,5 +66,17 @@ fun ImageOverlay(
 
         // Other overlays
         renderContent()
+    }
+}
+
+// Previews
+@PreviewSuite
+@Composable
+fun ImageOverlayPreviews() {
+    MyPreview {
+        ImageOverlay(
+            imageUri = "",
+            renderContent = {}
+        )
     }
 }

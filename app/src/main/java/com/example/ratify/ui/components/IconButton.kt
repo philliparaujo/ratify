@@ -1,7 +1,6 @@
 package com.example.ratify.ui.components
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -16,10 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun MyIconButton(
@@ -47,7 +46,7 @@ fun MyIconButton(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = "foo",
+                contentDescription = "Icon",
                 modifier = Modifier.size(specs.iconSize)
             )
         }
@@ -70,50 +69,11 @@ fun MyIconButton(
 }
 
 // Previews
-@Preview(name = "Dark Enabled Icon Button")
+@PreviewSuite
 @Composable
-fun DarkEnabledIconButtonPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
-            MyIconButton(
-                onClick = {},
-                enabled = true,
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
-                large = false
-            )
-            MyIconButton(
-                onClick = {},
-                onDisabledClick = { Log.d("IconButton", "IconButton is disabled") },
-                enabled = false,
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
-                large = false
-            )
-            MyIconButton(
-                onClick = {},
-                enabled = true,
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
-                large = true
-            )
-            MyIconButton(
-                onClick = {},
-                onDisabledClick = { Log.d("IconButton", "IconButton is disabled") },
-                enabled = false,
-                icon = ImageVector.vectorResource(id = R.drawable.baseline_pause_24),
-                large = true
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Enabled Icon Button")
-@Composable
-fun LightEnabledIconButtonPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
+fun IconButtonPreviews() {
+    MyPreview {
+        Column {
             MyIconButton(
                 onClick = {},
                 enabled = true,

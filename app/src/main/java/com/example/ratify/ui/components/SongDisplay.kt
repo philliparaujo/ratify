@@ -1,8 +1,6 @@
 package com.example.ratify.ui.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -13,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.ratify.core.helper.SongDisplaySpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.mocks.longMockSong
 import com.example.ratify.mocks.mockSong
 import com.spotify.protocol.types.Artist
@@ -85,70 +83,26 @@ fun getArtistsString(artists: List<Artist>): String {
 
 // Previews
 // Network images don't work with previews
-@Preview(name = "Dark Song Display")
+@PreviewSuite
 @Composable
-fun DarkSongDisplayPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDisplay(
-                title = mockSong.name,
-                artists = getArtistsString(mockSong.artists),
-                imageUri = mockSong.imageUri.raw ?: ""
-            )
-        }
+fun SongDisplayPreviews() {
+    MyPreview {
+        SongDisplay(
+            title = mockSong.name,
+            artists = getArtistsString(mockSong.artists),
+            imageUri = mockSong.imageUri.raw ?: ""
+        )
     }
 }
 
-@Preview(name = "Light Song Display")
+@PreviewSuite
 @Composable
-fun LightSongDisplayPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDisplay(
-                title = mockSong.name,
-                artists = getArtistsString(mockSong.artists),
-                imageUri = mockSong.imageUri.raw ?: ""
-            )
-        }
-    }
-}
-
-@Preview(name = "Dark Long Name Song Display")
-@Composable
-fun DarkLongNameSongDisplayPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDisplay(
-                title = longMockSong.name,
-                artists = getArtistsString(longMockSong.artists),
-                imageUri = longMockSong.imageUri.raw ?: ""
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Long Name Song Display")
-@Composable
-fun LightLongNameSongDisplayPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDisplay(
-                title = longMockSong.name,
-                artists = getArtistsString(longMockSong.artists),
-                imageUri = longMockSong.imageUri.raw ?: ""
-            )
-        }
+fun LongSongDisplayPreviews() {
+    MyPreview {
+        SongDisplay(
+            title = longMockSong.name,
+            artists = getArtistsString(longMockSong.artists),
+            imageUri = longMockSong.imageUri.raw ?: ""
+        )
     }
 }

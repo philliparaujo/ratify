@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,12 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.times
 import androidx.wear.compose.material.Text
 import com.example.ratify.core.helper.VisualizerSpecs
 import com.example.ratify.core.model.Rating
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import kotlin.math.max
 
 @Composable
@@ -73,30 +72,12 @@ fun Visualizer(
 }
 
 // Previews
-@Preview(name = "Dark Visualizer")
+@PreviewSuite
 @Composable
-fun DarkVisualizerPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Visualizer(
-                heights = listOf(50f, 150f, 30f, 1f, 50f, 50f, 50f, 50f, 50f, 50f)
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Visualizer")
-@Composable
-fun LightVisualizerPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Visualizer(
-                heights = listOf(50f, 150f, 30f, 1f, 50f, 50f, 50f, 50f, 50f, 50f)
-            )
-        }
+fun VisualizerPreviews() {
+    MyPreview {
+        Visualizer(
+            heights = listOf(5f, 10f, 20f, 30f, 40f, 60f, 40f, 20f, 30f, 90f)
+        )
     }
 }

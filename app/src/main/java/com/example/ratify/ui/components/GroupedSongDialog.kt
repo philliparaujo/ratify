@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.model.GroupType
 import com.example.ratify.database.GroupedSong
 import com.example.ratify.database.Song
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.mocks.mockGroupedSong
 import com.example.ratify.mocks.mockSong
 
@@ -95,10 +95,10 @@ fun GroupedSongDialog(
 }
 
 // Previews
-@Preview(name = "Grouped Song Dialog")
+@PreviewSuite
 @Composable
-fun GroupedSongDialogPreview() {
-    MyPreview(darkTheme = true) {
+fun GroupedSongDialogPreviews() {
+    MyPreview {
         GroupedSongDialog(
             groupedSong = mockGroupedSong,
             groupType = GroupType.ARTIST,

@@ -1,8 +1,6 @@
 package com.example.ratify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,10 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun PlaybackPosition(
@@ -60,79 +58,29 @@ fun formatTime(timeMs: Long): String {
     return "%02d:%02d".format(minutes, seconds)
 }
 
-// Preview
-@Preview(name = "Dark Player Position")
+// Previews
+@PreviewSuite
 @Composable
-fun DarkPlayerPositionPreview() {
-    MyPreview(darkTheme = true) {
+fun PlaybackPositionPreviews() {
+    MyPreview {
         Column {
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 105000L, // 1:45
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            PlaybackPosition(
+                currentPositionMs = 105000L, // 1:45
+                totalDurationMs = 300000L,  // 5:00
+                modifier = Modifier.padding(16.dp)
+            )
 
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 0L, // 0:00
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            PlaybackPosition(
+                currentPositionMs = 0L, // 0:00
+                totalDurationMs = 300000L,  // 5:00
+                modifier = Modifier.padding(16.dp)
+            )
 
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 300000L, // 5:00
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Preview(name = "Light Player Position")
-@Composable
-fun LightPlayerPositionPreview() {
-    MyPreview(darkTheme = false) {
-        Column {
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 105000L, // 1:45
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 0L, // 0:00
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Box(
-                Modifier.background(color = MaterialTheme.colorScheme.background)
-            ) {
-                PlaybackPosition(
-                    currentPositionMs = 300000L, // 5:00
-                    totalDurationMs = 300000L,  // 5:00
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+            PlaybackPosition(
+                currentPositionMs = 300000L, // 5:00
+                totalDurationMs = 300000L,  // 5:00
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }

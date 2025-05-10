@@ -1,5 +1,6 @@
 package com.example.ratify.mocks
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.ratify.repository.SongRepository
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -17,7 +18,7 @@ const val LANDSCAPE_DEVICE = "spec:width=411dp,height=891dp,dpi=420,isRound=fals
 
 @Composable
 fun MyPreview(
-    darkTheme: Boolean,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     RatifyTheme(

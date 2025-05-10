@@ -28,9 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,62 +125,28 @@ fun Search(
 }
 
 // Previews
-@Preview(name = "Dark Search Bar")
+@PreviewSuite
 @Composable
-fun DarkSearchBarPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
+fun SearchPreviews() {
+    MyPreview {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Search(
-                    query = "Foo",
-                    onQueryChange = { _ -> },
-                    trailingIcon = null,
-                    dropdownOptionOnClick = emptyList(),
-                    dropdownLabels = emptyList()
-                )
-                Search(
-                    query = "",
-                    onQueryChange = { _ ->},
-                    trailingIcon = Icons.Default.MoreVert,
-                    dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
-                    dropdownOptionOnClick = listOf({}, {})
-                )
-            }
-        }
-    }
-}
-
-@Preview(name = "Light Search Bar")
-@Composable
-fun LightSearchBarPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Search(
-                    query = "Foo",
-                    onQueryChange = { _ -> },
-                    trailingIcon = null,
-                    dropdownOptionOnClick = emptyList(),
-                    dropdownLabels = emptyList()
-                )
-                Search(
-                    query = "",
-                    onQueryChange = { _ ->},
-                    trailingIcon = Icons.Default.MoreVert,
-                    dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
-                    dropdownOptionOnClick = listOf({}, {})
-                )
-            }
+            Search(
+                query = "Foo",
+                onQueryChange = { _ -> },
+                trailingIcon = null,
+                dropdownOptionOnClick = emptyList(),
+                dropdownLabels = emptyList()
+            )
+            Search(
+                query = "",
+                onQueryChange = { _ ->},
+                trailingIcon = Icons.Default.MoreVert,
+                dropdownLabels = listOf("Hide visualizer", "Delete unrated songs"),
+                dropdownOptionOnClick = listOf({}, {})
+            )
         }
     }
 }

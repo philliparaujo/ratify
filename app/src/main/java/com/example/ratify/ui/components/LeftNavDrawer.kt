@@ -12,11 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.core.helper.LeftNavBarSpecs
 import com.example.ratify.core.helper.NoRippleInteractionSource
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
 import com.example.ratify.ui.navigation.NavigationTarget
@@ -56,7 +56,7 @@ fun LeftNavDrawer(
 
                 NavigationDrawerItem(
                     icon = { RenderTarget(target, isSelected) },
-                    label = { }, // Remove the label to avoid duplication
+                    label = { }, // Remove the label to avoid duplication (RenderTarget)
                     selected = isSelected,
                     onClick = { onClick(target, isSelected) },
                     colors = NavigationDrawerItemDefaults.colors(
@@ -74,25 +74,17 @@ fun LeftNavDrawer(
 }
 
 // Previews
-@Preview(name = "Dark Landscape Nav Drawer", widthDp = 640, heightDp = 360)
+@PreviewSuite
 @Composable
-fun DarkLandscapeNavDrawerPreview() {
-    MyPreview(darkTheme = true) {
+fun LeftNavDrawerPreviews() {
+    MyPreview {
         LeftNavDrawer(
             onClick = { _, _ -> run {} },
-            navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
-            currentTarget = MusicNavigationTarget
-        )
-    }
-}
-
-@Preview(name = "Light Landscape Nav Drawer", widthDp = 640, heightDp = 360)
-@Composable
-fun LightLandscapeNavDrawerPreview() {
-    MyPreview(darkTheme = false) {
-        LeftNavDrawer(
-            onClick = { _, _ -> run {} },
-            navigationTargets = listOf(MusicNavigationTarget, LibraryNavigationTarget, SettingsNavigationTarget),
+            navigationTargets = listOf(
+                MusicNavigationTarget,
+                LibraryNavigationTarget,
+                SettingsNavigationTarget
+            ),
             currentTarget = MusicNavigationTarget
         )
     }

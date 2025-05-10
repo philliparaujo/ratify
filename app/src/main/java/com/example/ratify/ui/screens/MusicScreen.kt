@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
@@ -42,8 +41,8 @@ import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.services.updateRatingService
 import com.example.ratify.spotify.ISpotifyViewModel
@@ -391,116 +390,26 @@ fun PlayerScreen() {
 }
 
 // Previews
-@Preview(name = "Dark Not Installed Screen")
+@PreviewSuite
 @Composable
-fun DarkNotInstalledScreenPreview() {
-    MyPreview(darkTheme = true) {
+fun NotInstalledScreenPreviews() {
+    MyPreview {
         AppNotInstalledScreen()
     }
 }
 
-@Preview(name = "Light Not Installed Screen")
+@PreviewSuite
 @Composable
-fun LightNotInstalledScreenPreview() {
-    MyPreview(darkTheme = false) {
-        AppNotInstalledScreen()
-    }
-}
-
-@Preview(name = "Dark Login Screen")
-@Composable
-fun DarkLoginScreenPreview() {
-    MyPreview(darkTheme = true) {
+fun LoginScreenPreviews() {
+    MyPreview {
         LoginScreen()
     }
 }
 
-@Preview(name = "Light Login Screen")
+@PreviewSuite
 @Composable
-fun LightLoginScreenPreview() {
-    MyPreview(darkTheme = false) {
-        LoginScreen()
-    }
-}
-
-@Preview(name = "Dark Player Screen")
-@Composable
-fun DarkPlayerScreenPreview() {
-    MyPreview(darkTheme = true) {
-        PlayerScreen()
-    }
-}
-
-@Preview(name = "Light Player Screen")
-@Composable
-fun LightPlayerScreenPreview() {
-    MyPreview(darkTheme = false) {
-        PlayerScreen()
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Not Installed Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeNotInstalledScreenPreview() {
-    MyPreview(darkTheme = true) {
-        AppNotInstalledScreen()
-    }
-}
-
-@Preview(
-    name = "Light Landscape Not Installed Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeNotInstalledScreenPreview() {
-    MyPreview(darkTheme = false) {
-        AppNotInstalledScreen()
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Login Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeLoginScreenPreview() {
-    MyPreview(darkTheme = true) {
-        LoginScreen()
-    }
-}
-
-@Preview(
-    name = "Light Landscape Login Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeLoginScreenPreview() {
-    MyPreview(darkTheme = false) {
-        LoginScreen()
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Player Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapePlayerScreenPreview() {
-    MyPreview(darkTheme = true) {
-        PlayerScreen()
-    }
-}
-
-@Preview(
-    name = "Light Landscape Player Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapePlayerScreenPreview() {
-    MyPreview(darkTheme = false) {
+fun PlayerScreenPreviews() {
+    MyPreview {
         PlayerScreen()
     }
 }

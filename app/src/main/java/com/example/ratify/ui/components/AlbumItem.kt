@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,10 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.mocks.mockAlbum
 import com.example.ratify.mocks.mockArtist
 
@@ -94,68 +96,13 @@ fun AlbumItem(
 }
 
 // Previews
-@Preview(name = "Dark Album Items")
+@PreviewSuite
 @Composable
-fun DarkAlbumItemsPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+fun AlbumItemPreviews() {
+    MyPreview {
+        Box(
+            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
         ) {
-            AlbumItem(
-                name = mockAlbum.name,
-                artistName = mockArtist.name,
-                songCount = 2,
-                averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
-                onClick = {}
-            )
-            AlbumItem(
-                name = mockAlbum.name,
-                artistName = mockArtist.name,
-                songCount = 2,
-                averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
-                onClick = {}
-            )
-            AlbumItem(
-                name = mockAlbum.name,
-                artistName = mockArtist.name,
-                songCount = 2,
-                averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
-                onClick = {}
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Album Items")
-@Composable
-fun LightAlbumItemsPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            AlbumItem(
-                name = mockAlbum.name,
-                artistName = mockArtist.name,
-                songCount = 2,
-                averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
-                onClick = {}
-            )
-            AlbumItem(
-                name = mockAlbum.name,
-                artistName = mockArtist.name,
-                songCount = 2,
-                averageRating = 6.4f,
-                imageUri = "spotify:image:ab67616d0000b2739fe3277e1c1295755de75305",
-                onClick = {}
-            )
             AlbumItem(
                 name = mockAlbum.name,
                 artistName = mockArtist.name,

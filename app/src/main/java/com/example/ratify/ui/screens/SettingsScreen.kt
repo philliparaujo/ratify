@@ -10,11 +10,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.di.LocalSettingsRepository
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.ui.components.BinarySetting
 import com.example.ratify.ui.components.MyButton
@@ -120,41 +119,11 @@ fun SettingsScreen(
     }
 }
 
-@Preview(name = "Dark Settings Screen")
+// Previews
+@PreviewSuite
 @Composable
-fun DarkSettingsScreenPreview() {
-    MyPreview(darkTheme = true) {
+fun SettingsScreenPreviews() {
+    MyPreview {
         SettingsScreen()
     }
 }
-
-@Preview(name = "Light Settings Screen")
-@Composable
-fun LightSettingsScreenPreview() {
-    MyPreview(darkTheme = false) {
-        SettingsScreen()
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Settings Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeSettingsScreenPreview() {
-    MyPreview(darkTheme = true) {
-        SettingsScreen()
-    }
-}
-
-@Preview(
-    name = "Light Landscape Settings Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeSettingsScreenPreview() {
-    MyPreview(darkTheme = false) {
-        SettingsScreen()
-    }
-}
-

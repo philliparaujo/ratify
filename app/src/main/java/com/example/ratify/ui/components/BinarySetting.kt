@@ -1,9 +1,7 @@
 package com.example.ratify.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
@@ -13,10 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun BinarySetting(
@@ -57,90 +54,11 @@ fun BinarySetting(
 }
 
 // Previews
-@Preview(name = "Dark BinarySettings")
+@PreviewSuite
 @Composable
-fun DarkBinarySettingsPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            BinarySetting(
-                displayText = "Default setting",
-                state = true,
-                toggleState = { }
-            )
-            BinarySetting(
-                displayText = "Other Default setting",
-                state = false,
-                toggleState = { }
-            )
-        }
-    }
-}
-
-@Preview(name = "Light BinarySettings")
-@Composable
-fun LightBinarySettingsPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            BinarySetting(
-                displayText = "Default setting",
-                state = true,
-                toggleState = { }
-            )
-            BinarySetting(
-                displayText = "Other Default setting",
-                state = false,
-                toggleState = { }
-            )
-        }
-    }
-}
-
-@Preview(
-    name = "Dark Landscape BinarySettings",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeBinarySettingsPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            BinarySetting(
-                displayText = "Default setting",
-                state = true,
-                toggleState = { }
-            )
-            BinarySetting(
-                displayText = "Other Default setting",
-                state = false,
-                toggleState = { }
-            )
-        }
-    }
-}
-
-@Preview(
-    name = "Light Landscape BinarySettings",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeBinarySettings() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
+fun BinarySettingPreviews() {
+    MyPreview {
+        Column {
             BinarySetting(
                 displayText = "Default setting",
                 state = true,

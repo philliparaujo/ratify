@@ -28,12 +28,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import com.example.ratify.R
 import com.example.ratify.core.helper.ItemSpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.mocks.mockSong
 import com.spotify.protocol.types.ImageUri
 
@@ -139,32 +139,36 @@ fun GenericItem(
 }
 
 // Previews
-@Preview(name = "Generic Item")
+private val genericItem = @Composable {
+    GenericItem(
+        title = "Title",
+        subtitle = "Subtitle",
+        ratingColor = MaterialTheme.colorScheme.primary,
+        ratingText = "10",
+        displayButton = {
+            MyIconButton(
+                icon = ImageVector.vectorResource(id = R.drawable.baseline_file_download_24),
+                onClick = { },
+                onDisabledClick = { },
+                enabled = false,
+            )
+        },
+        onClick = { },
+        onLongClick = { },
+        imageUri = mockSong.imageUri
+    )
+}
+
+@PreviewSuite
 @Composable
-fun GenericItemPreview() {
-    MyPreview(darkTheme = true) {
+fun GenericItemPreviews() {
+    MyPreview {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            GenericItem(
-                title = "Title",
-                subtitle = "Subtitle",
-                ratingColor = MaterialTheme.colorScheme.primary,
-                ratingText = "10",
-                displayButton = {
-                    MyIconButton(
-                        icon = ImageVector.vectorResource(id = R.drawable.baseline_file_download_24),
-                        onClick = { },
-                        onDisabledClick = { },
-                        enabled = false,
-                    )
-                },
-                onClick = { },
-                onLongClick = { },
-                imageUri = mockSong.imageUri
-            )
+            genericItem()
+            genericItem()
+            genericItem()
         }
     }
 }

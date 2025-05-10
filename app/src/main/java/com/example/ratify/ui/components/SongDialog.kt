@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -20,12 +19,11 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.database.Song
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.mocks.mockSong
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -224,82 +222,17 @@ fun timestampToDate(timestamp: Long?): String? {
 }
 
 // Previews
-@Preview(name = "Dark Test Dialog")
+@PreviewSuite
 @Composable
-fun DarkTestDialogPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDialog(
-                song = mockSong,
-                onDismissRequest = {},
-                onRatingSelect = { _ -> },
-                onPlay = {},
-                onDisabledPlay = {},
-                onDelete = {}
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Test Dialog")
-@Composable
-fun TestDialogPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDialog(
-                song = mockSong,
-                onDismissRequest = {},
-                onRatingSelect = { _ -> },
-                onPlay = {},
-                onDisabledPlay = {},
-                onDelete = {}
-            )
-        }
-    }
-}
-
-@Preview(name = "Dark Landscape Test Dialog", device = LANDSCAPE_DEVICE)
-@Composable
-fun DarkLandscapeTestDialogPreview() {
-    MyPreview(darkTheme = true) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDialog(
-                song = mockSong,
-                onDismissRequest = {},
-                onRatingSelect = { _ -> },
-                onPlay = {},
-                onDisabledPlay = {},
-                onDelete = {}
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Landscape Test Dialog", device = LANDSCAPE_DEVICE)
-@Composable
-fun LightLandscapeTestDialogPreview() {
-    MyPreview(darkTheme = false) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            SongDialog(
-                song = mockSong,
-                onDismissRequest = {},
-                onRatingSelect = { _ -> },
-                onPlay = {},
-                onDisabledPlay = {},
-                onDelete = {}
-            )
-        }
+fun SongDialogPreviews() {
+    MyPreview {
+        SongDialog(
+            song = mockSong,
+            onDismissRequest = {},
+            onRatingSelect = { _ -> },
+            onPlay = {},
+            onDisabledPlay = {},
+            onDelete = {}
+        )
     }
 }

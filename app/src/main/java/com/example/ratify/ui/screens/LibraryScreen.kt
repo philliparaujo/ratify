@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -45,8 +44,8 @@ import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.repository.SongRepository
 import com.example.ratify.repository.StateRepository
@@ -327,46 +326,10 @@ fun LibraryScreen(
 }
 
 // Previews
-@Preview(name = "Dark Library Screen")
+@PreviewSuite
 @Composable
-fun DarkLibraryScreenPreview() {
-    MyPreview(darkTheme = true) {
-        LibraryScreen(
-            navController = rememberNavController()
-        )
-    }
-}
-
-@Preview(name = "Light Library Screen")
-@Composable
-fun LightLibraryScreenPreview() {
-    MyPreview(darkTheme = false) {
-        LibraryScreen(
-            navController = rememberNavController()
-        )
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Library Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeLibraryScreenPreview() {
-    MyPreview(darkTheme = true) {
-        LibraryScreen(
-            navController = rememberNavController()
-        )
-    }
-}
-
-@Preview(
-    name = "Light Landscape Library Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeLibraryScreenPreview() {
-    MyPreview(darkTheme = false) {
+fun LibraryScreenPreviews() {
+    MyPreview {
         LibraryScreen(
             navController = rememberNavController()
         )

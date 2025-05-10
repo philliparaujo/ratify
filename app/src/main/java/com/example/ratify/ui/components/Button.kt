@@ -16,10 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.ratify.core.helper.ButtonSpecs
 import com.example.ratify.core.helper.textStyle
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun MyButton(
@@ -75,31 +75,15 @@ fun MyButton(
 }
 
 // Previews
-const val smallButtonText = "Delete"
-const val bigButtonText = "Connect to Spotify"
-
-@Preview(name = "Dark Enabled Button")
+@PreviewSuite
 @Composable
-fun DarkEnabledButtonPreview() {
-    MyPreview(darkTheme = true) {
+fun ButtonPreviews() {
+    MyPreview {
         Column {
-            MyButton(text = smallButtonText, onClick = {}, enabled = true)
-            MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
-            MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
-            MyButton(text = bigButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false, large = true)
-        }
-    }
-}
-
-@Preview(name = "Light Enabled Button")
-@Composable
-fun LightEnabledButtonPreview() {
-    MyPreview(darkTheme = false) {
-        Column {
-            MyButton(text = smallButtonText, onClick = {}, enabled = true)
-            MyButton(text = smallButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
-            MyButton(text = bigButtonText, onClick = {}, enabled = true, large = true)
-            MyButton(text = bigButtonText, onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false, large = true)
+            MyButton(text = "Delete", onClick = {}, enabled = true)
+            MyButton(text = "Delete", onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false)
+            MyButton(text = "Connect to Spotify", onClick = {}, enabled = true, large = true)
+            MyButton(text = "Connect to Spotify", onClick = {}, onDisabledClick = { Log.d("Button", "Button is disabled") }, enabled = false, large = true)
         }
     }
 }

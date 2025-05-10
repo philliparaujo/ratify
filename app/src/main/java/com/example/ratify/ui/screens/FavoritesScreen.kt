@@ -32,7 +32,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratify.core.helper.FAVORITES_MAX_SLIDER_VALUE
@@ -48,8 +47,8 @@ import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.di.LocalSongRepository
 import com.example.ratify.di.LocalSpotifyViewModel
 import com.example.ratify.di.LocalStateRepository
-import com.example.ratify.mocks.LANDSCAPE_DEVICE
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.repository.SettingsRepository
 import com.example.ratify.repository.SongRepository
 import com.example.ratify.repository.StateRepository
@@ -353,40 +352,10 @@ fun FavoritesScreen() {
 }
 
 // Previews
-@Preview(name = "Dark Favorites Screen")
+@PreviewSuite
 @Composable
-fun DarkFavoritesScreenPreview() {
-    MyPreview(darkTheme = true) {
-        FavoritesScreen()
-    }
-}
-
-@Preview(name = "Light Favorites Screen")
-@Composable
-fun LightFavoritesScreenPreview() {
-    MyPreview(darkTheme = false) {
-        FavoritesScreen()
-    }
-}
-
-@Preview(
-    name = "Dark Landscape Favorites Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun DarkLandscapeFavoritesScreenPreview() {
-    MyPreview(darkTheme = true) {
-        FavoritesScreen()
-    }
-}
-
-@Preview(
-    name = "Light Landscape Favorites Screen",
-    device = LANDSCAPE_DEVICE
-)
-@Composable
-fun LightLandscapeFavoritesScreenPreview() {
-    MyPreview(darkTheme = false) {
+fun FavoriteScreenPreviews() {
+    MyPreview {
         FavoritesScreen()
     }
 }

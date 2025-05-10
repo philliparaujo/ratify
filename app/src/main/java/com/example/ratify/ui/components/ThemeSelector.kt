@@ -18,11 +18,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.core.helper.ThemeSelectorSpecs
 import com.example.ratify.core.model.PrimaryColor
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun ThemeSelector(
@@ -112,21 +112,10 @@ fun ThemeDropdown(
 }
 
 // Previews
-@Preview(name = "Dark Theme Selector")
+@PreviewSuite
 @Composable
-fun DarkThemeSelectorPreview() {
-    MyPreview(darkTheme = true) {
-        ThemeSelector(
-            currentTheme = PrimaryColor.DEFAULT.ordinal,
-            onThemeSelected = { }
-        )
-    }
-}
-
-@Preview(name = "Light Theme Selector")
-@Composable
-fun LightThemeSelectorPreview() {
-    MyPreview(darkTheme = false) {
+fun ThemeSelectorPreviews() {
+    MyPreview {
         ThemeSelector(
             currentTheme = PrimaryColor.DEFAULT.ordinal,
             onThemeSelected = { }

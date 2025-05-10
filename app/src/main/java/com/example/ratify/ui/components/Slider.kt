@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -23,12 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.ratify.core.helper.SliderSpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun MySlider(
@@ -128,32 +127,13 @@ fun MySlider(
 }
 
 // Previews
-@Preview(name = "Dark Slider")
+@PreviewSuite
 @Composable
-fun DarkSliderPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
-            MySlider(
-                20,
-                100,
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Slider")
-@Composable
-fun LightSliderPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
-        ) {
-            MySlider(
-                95,
-                100,
-            )
-        }
+fun SliderPreviews() {
+    MyPreview {
+        MySlider(
+            20,
+            100,
+        )
     }
 }

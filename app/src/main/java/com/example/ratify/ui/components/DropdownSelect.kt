@@ -27,10 +27,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ratify.core.helper.DropdownSpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -112,10 +112,10 @@ fun <T> DropdownSelect(
 }
 
 // Previews
-@Preview(name = "Dark Dropdown Select")
+@PreviewSuite
 @Composable
-fun DarkDropdownSelectPreview() {
-    MyPreview(darkTheme = true) {
+fun DropdownSelectPreviews() {
+    MyPreview {
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -132,7 +132,6 @@ fun DarkDropdownSelectPreview() {
                 onSelect = {},
                 label = "Search by"
             )
-
             DropdownSelect(
                 options = listOf(
                     "Name",
@@ -143,10 +142,7 @@ fun DarkDropdownSelectPreview() {
                 selectedOption = "Artists",
                 onSelect = {},
                 label = "Search by",
-                startExpanded = true
             )
-
-
             DropdownSelect(
                 options = listOf(
                     "Rating",
@@ -157,59 +153,6 @@ fun DarkDropdownSelectPreview() {
                 selectedOption = "Last played",
                 onSelect = {},
                 label = "Sort by",
-                startExpanded = true,
-                large = true
-            )
-        }
-    }
-}
-
-@Preview(name = "Light Dropdown Select")
-@Composable
-fun LightDropdownSelectPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            DropdownSelect(
-                options = listOf(
-                    "Name",
-                    "Artists",
-                    "Album",
-                    "Rating"
-                ),
-                selectedOption = "Name",
-                onSelect = {},
-                label = "Search by"
-            )
-
-            DropdownSelect(
-                options = listOf(
-                    "Name",
-                    "Artists",
-                    "Album",
-                    "Rating"
-                ),
-                selectedOption = "Artists",
-                onSelect = {},
-                label = "Search by",
-                startExpanded = true
-            )
-
-
-            DropdownSelect(
-                options = listOf(
-                    "Rating",
-                    "Last played",
-                    "Last rated",
-                    "Times played"
-                ),
-                selectedOption = "Last played",
-                onSelect = {},
-                label = "Sort by",
-                startExpanded = true,
                 large = true
             )
         }

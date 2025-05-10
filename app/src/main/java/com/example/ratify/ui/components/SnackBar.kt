@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,9 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.ratify.core.helper.SnackBarSpecs
 import com.example.ratify.mocks.MyPreview
+import com.example.ratify.mocks.PreviewSuite
 
 @Composable
 fun MySnackBar(
@@ -76,57 +75,12 @@ fun MySnackBar(
     }
 }
 
-
-
 // Previews
-@Preview(name = "Dark SnackBar")
+@PreviewSuite
 @Composable
-fun DarkSnackBarPreview() {
-    MyPreview(darkTheme = true) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            MySnackBar(
-                snackbarData = object : SnackbarData {
-                    override val visuals = object : SnackbarVisuals {
-                        override val message = "Preview"
-                        override val actionLabel = "Dismiss"
-                        override val withDismissAction = true
-                        override val duration = SnackbarDuration.Short
-                    }
-
-                    override fun performAction() {}
-                    override fun dismiss() {}
-                }
-            )
-
-            MySnackBar(
-                snackbarData = object : SnackbarData {
-                    override val visuals = object : SnackbarVisuals {
-                        override val message = "Preview"
-                        override val actionLabel = null
-                        override val withDismissAction = true
-                        override val duration = SnackbarDuration.Short
-                    }
-
-                    override fun performAction() {}
-                    override fun dismiss() {}
-                }
-            )
-        }
-    }
-}
-
-
-@Preview(name = "Light SnackBar")
-@Composable
-fun LightSnackBarPreview() {
-    MyPreview(darkTheme = false) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+fun SnackBarPreviews() {
+    MyPreview {
+        Column {
             MySnackBar(
                 snackbarData = object : SnackbarData {
                     override val visuals = object : SnackbarVisuals {
