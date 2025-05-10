@@ -69,17 +69,10 @@ private val LightColorScheme = darkColorScheme(
 fun RatifyTheme(
     darkTheme: Boolean,
     themeColor: Int = PrimaryColor.DEFAULT.ordinal,
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false,  // Disabling for now
     content: @Composable () -> Unit
 ) {
     // Get proper light/dark theme
     val baseColorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

@@ -92,7 +92,7 @@ fun FavoritesScreen() {
         groupName?.let { songRepository.getSongsByGroup(groupType, it, groupUri!!) } ?: flowOf(emptyList())
     }.collectAsState(initial = emptyList())
 
-    // Slider values
+    // Slider value
     var currentSliderValue by remember { mutableLongStateOf(favoritesState.minEntriesThreshold.toLong()) }
     LaunchedEffect(favoritesState.minEntriesThreshold) {
         currentSliderValue = favoritesState.minEntriesThreshold.toLong()

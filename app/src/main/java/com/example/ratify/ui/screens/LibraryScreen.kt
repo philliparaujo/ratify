@@ -120,11 +120,11 @@ fun LibraryScreen(
             onRatingSelect = { rating ->
                 // Update current rating (UI indicator)
                 val ratingValue = Rating.from(rating)
-
                 if (playerState?.track?.uri == song.uri) {
                     stateRepository.updateCurrentRating(ratingValue)
                     context.updateRatingService(ratingValue)
                 }
+
                 // Update rating in database
                 scope.launch {
                     songRepository.updateRating(
