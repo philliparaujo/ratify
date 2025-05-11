@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -62,7 +63,10 @@ fun GenericDialog(
                     top = specs.outerTopPadding,
                     bottom = specs.outerBottomPadding
                 )
-                .fillMaxHeight()
+                .then(
+                    if (isLandscapeOrientation()) Modifier.fillMaxHeight()
+                    else Modifier.fillMaxWidth()
+                )
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(specs.innerPadding)
         ) {
