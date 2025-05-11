@@ -63,10 +63,6 @@ fun GenericDialog(
                     top = specs.outerTopPadding,
                     bottom = specs.outerBottomPadding
                 )
-                .then(
-                    if (isLandscapeOrientation()) Modifier.fillMaxHeight()
-                    else Modifier.fillMaxWidth()
-                )
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(specs.innerPadding)
         ) {
