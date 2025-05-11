@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -19,9 +21,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        manifestPlaceholders["redirectSchemeName"] = "https"
-        manifestPlaceholders["redirectHostName"] = "philliparaujo.github.io"
-        manifestPlaceholders["redirectPathPrefix"] = "/callback"
+        val spotifyRedirectUri: String by project
+        val redirectUri = URI(spotifyRedirectUri)
+
+        manifestPlaceholders["redirectSchemeName"] = redirectUri.scheme
+        manifestPlaceholders["redirectHostName"] = redirectUri.host
+        manifestPlaceholders["redirectPathPrefix"] = redirectUri.path
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${project.findProperty("spotifyClientId")}\"")
         buildConfigField("String", "SPOTIFY_REDIRECT_URI", "\"${project.findProperty("spotifyRedirectUri")}\"")
