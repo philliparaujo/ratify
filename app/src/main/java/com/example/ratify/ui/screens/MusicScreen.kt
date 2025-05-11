@@ -2,6 +2,7 @@ package com.example.ratify.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.ratify.R
 import com.example.ratify.core.helper.IconButtonSpecs
@@ -90,22 +93,20 @@ fun AppNotInstalledScreen() {
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        Column(
+        // Logo at top center
+        Logo(
+            darkTheme = darkTheme.value,
+            primaryColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .align(Alignment.TopCenter),
+                .align(Alignment.TopCenter)
+                .padding(top = if (isLandscapeOrientation()) 32.dp else 64.dp)
+        )
+
+        Column(
+            modifier = Modifier.padding(top = if (isLandscapeOrientation()) 128.dp else 64.dp).align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(42.dp)
+            verticalArrangement = Arrangement.spacedBy(26.dp)
         ) {
-            Logo(
-                darkTheme = darkTheme.value,
-                primaryColor = MaterialTheme.colorScheme.primary,
-                modifier =
-                if (isLandscapeOrientation()) {
-                    Modifier.padding(0.dp, 0.dp)
-                } else {
-                    Modifier.padding(top = 128.dp, bottom = 96.dp)
-                }
-            )
             MyButton(
                 enabled = true,
                 onClick = { navigateToSpotifyInstall(context) },
@@ -124,7 +125,7 @@ fun AppNotInstalledScreen() {
                     tint = MaterialTheme.colorScheme.onBackground
                 )
                 Column(
-                    modifier = Modifier.widthIn(max = 400.dp),
+                    modifier = Modifier.widthIn(max = 500.dp),
                 ) {
                     Text(
                         "Spotify is not installed on your device.",
@@ -153,23 +154,23 @@ fun LoginScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(8.dp)
     ) {
-        Column(
+        // Logo at top center
+        Logo(
+            darkTheme = darkTheme.value,
+            primaryColor = MaterialTheme.colorScheme.primary,
             modifier = Modifier
-                .align(Alignment.TopCenter),
+                .align(Alignment.TopCenter)
+                .padding(top = if (isLandscapeOrientation()) 32.dp else 64.dp)
+        )
+
+        // Centered login content
+        Column(
+            modifier = Modifier.padding(top = if (isLandscapeOrientation()) 128.dp else 64.dp).align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Logo(
-                darkTheme = darkTheme.value,
-                primaryColor = MaterialTheme.colorScheme.primary,
-                modifier =
-                    if (isLandscapeOrientation()) {
-                        Modifier.padding(0.dp, 32.dp)
-                    } else {
-                        Modifier.padding(top = 160.dp, bottom = 128.dp)
-                    }
-            )
             MyButton(
                 enabled = true,
                 onClick = {
@@ -221,14 +222,15 @@ fun PlayerScreen() {
                 imageUri = "",
                 renderContent = {
                     Column(
-                        modifier = Modifier.widthIn(max = 300.dp).align(Alignment.BottomCenter)
+                        modifier = Modifier.align(Alignment.BottomCenter)
                     ) {
                         Text(
                             text = "Play a song on Spotify to get started!",
                             color = MaterialTheme.colorScheme.onSecondary,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -341,35 +343,73 @@ fun PlayerScreen() {
         )
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize().padding(8.dp)
     ) {
         if (isLandscapeOrientation()) {
             // Landscape layout (two columns)
-            Row(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(16.dp)
-                    .align(Alignment.Center),
-                horizontalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                Column(
+
+            val totalWidth = maxWidth
+            val minRightColumnWidth = 400.dp
+            val spacerWidth = 32.dp
+            val availableWidth = totalWidth - spacerWidth
+            val useEqualWeights = availableWidth >= (minRightColumnWidth * 2)
+
+            if (useEqualWeights) {
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .align(Alignment.Center),
+                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
-                    RenderSongDisplay()
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RenderSongDisplay()
+                    }
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .align(Alignment.CenterVertically),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RenderSongControls()
+                    }
                 }
-                Column(
+            } else {
+                Row(
                     modifier = Modifier
-                        .weight(1f)
-                        .align(Alignment.CenterVertically),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .align(Alignment.Center),
+                    horizontalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
-                    RenderSongControls()
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(8.dp)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RenderSongDisplay()
+                    }
+                    Column(
+                        modifier = Modifier
+                            .width(minRightColumnWidth)
+                            .align(Alignment.CenterVertically),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        RenderSongControls()
+                    }
                 }
             }
         } else {

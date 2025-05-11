@@ -3,6 +3,7 @@ package com.example.ratify.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -17,6 +18,7 @@ import com.example.ratify.core.helper.LeftNavBarSpecs
 import com.example.ratify.core.helper.NoRippleInteractionSource
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.PreviewSuite
+import com.example.ratify.ui.navigation.FavoritesNavigationTarget
 import com.example.ratify.ui.navigation.LibraryNavigationTarget
 import com.example.ratify.ui.navigation.MusicNavigationTarget
 import com.example.ratify.ui.navigation.NavigationTarget
@@ -83,6 +85,7 @@ fun LeftNavDrawerPreviews() {
             navigationTargets = listOf(
                 MusicNavigationTarget,
                 LibraryNavigationTarget,
+                FavoritesNavigationTarget,
                 SettingsNavigationTarget
             ),
             currentTarget = MusicNavigationTarget

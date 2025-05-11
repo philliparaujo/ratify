@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +53,7 @@ fun StarHalf(
     deselectedStarColor: Color,
     selected: Boolean = false,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     // Class that creates a shape object to clip with
     class StarHalfShape(
@@ -100,7 +102,7 @@ fun StarHalf(
 
     val starColor = if (selected) selectedStarColor else deselectedStarColor
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size((BASE_STAR_SIZE * scale).dp)
             .clip(StarHalfShape(roundedPolygonPath))
             .background(starColor)
@@ -143,7 +145,8 @@ fun Star(
             selectedStarColor = selectedStarColor,
             deselectedStarColor = deselectedStarColor,
             onClick = onRightClick,
-            selected = isRightSelected
+            selected = isRightSelected,
+            modifier = Modifier.offset(x = (-0.4).dp)
         )
     }
 }
@@ -249,7 +252,8 @@ fun StarPreviews() {
                 isLeftSelected = true,
                 isRightSelected = true,
                 onLeftClick = {},
-            ) {}
+                onRightClick = {}
+            )
 
             Star(
                 scale = 2f,
@@ -258,8 +262,8 @@ fun StarPreviews() {
                 isLeftSelected = true,
                 isRightSelected = true,
                 onLeftClick = {},
-            ) {}
-
+                onRightClick = {}
+            )
 
             Star(
                 scale = 0.5f,
@@ -268,7 +272,8 @@ fun StarPreviews() {
                 isLeftSelected = true,
                 isRightSelected = true,
                 onLeftClick = {},
-            ) {}
+                onRightClick = {},
+            )
         }
     }
 }

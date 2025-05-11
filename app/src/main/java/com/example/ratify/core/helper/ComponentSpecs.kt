@@ -73,7 +73,7 @@ enum class IconButtonSpecs(
 
 
 object LeftNavBarSpecs {
-    val width = 100.dp
+    val width = 105.dp
 }
 
 
