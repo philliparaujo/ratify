@@ -2,7 +2,6 @@ package com.example.ratify.services
 
 import com.example.ratify.core.model.PlaylistCreationConfig
 import com.example.ratify.core.model.SearchField
-import com.example.ratify.database.Song
 import com.example.ratify.repository.SongRepository
 import kotlinx.coroutines.flow.first
 

@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.ratify.core.model.PlaylistCreationConfig
 import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.PreviewSuite
@@ -118,7 +117,7 @@ fun SettingsScreen(
             MyButton(
                 onClick = { showPlaylistDialog = true },
                 text = "Create New Playlist",
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
         }
 

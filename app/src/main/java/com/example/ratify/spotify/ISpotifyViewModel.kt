@@ -33,8 +33,8 @@ interface ISpotifyViewModel {
 }
 
 sealed class PlaylistCreationState {
-    object Idle : PlaylistCreationState()
-    object Loading : PlaylistCreationState()
+    data object Idle : PlaylistCreationState()
+    data object Loading : PlaylistCreationState()
     data class Success(val playlistId: String, val playlistName: String) : PlaylistCreationState()
     data class Error(val message: String) : PlaylistCreationState()
 }
