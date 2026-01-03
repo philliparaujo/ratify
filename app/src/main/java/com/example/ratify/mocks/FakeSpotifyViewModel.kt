@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.spotify.PlaylistCreationState
 import com.example.ratify.spotify.SpotifyEvent
 import com.spotify.protocol.types.Capabilities
 import com.spotify.protocol.types.PlayerState
@@ -24,11 +25,16 @@ class FakeSpotifyViewModel: ISpotifyViewModel {
         get() = MutableStateFlow(null)
     override val currentPlaybackPosition: LiveData<Long>
         get() = MutableLiveData()
+    override val playlistCreationState: LiveData<PlaylistCreationState>
+        get() = MutableLiveData(PlaylistCreationState.Idle)
 
     override fun isSpotifyAppInstalled(context: Context): Boolean {
         return false
     }
     override fun setSpotifyAppInstalled(installed: Boolean) {
+
+    }
+    override fun setAccessToken(token: String) {
 
     }
 

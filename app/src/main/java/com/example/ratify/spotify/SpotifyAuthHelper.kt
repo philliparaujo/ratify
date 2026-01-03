@@ -20,6 +20,8 @@ class SpotifyAuthHelper(
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
                     Log.d("SpotifyAuthHelper", "Authorization successful!")
+                    // Save the access token
+                    spotifyViewModel.setAccessToken(response.accessToken)
                     spotifyViewModel.onEvent(SpotifyEvent.ConnectAppRemote)
                 }
                 AuthorizationResponse.Type.ERROR -> {

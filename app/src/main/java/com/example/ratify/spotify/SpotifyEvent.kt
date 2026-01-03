@@ -1,5 +1,7 @@
 package com.example.ratify.spotify
 
+import com.example.ratify.core.model.PlaylistCreationConfig
+
 // Defines all Spotify-related actions for the ViewModel
 sealed interface SpotifyEvent {
     // Authentication and connection
@@ -16,6 +18,9 @@ sealed interface SpotifyEvent {
     data object SkipPrevious: SpotifyEvent
     data class SeekTo(val positionMs: Long): SpotifyEvent
     data class QueueTrack(val trackUri: String, val trackName: String): SpotifyEvent
+
+    // Playlist creation
+    data class CreatePlaylist(val config: PlaylistCreationConfig): SpotifyEvent
 
     data object PlayerEventWhenNotConnected: SpotifyEvent
 }

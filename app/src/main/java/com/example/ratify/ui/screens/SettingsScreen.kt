@@ -5,17 +5,33 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.ratify.core.model.PlaylistCreationConfig
 import com.example.ratify.di.LocalSettingsRepository
 import com.example.ratify.mocks.MyPreview
 import com.example.ratify.mocks.PreviewSuite
 import com.example.ratify.repository.SettingsRepository
+import com.example.ratify.services.PlaylistFilterService
+import com.example.ratify.spotify.ISpotifyViewModel
+import com.example.ratify.spotify.PlaylistCreationState
+import com.example.ratify.spotify.SpotifyEvent
 import com.example.ratify.ui.components.BinarySetting
+import com.example.ratify.ui.components.CreatePlaylistDialog
 import com.example.ratify.ui.components.MyButton
 import com.example.ratify.ui.components.MySwitch
 import com.example.ratify.ui.components.ThemeSelector
@@ -24,11 +40,50 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     onExportClick: () -> Unit = {},
-    onImportClick: () -> Unit = {}
+    onImportClick: () -> Unit = {},
+    spotifyViewModel: ISpotifyViewModel? = null,
+    playlistFilterService: PlaylistFilterService? = null
 ) {
     val settingsRepository: SettingsRepository = LocalSettingsRepository.current
 
     val scope = rememberCoroutineScope()
+
+    // Playlist creation state
+    var showPlaylistDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var successPlaylistName by remember { mutableStateOf("") }
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    val playlistCreationState by spotifyViewModel?.playlistCreationState?.observeAsState() ?: remember { mutableStateOf(PlaylistCreationState.Idle) }
+
+    // Handle playlist creation state changes
+    LaunchedEffect(playlistCreationState) {
+        when (val state = playlistCreationState) {
+            is PlaylistCreationState.Loading -> {
+                showLoadingDialog = true
+                showPlaylistDialog = false
+            }
+            is PlaylistCreationState.Success -> {
+                showLoadingDialog = false
+                successPlaylistName = state.playlistName
+                showSuccessDialog = true
+            }
+            is PlaylistCreationState.Error -> {
+                showLoadingDialog = false
+                errorMessage = state.message
+                showErrorDialog = true
+            }
+            is PlaylistCreationState.Idle -> {
+                showLoadingDialog = false
+            }
+            null -> {
+                // No state available (e.g., spotifyViewModel is null)
+                showLoadingDialog = false
+            }
+        }
+    }
 
     // Toggleable settings rendered on screen
     val darkTheme = settingsRepository.darkTheme.collectAsState(true)
@@ -55,6 +110,15 @@ fun SettingsScreen(
             MyButton(
                 onClick = { onImportClick() },
                 text = "Import Database"
+            )
+        }
+
+        // Create Playlist Button
+        if (spotifyViewModel != null && playlistFilterService != null) {
+            MyButton(
+                onClick = { showPlaylistDialog = true },
+                text = "Create New Playlist",
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
@@ -113,6 +177,68 @@ fun SettingsScreen(
             toggleState = { newState ->
                 scope.launch {
                     settingsRepository.setLibraryImageUri(newState)
+                }
+            }
+        )
+    }
+
+    // Playlist Creation Dialog
+    if (showPlaylistDialog && spotifyViewModel != null && playlistFilterService != null) {
+        CreatePlaylistDialog(
+            onConfirm = { config ->
+                spotifyViewModel.onEvent(SpotifyEvent.CreatePlaylist(config))
+                showPlaylistDialog = false
+            },
+            onDismiss = {
+                showPlaylistDialog = false
+            },
+            onPreviewCount = { config ->
+                playlistFilterService.getFilteredSongCount(config)
+            }
+        )
+    }
+
+    // Loading Dialog
+    if (showLoadingDialog) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text("Creating Playlist") },
+            text = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator()
+                    Text("Please wait...")
+                }
+            },
+            confirmButton = { }
+        )
+    }
+
+    // Success Dialog
+    if (showSuccessDialog) {
+        AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("Success!") },
+            text = { Text("Playlist '$successPlaylistName' created successfully!") },
+            confirmButton = {
+                Button(onClick = { showSuccessDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    // Error Dialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { Text("Error") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    Text("OK")
                 }
             }
         )

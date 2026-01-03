@@ -14,6 +14,7 @@ import com.example.ratify.database.Converters
 import com.example.ratify.repository.SongRepository
 import com.example.ratify.repository.StateRepository
 import com.example.ratify.services.PLAYER_STATE_SHARED_PREFS
+import com.example.ratify.services.PlaylistFilterService
 import com.example.ratify.services.TRACK_ARTISTS_SHARED_PREFS
 import com.example.ratify.services.TRACK_NAME_SHARED_PREFS
 import com.example.ratify.services.updateRatingService
@@ -37,7 +38,8 @@ import kotlinx.coroutines.launch
 class SpotifyViewModel(
     application: Application,
     private val songRepository: SongRepository,
-    private val stateRepository: StateRepository
+    private val stateRepository: StateRepository,
+    private val playlistFilterService: PlaylistFilterService
 ): AndroidViewModel(application), ISpotifyViewModel {
     // Keys added in local.properties, accessed in build.gradle
     private val clientId: String by lazy { BuildConfig.SPOTIFY_CLIENT_ID }
@@ -47,13 +49,22 @@ class SpotifyViewModel(
     private val scopes = arrayOf(
         Scopes.STREAMING,
         Scopes.APP_REMOTE_CONTROL,
-        Scopes.USER_READ_PLAYBACK_STATE
+        Scopes.USER_READ_PLAYBACK_STATE,
+        Scopes.PLAYLIST_MODIFY_PRIVATE,
+        Scopes.USER_READ_PRIVATE  // Needed to get user ID for playlist creation
     )
         .map { scope -> scope.value }
         .toTypedArray()
 
     // Allows access to Spotify Remote API
     private var spotifyAppRemote: SpotifyAppRemote? = null
+
+    // Store access token for Web API calls
+    private var accessToken: String? = null
+    override fun setAccessToken(token: String) {
+        accessToken = token
+        Log.d("SpotifyViewModel", "Access token saved")
+    }
 
     // Saves request to launch authentication, done in MainActivity
     private val _authRequest = MutableLiveData<AuthorizationRequest>()
@@ -163,6 +174,10 @@ class SpotifyViewModel(
     private val _currentPlaybackPosition = MutableLiveData<Long>()
     override val currentPlaybackPosition: LiveData<Long> get() = _currentPlaybackPosition
     private var playbackJob: Job? = null
+
+    // Provides status of playlist creation
+    private val _playlistCreationState = MutableLiveData<PlaylistCreationState>(PlaylistCreationState.Idle)
+    override val playlistCreationState: LiveData<PlaylistCreationState> get() = _playlistCreationState
     private fun startUpdatingPlaybackPosition(initialPosition: Long) {
         stopUpdatingPlaybackPosition() // Stop any existing jobs
 
@@ -223,6 +238,7 @@ class SpotifyViewModel(
             is SpotifyEvent.SkipNext -> skipNext()
             is SpotifyEvent.SkipPrevious -> skipPrevious()
             is SpotifyEvent.SeekTo -> seekTo(event.positionMs)
+            is SpotifyEvent.CreatePlaylist -> createPlaylist(event.config)
             is SpotifyEvent.PlayerEventWhenNotConnected -> playerEventWhenNotConnected()
         }
     }
@@ -346,6 +362,83 @@ class SpotifyViewModel(
                     }
                 )
             )
+        }
+    }
+
+    private fun createPlaylist(config: com.example.ratify.core.model.PlaylistCreationConfig) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _playlistCreationState.postValue(PlaylistCreationState.Loading)
+
+                // Check if access token is available
+                val token = accessToken
+                if (token == null) {
+                    Log.e("SpotifyViewModel", "No access token available for playlist creation")
+                    _playlistCreationState.postValue(
+                        PlaylistCreationState.Error("Not authenticated. Please sign in to Spotify.")
+                    )
+                    return@launch
+                }
+
+                // Create Web API service
+                val webApiService = SpotifyWebApiService(token)
+
+                // Get user ID
+                val userId = webApiService.getCurrentUserId()
+                if (userId == null) {
+                    Log.e("SpotifyViewModel", "Failed to get user ID")
+                    _playlistCreationState.postValue(
+                        PlaylistCreationState.Error("Failed to get user information")
+                    )
+                    return@launch
+                }
+
+                // Get filtered song URIs
+                val songUris = playlistFilterService.getFilteredSongUris(config)
+                Log.d("SpotifyViewModel", "Creating playlist with ${songUris.size} tracks")
+
+                if (songUris.isEmpty()) {
+                    _playlistCreationState.postValue(
+                        PlaylistCreationState.Error("No songs match the selected criteria")
+                    )
+                    return@launch
+                }
+
+                // Create playlist with tracks
+                val result = webApiService.createPlaylistWithTracks(
+                    userId = userId,
+                    playlistName = config.playlistName,
+                    trackUris = songUris
+                )
+
+                when (result) {
+                    is PlaylistCreationResult.Success -> {
+                        Log.d("SpotifyViewModel", "Playlist created successfully: ${result.playlistName}")
+                        _playlistCreationState.postValue(
+                            PlaylistCreationState.Success(result.playlistId, result.playlistName)
+                        )
+                        stateRepository.showSnackbar("Playlist '${result.playlistName}' created with ${songUris.size} tracks!")
+                    }
+                    is PlaylistCreationResult.PartialSuccess -> {
+                        Log.w("SpotifyViewModel", "Playlist created with warnings: ${result.message}")
+                        _playlistCreationState.postValue(
+                            PlaylistCreationState.Success(result.playlistId, result.playlistName)
+                        )
+                        stateRepository.showSnackbar("Playlist created (${result.message})")
+                    }
+                    is PlaylistCreationResult.Error -> {
+                        Log.e("SpotifyViewModel", "Failed to create playlist: ${result.message}")
+                        _playlistCreationState.postValue(
+                            PlaylistCreationState.Error(result.message)
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("SpotifyViewModel", "Error creating playlist: ${e.message}", e)
+                _playlistCreationState.postValue(
+                    PlaylistCreationState.Error("Failed to create playlist: ${e.message}")
+                )
+            }
         }
     }
 }

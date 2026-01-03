@@ -21,10 +21,20 @@ interface ISpotifyViewModel {
     val playerState: StateFlow<PlayerState?>
     // Provides information on live playback position by incrementing a timer on song being played
     val currentPlaybackPosition: LiveData<Long>
+    // Provides status of playlist creation
+    val playlistCreationState: LiveData<PlaylistCreationState>
 
     fun setSpotifyAppInstalled(installed: Boolean)
     fun isSpotifyAppInstalled(context: Context): Boolean
+    fun setAccessToken(token: String)
 
     fun onEvent(event: SpotifyEvent)
     fun syncPlaybackPositionNow()
+}
+
+sealed class PlaylistCreationState {
+    object Idle : PlaylistCreationState()
+    object Loading : PlaylistCreationState()
+    data class Success(val playlistId: String, val playlistName: String) : PlaylistCreationState()
+    data class Error(val message: String) : PlaylistCreationState()
 }
